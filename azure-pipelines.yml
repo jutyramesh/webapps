@@ -13,8 +13,8 @@ pool:
 steps:
 - task: Maven@3
   inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
+    mavenPomFile: 
+    mavenOptions: '-Xmx3072m''pom.xml'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
