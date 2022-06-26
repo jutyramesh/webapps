@@ -1,0 +1,286 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.1.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location.",
+				"required": "yes"
+			}
+		},
+		"identityType": {
+			"type": "string",
+			"defaultValue": "SystemAssigned",
+			"allowedValues": [
+				"SystemAssigned"
+			],
+			"metadata": {
+				"description": "The identity type. Only SystemAssigned identities are allowed.",
+				"required": "no"
+			}
+		},
+		"factoryName": {
+			"type": "string",
+			"minLength": 3,
+			"maxLength": 63,
+			"metadata": {
+				"description": "The name of your Data Factory instance.",
+				"required": "yes",
+				"subType": "regex",
+				"pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$"
+			}
+		},
+		"encryptionIdentity": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [
+				""
+			],
+			"metadata": {
+				"description": "The resource id of the user assigned identity to authenticate to customer's key vault. Only system assigned identities are allowed",
+				"required": "no"
+			}
+		},
+		"encryptionKeyName": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [
+				""
+			],
+			"metadata": {
+				"description": "The name of the key in Azure Key Vault to use as Customer Managed Key. Only system assigned identities are allowed ",
+				"required": "no"
+			}
+		},
+		"encryptionKeyVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [
+				""
+			],
+			"metadata": {
+				"description": "The version of the key used for CMK. If not provided, latest version will be used. Only system assigned identities are allowed ",
+				"required": "no"
+			}
+		},
+		"encryptionVaultBaseUrl": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [
+				""
+			],
+			"metadata": {
+				"description": "The url of the Azure Key Vault used for CMK.  Only system assigned identities are allowed",
+				"required": "no"
+			}
+		},
+		"publicNetworkAccess": {
+			"type": "string",
+			"defaultValue": "Enabled",
+			"allowedValues": [
+				"Enabled"
+			],
+			"metadata": {
+				"description": "Whether or not public network access is allowed for the data factory.",
+				"required": "no"
+			}
+		},
+		"repoType": {
+			"type": "string",
+			"defaultValue": "FactoryVSTSConfiguration",
+			"allowedValues": [
+				"FactoryVSTSConfiguration"
+			],
+			"metadata": {
+				"description": "The type of repository to use.",
+				"required": "no"
+			}
+		},
+		"repoAccountName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of the tenant where the source code repository resides.",
+				"required": "no"
+			}
+		},
+		"repoProjectName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of the project where the source code repository resides.",
+				"required": "no"
+			}
+		},
+		"repoCollaborationBranch": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of the branch in the source code repository to use.",
+				"required": "no"
+			}
+		},
+		"repoLastCommitId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The id of the commit to use from the repo. Used only if you do not want to use the latest commit.",
+				"required": "no"
+			}
+		},
+		"repositoryName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of the source code repository.",
+				"required": "no"
+			}
+		},
+		"repoRootFolder": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The root folder to be used in the source code repository.",
+				"required": "no"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Data Factory Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		},
+		"logAnalyticsDestinationType": {
+            "type": "string",
+			"allowedValues": [
+				"resourceSpecific"
+			],
+			"defaultValue": "resourceSpecific",
+            "metadata": {
+                "required": "no",
+                "description": "Defines how to write data to send to Log Analytics. Data can be written into Azure Diagnostics (azureDiagnostics) or Resource-specific (resourceSpecific) tables."
+            }
+        }
+	},
+	"variables": {
+		"factoryApiVersion": "2018-06-01",
+		"integrationRuntimesApiVersion": "2018-06-01",
+		"roleAssignmentsApiVersion": "2018-09-01-preview",
+		"uniqueName": "[uniqueString(parameters('factoryName'))]",
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
+		"repoConfiguration": {
+			"type": "[parameters('repoType')]",
+			"accountName": "[parameters('repoAccountName')]",
+			"projectName": "[parameters('repoProjectName')]",
+			"repositoryName": "[parameters('repositoryName')]",
+			"collaborationBranch": "[parameters('repoCollaborationBranch')]",
+			"rootFolder": "[parameters('repoRootFolder')]"
+		},
+		"encryption": {
+			"identity": {
+				"userAssignedIdentity": "[parameters('encryptionIdentity')]"
+			},
+			"keyName": "[parameters('encryptionKeyName')]",
+			"keyVersion": "[parameters('encryptionKeyVersion')]",
+			"vaultBaseUrl": "[parameters('encryptionVaultBaseUrl')]"
+		},
+		"defaultRoleAssignment": [
+			{
+				"roleDefinitionName": "UNSET",
+				"principalId": "UNSET"
+			}
+		],
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Data Factory Contributor": "673868aa-7521-48a0-acc6-0f60742d39f5",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.DataFactory/factories",
+			"apiVersion": "[variables('factoryApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('factoryName')]",
+			"location": "[parameters('location')]",
+			"identity": {
+				"type": "[parameters('identityType')]"
+			},
+			"properties": {
+				"encryption": "[if(not(empty(parameters('encryptionVaultBaseUrl'))), variables('encryption'), json('null'))]",
+				"publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+				"repoConfiguration": "[if(not(empty(parameters('repositoryName'))), variables('repoConfiguration'), json('null'))]",
+				"resources": [
+					{
+						"name": "string",
+						"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+						"apiVersion": "[variables('integrationRuntimesApiVersion')]",
+						"properties": {
+							"additionalProperties": {},
+							"type": "ManagedIntegrationRuntime"
+						}
+					}
+				]
+			}
+		},
+		{
+			"type": "Microsoft.DataFactory/factories/providers/roleAssignments",
+			"condition": "[not(empty(variables('roleAssignments')))]",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"name": "[concat(parameters('factoryName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName, variables('uniqueName')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.DataFactory/factories', parameters('factoryName'))]"
+			],
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

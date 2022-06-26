@@ -1,0 +1,49 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "actionGroupName": {
+            "type": "string"
+        },
+        "actionGroupShortName": {
+            "type": "string"
+        },
+        "emailsReciever": {
+            "type": "array",
+            "metadata": {
+                "description": "alert email addresses"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2021-09-01",
+            "name": "[parameters('actionGroupName')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "[parameters('actionGroupShortName')]",
+                "enabled": true,
+                "emailReceivers": "[parameters('emailsReciever')]",
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "eventHubReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [],
+                "azureFunctionReceivers": [],
+                "armRoleReceivers": []
+            }
+        }
+    ],
+    "outputs": {
+        "actionGroupId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Insights/actionGroups',parameters('actionGroupName'))]"
+        }
+    }
+}

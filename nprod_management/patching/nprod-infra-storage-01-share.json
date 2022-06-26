@@ -1,0 +1,38 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+			"value": {
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Global Cloud & Platform Service",
+                "Department": "Cloud COE",
+                "CostCenter": "Project LEAP 5001",
+                "EnvType": "Production",
+                "Sensitivity": "Non-Sensitive",
+                "SenType": "Not Applicable",
+                "CCP": "True"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "storageAccountName": {
+            "value": "nprodinfrastorage01"
+        },
+        "shares": {
+            "value": [
+                {
+                    "shareName": "repo-share",
+                    "shareSize": 5120,
+                    "accessTier": "TransactionOptimized"
+                }
+            ]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/storage-shares-template.json"
+    }
+}

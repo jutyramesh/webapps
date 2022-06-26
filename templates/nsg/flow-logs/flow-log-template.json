@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "String"
+        },
+        "name": {
+            "type": "String"
+        },
+        "storageId": {
+            "type": "String"
+        },
+        "targetNSGResourceId": {
+            "type": "String"
+        },
+        "enableFlowLogs": {
+            "type": "Bool"
+        },
+        "version": {
+            "type": "Int"
+        },
+        "retentionPolicyDays": {
+            "type": "Int"
+        },
+        "retentionPolicyEnabled": {
+            "type": "Bool"
+        },
+        "networkWatcherFlowAnalyticsConfiguration": {
+            "type": "object"
+        }
+    },
+    "variables": {
+        "namePrefix": "[concat('NetworkWatcher_', parameters('location'))]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.network/networkwatchers/flowlogs",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(variables('namePrefix'), '/', parameters('name'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "targetResourceId": "[parameters('targetNSGResourceId')]",
+                "storageId": "[parameters('storageId')]",
+                "enabled": "[parameters('enableFlowLogs')]",
+                "format": {
+                    "type": "JSON",
+                    "version": "[parameters('version')]"
+                },
+                "flowAnalyticsConfiguration": {
+                    "networkWatcherFlowAnalyticsConfiguration": "[parameters('networkWatcherFlowAnalyticsConfiguration')]"
+                },
+                "retentionPolicy": {
+                    "days": "[parameters('retentionPolicyDays')]",
+                    "enabled": "[parameters('retentionPolicyEnabled')]"
+                }
+            }
+        }
+    ]
+}

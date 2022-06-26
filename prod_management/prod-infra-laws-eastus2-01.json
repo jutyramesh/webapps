@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "value": "prod-infra-laws-eastus2-01"
+    },
+    "tags": {
+      "value": {
+        "Deployer": "Josh Hetland"
+      }
+    },
+    "sku": {
+      "value": "pergb2018"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "resourcePermissions": {
+      "value": true
+    },
+    "heartbeatTableRetention": {
+      "value": 30
+    }
+  },
+  "deploymentParameters": {
+    "resourceGroup": "prod-infra-monitoring-general-eastus2",
+    "subscription": "wh-prod-management-01",
+    "templateFile": "templates/log-analytics-workspace-template.json"
+  }
+}

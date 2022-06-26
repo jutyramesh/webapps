@@ -1,0 +1,62 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"firewallPolicyName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"applicationRules": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": ""
+			}
+		},
+		"networkRules": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": ""
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"firewallPolicies": "2020-11-01"
+		}
+	},
+	"resources": [
+        {
+            "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+            "apiVersion": "[variables('apiVersions').firewallPolicies]",
+            "name": "[concat(parameters('firewallPolicyName'), '/DefaultApplicationRuleCollectionGroup')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "priority": 300,
+                "ruleCollections": "[parameters('applicationRules')]"
+			}
+		},
+        {
+            "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+            "apiVersion": "[variables('apiVersions').firewallPolicies]",
+            "name": "[concat(parameters('firewallPolicyName'), '/DefaultNetworkRuleCollectionGroup')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultApplicationRuleCollectionGroup')]"
+            ],
+            "properties": {
+                "priority": 200,
+                "ruleCollections": "[parameters('networkRules')]"
+			}
+		}
+	]
+}

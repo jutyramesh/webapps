@@ -1,0 +1,59 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.5.0.0",
+    "parameters": {
+        "injectedValues": {
+            "value": {
+                "envType": "non-production",
+                "geoLocation":"wh"
+
+            }
+        },
+        "tags": {
+            "value": {
+				"LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601",
+                "Sensitivity": "Non-Sensitive",
+                "SenType": "Not Applicable"
+            
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverName": {
+            "value": "dev-datalynx-dataeng-ingest-eastus2-sqlsrv-01"
+        },
+        "subnetId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet02-eastus2/providers/Microsoft.Network/virtualNetworks/wh-datalynx-nprod-int-general-eastus2-vnet-02/subnets/wh-datalynx-nprod-int-general-eastus2-vnet-02-sqlmi01"
+            
+        },
+        "administrators": {
+            "value": [
+                {
+                    "login": "wh-np-dae-contributors",
+                    "sid": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967"
+                }
+            ]
+        },
+        "allowedIpAddresses": {
+            "value": []
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                "roleDefinitionName": "Reader",
+                "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                }
+            ]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/sql-server-template-custom.json"
+    }
+}

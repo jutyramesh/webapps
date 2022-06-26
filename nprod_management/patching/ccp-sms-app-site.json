@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Nick Barber",
+                "CostCenter": "Healthcare Development 5004",
+                "CostCode": "1000609920",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "envType": "Production"
+            }
+        },
+        "location": {
+            "value": "east us 2"
+        },
+        "siteName": {
+            "value": "ccp-sms"
+        },
+        "kind": {
+            "value": "app"
+        },
+        "isLinux": {
+            "value": true
+        },
+        "linuxFxVersion": {
+            "value": "DOCKER"
+        },
+        "alwaysOn": {
+            "value": true
+        },
+        "hostingEnvironmentProfileId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/hostingEnvironments/rpu-nprod-infra-svcs-eastus2-ase-01"
+        },
+        "serverFarmId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/serverFarms/ccp-peering-api-np-l-asp-01"
+        },
+        "containerRegistryName": {
+            "value": "nprodinfraprovisioningagentsacr01"
+        },
+        "containerImageName": {
+            "value": "sms"
+        },
+        "containerImageTagName": {
+            "value": "prod"
+        },
+        "containerRegistryUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.KeyVault/vaults/nprod-infra-kv-01"
+                },
+                "secretName": "ACRUSERNAME"
+            }
+        },
+        "containerRegistryPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.KeyVault/vaults/nprod-infra-kv-01"
+                },
+                "secretName": "ACRPASSWORD"
+            }
+        },
+        "appSettings": {
+            "value": {
+                "SSL_CA_PATH" : "./cert.pem",
+                "APP_DSN": "mssql://prod-infra-services-dbserver.database.windows.net:1433/sms?driver=/opt/microsoft/msodbcsql18/lib64/libmsodbcsql-18.0.so.1.1&authentication=ActiveDirectoryMsi",
+                "RMT_BASE_URL": "https://ccp-repo.walgreens.com"
+            }
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Infrastructure"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/app-service-sites-template.json"
+    }
+}

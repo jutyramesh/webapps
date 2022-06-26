@@ -1,0 +1,927 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.5.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location.",
+				"required": "yes"
+			}
+		},
+		"serverName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the server.",
+				"required": "yes"
+			}
+		},
+		"identityType": {
+			"type": "string",
+			"allowedValues": [
+				"SystemAssigned"
+			],
+			"defaultValue": "SystemAssigned",
+			"metadata": {
+				"description": "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for the resource.",
+				"required": "no"
+			}
+		},
+		"administratorLogin": {
+			"type": "string",
+			"allowedValues": [
+				"AdminUser"
+			],
+			"defaultValue": "AdminUser",
+			"metadata": {
+				"description": "Administrator username for the server. Once created it cannot be changed.",
+				"required": "no"
+			}
+		},
+		"version": {
+			"type": "string",
+			"allowedValues": [
+				"12.0"
+			],
+			"defaultValue": "12.0",
+			"metadata": {
+				"description": "The version of the server.",
+				"required": "no"
+			}
+		},
+		"minimalTlsVersion": {
+			"type": "string",
+			"allowedValues": [
+				"1.2"
+			],
+			"defaultValue": "1.2",
+			"metadata": {
+				"description": "Minimal TLS version. Allowed values: '1.0', '1.1', '1.2'",
+				"required": "no"
+			}
+		},
+		"publicNetworkAccess": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Whether or not public endpoint access is allowed for this server. Value is optional but if passed in, must be 'Enabled' or 'Disabled'",
+				"required": "no"
+			}
+		},
+		"administrators": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Administrator for the server. Only the first element in list will be used. You may simply provide the 'login'. The 'sid' will auto-fill during the build process.",
+				"subType": "object",
+				"subTypeDefinition": {
+					"login": {
+						"type": "string",
+						"metadata": {
+							"description": "Login name of the server administrator.",
+							"required": "yes"
+						}
+					},
+					"sid": {
+						"type": "string",
+						"metadata": {
+							"description": "SID (object ID) of the server administrator.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"allowedIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of firewall rules to be applied to the server",
+				"subType": "object",
+				"subTypeDefinition": {
+					"firewallRuleName": {
+						"type": "string",
+						"metadata": {
+							"description": "Name of the firewall rule",
+							"required": "yes"
+						}
+					},
+					"startIpAddress": {
+						"type": "string",
+						"metadata": {
+							"subType": "ipv4",
+							"description": "The start IP address of the firewall rule. Must be IPv4 format. Use value '0.0.0.0' for all Azure-internal IP addresses.",
+							"required": "yes"
+						}
+					},
+					"endIpAddress": {
+						"type": "string",
+						"metadata": {
+							"subType": "ipv4",
+							"description": "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value '0.0.0.0' for all Azure-internal IP addresses.",
+							"required": "yes"
+						}
+					}
+				}
+			}
+		},
+		"allowedVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"subType": "resourceId",
+				"required": "no",
+                "description": "List of resource IDs of subnets to be applied to the server"
+			}
+		},
+		"allowAzureServices": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"required": "no",
+				"description": "Specifies whether to add All Azure Services.  This opens the SQL Server up to All Azure Services.  For more information, please refer to the [User Responsibilities](./RESPONSIBILITIES.MD##%602.08) documentation."
+			}
+		},
+		"enableAdvancedDataSecurity": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "ADS provides a set of advanced SQL security capabilities, including Data Discovery & Classification, SQL Vulnerability Assessment, and Advanced Threat Protection."
+			}
+		},
+		"securityAlertPolicyName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the security alert policy.",
+				"required": "yes"
+			}
+		},
+		"securityAlertPolicyState": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Specifies the state of the policy, whether it is enabled or disabled or a policy has not been applied yet on the specific database.",
+				"required": "yes"
+			}
+		},
+		"securityAlertPolicyDisabledAlerts": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of alerts that are disabled. Allowed values are: Sql_Injection, Sql_Injection_Vulnerability, Access_Anomaly, Data_Exfiltration, Unsafe_Action",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyEmailAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of e-mail addresses to which the alert is sent.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyEmailAccountAdmins": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies that the alert is sent to the account administrators.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyStorageEndpoint": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the blob storage endpoint (e.g. https://MyAccount.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyStorageAccountAccessKey": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the identifier key of the Threat Detection audit storage account.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyRetentionDays": {
+			"type": "int",
+			"minValue": 60,
+			"defaultValue": 60,
+			"metadata": {
+				"description": "Specifies the number of days to keep in the Threat Detection audit logs.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the vulnerability assessment.",
+				"required": "yes"
+			}
+		},
+		"vulnerabilityAssessmentRecurringScansIsEnabled": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Recurring scans state.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentEmailAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of e-mail addresses to which the alert is sent.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentEmailSubscriptionAdmins": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies that the alert is sent to the account administrators.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentStorageContainerPath": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "A blob storage container path to hold the scan results (e.g. https://myStorage.blob.core.windows.net/VaScans/).",
+				"required": "yes"
+			}
+		},
+		"vulnerabilityAssessmentStorageContainerSasKey": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "A shared access signature (SAS Key) that has read and write access to the blob container specified in 'storageContainerPath' parameter. If 'storageAccountAccessKey' isn't specified, StorageContainerSasKey is required.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentStorageAccountAccessKey": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "Specifies the identifier key of the Threat Detection audit storage account.",
+				"required": "no"
+			}
+		},
+		"subnetId": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet resource ID used to create private link endpoint to SQL server",
+				"required": "yes"
+			}
+		},
+		"databaseName": {
+			"type": "string",
+			"allowedValues": [
+				"master"
+			],
+			"defaultValue": "master",
+			"metadata": {
+				"description": "Name of master database for initial creation.",
+				"required": "yes"
+			}
+		},
+		"databaseKind": {
+			"type": "string",
+			"allowedValues": [
+				"v12.0,user"
+			],
+			"defaultValue": "v12.0,user",
+			"metadata": {
+				"description": "Kind of master database for initial creation.",
+				"required": "no"
+			}
+		},
+		"transparentDataEncryptionName": {
+			"type": "string",
+			"allowedValues": [
+				"current"
+			],
+			"defaultValue": "current",
+			"metadata": {
+				"description": "The name of the transparent data encryption configuration.",
+				"required": "yes"
+			}
+		},
+		"transparentDataEncryptionStatus": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "The status of the database transparent data encryption.",
+				"required": "no"
+			}
+		},
+		"auditingSettingName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the blob auditing policy.",
+				"required": "yes"
+			}
+		},
+		"auditingSettingState": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Specifies the state of the policy. If state is Enabled, storageEndpoint or isAzureMonitorTargetEnabled are required.",
+				"required": "yes"
+			}
+		},
+		"auditingSettingStorageEndpoint": {
+			"type": "string",
+			"allowedValues": [
+				""
+			],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the blob storage endpoint (e.g. https://MyAccount.blob.core.windows.net). If state is Enabled, storageEndpoint or isAzureMonitorTargetEnabled is required.",
+				"required": "no"
+			}
+		},
+		"auditingSettingStorageAccountAccessKey": {
+			"type": "string",
+			"allowedValues": [
+				""
+			],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the identifier key of the auditing storage account. If state is Enabled and storageEndpoint is specified, not specifying the storageAccountAccessKey will use SQL server system-assigned managed identity to access the storage. Prerequisites for using managed identity authentication: 1. Assign SQL Server a system-assigned managed identity in Azure Active Directory (AAD). 2. Grant SQL Server identity access to the storage account by adding 'Storage Blob Data Contributor' RBAC role to the server identity. For more information, see [Auditing to storage using Managed Identity authentication](https://go.microsoft.com/fwlink/?linkid=2114355)",
+				"required": "no"
+			}
+		},
+		"auditingSettingRetentionDays": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Specifies the number of days to keep in the audit logs in the storage account.",
+				"required": "no"
+			}
+		},
+		"auditingSettingAuditActionsAndGroups": {
+			"type": "array",
+			"defaultValue": [
+				"SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+				"FAILED_DATABASE_AUTHENTICATION_GROUP",
+				"BATCH_COMPLETED_GROUP"
+			],
+			"metadata": {
+				"description": "Specifies the Actions-Groups and Actions to audit. The recommended set of action groups to use is the following combination - this will audit all the queries and stored procedures executed against the database, as well as successful and failed logins:  BATCH_COMPLETED_GROUP, SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP, FAILED_DATABASE_AUTHENTICATION_GROUP. This above combination is also the set that is configured by default when enabling auditing from the Azure portal. The supported action groups to audit are (note: choose only specific groups that cover your auditing needs. Using unnecessary groups could lead to very large quantities of audit records): APPLICATION_ROLE_CHANGE_PASSWORD_GROUP BACKUP_RESTORE_GROUP DATABASE_LOGOUT_GROUP DATABASE_OBJECT_CHANGE_GROUP DATABASE_OBJECT_OWNERSHIP_CHANGE_GROUP DATABASE_OBJECT_PERMISSION_CHANGE_GROUP DATABASE_OPERATION_GROUP DATABASE_PERMISSION_CHANGE_GROUP DATABASE_PRINCIPAL_CHANGE_GROUP DATABASE_PRINCIPAL_IMPERSONATION_GROUP DATABASE_ROLE_MEMBER_CHANGE_GROUP FAILED_DATABASE_AUTHENTICATION_GROUP SCHEMA_OBJECT_ACCESS_GROUP SCHEMA_OBJECT_CHANGE_GROUP SCHEMA_OBJECT_OWNERSHIP_CHANGE_GROUP SCHEMA_OBJECT_PERMISSION_CHANGE_GROUP SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP USER_CHANGE_PASSWORD_GROUP BATCH_STARTED_GROUP BATCH_COMPLETED_GROUP  These are groups that cover all sql statements and stored procedures executed against the database, and should not be used in combination with other groups as this will result in duplicate audit logs.  For more information, see [Database-Level Audit Action Groups](https://docs.microsoft.com/en-us/sql/relational-databases/security/auditing/sql-server-audit-action-groups-and-actions#database-level-audit-action-groups).  For Database auditing policy, specific Actions can also be specified (note that Actions cannot be specified for Server auditing policy). The supported actions to audit are: SELECT UPDATE INSERT DELETE EXECUTE RECEIVE REFERENCES  The general form for defining an action to be audited is: {action} ON {object} BY {principal}  Note that <object> in the above format can refer to an object like a table, view, or stored procedure, or an entire database or schema. For the latter cases, the forms DATABASE::{db_name} and SCHEMA::{schema_name} are used, respectively.  For example: SELECT on dbo.myTable by public SELECT on DATABASE::myDatabase by public SELECT on SCHEMA::mySchema by public  For more information, see [Database-Level Audit Actions](https://docs.microsoft.com/en-us/sql/relational-databases/security/auditing/sql-server-audit-action-groups-and-actions#database-level-audit-actions)",
+				"required": "no"
+			}
+		},
+		"auditingSettingStorageAccountSubscriptionId": {
+			"type": "string",
+			"allowedValues": [
+				"00000000-0000-0000-0000-000000000000"
+			],
+			"defaultValue": "00000000-0000-0000-0000-000000000000",
+			"metadata": {
+				"description": "Specifies the blob storage subscription Id.",
+				"required": "no"
+			}
+		},
+		"auditingSettingIsStorageSecondaryKeyInUse": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "Specifies whether storageAccountAccessKey value is the storage's secondary key.",
+				"required": "no"
+			}
+		},
+		"auditingSettingIsAzureMonitorTargetEnabled": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies whether audit events are sent to Azure Monitor.  In order to send the events to Azure Monitor, specify 'state' as 'Enabled' and 'isAzureMonitorTargetEnabled' as true.  When using REST API to configure auditing, Diagnostic Settings with 'SQLSecurityAuditEvents' diagnostic logs category on the database should be also created. Note that for server level audit you should use the 'master' database as {databaseName}.  Diagnostic Settings URI format: PUT https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/providers/microsoft.insights/diagnosticSettings/{settingsName}?api-version=2017-05-01-preview  For more information, see [Diagnostic Settings REST API](https://go.microsoft.com/fwlink/?linkid=2033207) or [Diagnostic Settings PowerShell](https://go.microsoft.com/fwlink/?linkid=2033043) ",
+				"required": "no"
+			}
+		},
+		"auditingSettingQueueDelayMs": {
+			"type": "int",
+			"allowedValues": [
+				1000
+			],
+			"defaultValue": 1000,
+			"metadata": {
+				"description": "Specifies the amount of time in milliseconds that can elapse before audit actions are forced to be processed. The default minimum value is 1000 (1 second). The maximum is 2,147,483,647.",
+				"required": "no"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		},
+		"utcValue": {
+			"type": "string",
+			"defaultValue": "[utcNow()]"
+		}
+	},
+	"variables": {
+		"serverApiVersion": "2019-06-01-preview",
+		"auditingSettingApiVersion": "2017-03-01-preview",
+		"securityAlertPolicyApiVersion": "2020-02-02-preview",
+		"vulnerabilityAssessmentApiVersion": "2018-06-01-preview",
+		"firewallRuleApiVersion": "2015-05-01-preview",
+		"virtualNetworkRuleApiVersion": "2015-05-01-preview",
+		"transparentDataEncryptionApiVersion": "2014-04-01",
+		"networkApiVersion": "2019-04-01",
+		"deploymentsApiVersion": "2017-05-10",
+		"keyVaultApiVersion": "2019-09-01",
+		"roleAssignmentsApiVersion": "2018-09-01-preview",
+		"dnsApiVersion": "2018-09-01",
+		"uniqueName": "[uniqueString(parameters('serverName'))]",
+		"isSensitive": "[equals(parameters('tags').sensitivity, 'Non-Sensitive')]",
+		"isRpu": "[equals(parameters('injectedValues').geoLocation, 'rpu')]",
+		"tenantId": "92cb778e-8ba7-4f34-a011-4ba6e7366996",
+		"administratorLoginPassword": "[concat('P', uniqueString(resourceGroup().id, parameters('utcValue')), 'x', '!')]",
+		"nonSensitiveFirewallRules": [
+			{
+				"firewallRuleName": "preDefined-Standard-VDI1",
+				"startIpAddress": "172.23.196.0",
+				"endIpAddress": "172.23.199.255"
+			},
+			{
+				"firewallRuleName": "preDefined-Standard-VDI2",
+				"startIpAddress": "172.26.104.0",
+				"endIpAddress": "172.26.107.255"				
+			}
+		],
+		"sensitiveFirewallRules": [
+			{
+				"firewallRuleName": "preDefined-Segregated-VDI1",
+				"startIpAddress": "172.23.152.0",
+				"endIpAddress": "172.23.155.255"
+			},
+			{
+				"firewallRuleName": "preDefined-Segregated-VDI2",
+				"startIpAddress": "172.26.108.0",
+				"endIpAddress": "172.26.111.255"
+			}
+		],
+		"azureServicesFirewallRules": [
+			{
+				"firewallRuleName": "preDefined-AzureServices",
+				"startIpAddress": "0.0.0.0",
+				"endIpAddress": "0.0.0.0"
+			}
+		],
+		"predefinedFirewallRules": [
+			{
+				"firewallRuleName": "preDefined-PROD OnPrem Spring Batch Servers",
+				"startIpAddress": "10.238.165.1",
+				"endIpAddress": "10.238.165.126"
+			},
+			{
+				"firewallRuleName": "preDefined-PROD VDI",
+				"startIpAddress": "10.248.109.1",
+				"endIpAddress": "10.248.109.254"
+			},
+			{
+				"firewallRuleName": "preDefined-VDI",
+				"startIpAddress": "10.248.112.1",
+				"endIpAddress": "10.248.119.254"
+			},
+			{
+				"firewallRuleName": "preDefined-VPN",
+				"startIpAddress": "10.222.0.0",
+				"endIpAddress": "10.222.255.255"
+			},
+			{
+				"firewallRuleName": "preDefined-VPN2",
+				"startIpAddress": "10.223.0.0",
+				"endIpAddress": "10.223.255.255"
+			},
+			{
+				"firewallRuleName": "preDefined-WagOffice1",
+				"startIpAddress": "10.237.188.0",
+				"endIpAddress": "10.237.188.255"
+			},
+			{
+				"firewallRuleName": "preDefined-WagOffice2",
+				"startIpAddress": "10.237.184.0",
+				"endIpAddress": "10.237.184.255"
+			}
+		],
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"defaultRpuAdministrator": {
+			"login": "TAS-DBBI-MSSQL",
+			"sid": "e7210bd5-5d0c-4b2a-a8e9-86f8ebbbab3d"
+		},
+		"defaultRpiAdministrator": {
+			"login": "TAS-DBBI-MSSQL",
+			"sid": "e7210bd5-5d0c-4b2a-a8e9-86f8ebbbab3d"
+		},
+		"defaultAdministrator": "[if(variables('isRpu'), variables('defaultRpuAdministrator'), variables('defaultRpiAdministrator'))]",
+		"administrator": "[if(empty(parameters('administrators')), variables('defaultAdministrator'), if(contains(first(parameters('administrators')),'login'), first(parameters('administrators')), variables('defaultADministrator')))]",
+		"copy": [
+			{
+				"name": "parameterDefinedFirewallRules",
+				"count": "[length(parameters('allowedIpAddresses'))]",
+				"input": {
+					"firewallRuleName": "[concat('parameterDefined-', parameters('allowedIpAddresses')[copyIndex('parameterDefinedFirewallRules')].firewallRuleName)]",
+					"startIpAddress": "[parameters('allowedIpAddresses')[copyIndex('parameterDefinedFirewallRules')].startIpAddress]",
+					"endIpAddress": "[parameters('allowedIpAddresses')[copyIndex('parameterDefinedFirewallRules')].endIpAddress]"
+				}
+			},
+			{
+				"name": "allowedVirtualNetworks",
+				"count": "[length(parameters('allowedVirtualNetworks'))]",
+				"input": {
+					"virtualNetworkRuleName": "[last(split(parameters('allowedVirtualNetworks')[copyIndex('allowedVirtualNetworks')], '/'))]",
+					"virtualNetworkSubnetId": "[parameters('allowedVirtualNetworks')[copyIndex('allowedVirtualNetworks')]]",
+					"ignoreMissingVnetServiceEndpoint": false					
+				}
+			}
+		],
+		"defaultVirtualNetworkRule": {
+			"virtualNetworkRuleName": "UNSET",
+			"virtualNetworkSubnetId": "",
+			"ignoreMissingVnetServiceEndpoint": false
+		},
+		"virtualNetworkRules": "[if(empty(parameters('allowedVirtualNetworks')), array(variables('defaultVirtualNetworkRule')), variables('allowedVirtualNetworks'))]",
+		"rpuKeyVault": {
+			"vaultName": "prod-rpu-sqldb-kv-02",
+			"resourceGroup": "prod-infra-sqldb-keyvaults-01",
+			"subscriptionId": "5667cdb6-b56a-40c3-8cba-d9c9d8c423b4"
+		},
+		"rpiKeyVault": {
+			"vaultName": "prod-rpi-sqldb-kv-02",
+			"resourceGroup": "prod-infra-sqldb-keyvaults-01",
+			"subscriptionId": "5667cdb6-b56a-40c3-8cba-d9c9d8c423b4"		
+		},
+		"storageAccounts": {
+			"rpu": {
+				"production": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/prod-sql-vulnerability-scan-eastus2-01/providers/Microsoft.Storage/storageAccounts/prodsqlvulscanrpu01",
+				"non-production": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/nprod-sql-vulnerability-scan-eastus2-01/providers/Microsoft.Storage/storageAccounts/nprodsqlvulscanrpu01"
+			},
+			"rpi": {
+				"production": "/subscriptions/65b8775a-2737-4d6c-91ab-50b8c6607d40/resourceGroups/prod-sql-vulnerability-scan-northeurope-01/providers/Microsoft.Storage/storageAccounts/prodsqlvulscanrpi01",
+				"non-production": "/subscriptions/65b8775a-2737-4d6c-91ab-50b8c6607d40/resourceGroups/nprod-sql-vulnerability-scan-northeurope-01/providers/Microsoft.Storage/storageAccounts/nprodsqlvulscanrpi01"
+			}
+		},
+		"keyVault": "[if(equals(parameters('injectedValues').geoLocation,'rpu'), variables('rpuKeyVault'), variables('rpiKeyVault'))]",
+		"firewallRules": "[union(variables('predefinedFirewallRules'), if(variables('isSensitive'), variables('sensitiveFirewallRules'), variables('nonSensitiveFirewallRules')), variables('parameterDefinedFirewallRules'), if(parameters('allowAzureServices'), variables('azureServicesFirewallRules'),createArray()))]",
+		"administratorLoginSecretName": "[concat(parameters('serverName'), '-AdminUser')]",
+		"administratorLoginPasswordSecretName": "[concat(parameters('serverName'), '-AdminPassword')]",
+		"subnet": {
+			"subscriptionId": "[split(parameters('subnetId'), '/')[2]]",
+			"resourceGroup": "[split(parameters('subnetId'), '/')[4]]",
+			"virtualNetwork": "[split(parameters('subnetId'), '/')[8]]",
+			"name": "[split(parameters('subnetId'), '/')[10]]"
+		},
+		"serviceEndpoint": [
+			{
+				"service": "Microsoft.Sql",
+				"locations": [
+					"[replace(toLower(parameters('location')), ' ', '')]"
+				]
+			}
+		],
+		"dns": {
+			"subscriptionId": "5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0",
+			"resourceGroup": "prod-infra-network-plink-eastus2-01",
+			"zoneName": "privatelink.database.windows.net"
+		},
+		"storageAccount": {
+			"id": "[variables('storageAccounts')[parameters('injectedValues').geoLocation][parameters('injectedValues').envType]]",
+			"subscriptionId": "[split(variables('storageAccounts')[parameters('injectedValues').geoLocation][parameters('injectedValues').envType], '/')[2]]",
+			"resourceGroup": "[split(variables('storageAccounts')[parameters('injectedValues').geoLocation][parameters('injectedValues').envType], '/')[4]]",
+			"name": "[split(variables('storageAccounts')[parameters('injectedValues').geoLocation][parameters('injectedValues').envType], '/')[8]]"
+		},
+		"storageAccountEndpoint": "[concat('https://', variables('storageAccount').name, '.blob.core.windows.net/')]",
+		"storageContainerPath": "[concat('https://', variables('storageAccount').name, '.blob.core.windows.net/vulnerability-assessments/')]",
+		"privateEndpointName": "[concat(parameters('serverName'), '-privateEndpoint')]",
+		"Storage Blob Data Contributor": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+		"WBA - LEAP - Resource Deletion":  "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('deploymentsApiVersion')]",
+			"name": "disablePrivateEndpointPolicy",
+			"resourceGroup": "[variables('subnet').resourceGroup]",
+			"subscriptionId": "[variables('subnet').subscriptionId]",
+			"properties": {
+				"mode": "Incremental",
+				"template": {
+					"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+					"contentVersion": "1.0.0.0",
+					"parameters": {},
+					"variables": {},
+					"resources": [
+						{
+							"type": "Microsoft.Network/virtualNetworks/subnets",
+							"apiVersion": "[variables('networkApiVersion')]",
+							"name": "[concat(variables('subnet').virtualNetwork, '/', variables('subnet').name)]",
+							"properties": {
+								"addressPrefix": "[reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.addressPrefix]",
+								"networkSecurityGroup": "[if(contains(reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties, 'networkSecurityGroup'), reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.networkSecurityGroup, json('null'))]",
+								"routeTable": "[if(contains(reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties, 'routeTable'), reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.routeTable, json('null'))]",
+								"serviceEndpoints": "[if(contains(reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties, 'serviceEndpoints'), reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.serviceEndpoints, json('null'))]",
+								"privateEndpoints": "[if(contains(reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties, 'privateEndpoints'), reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.privateEndpoints, json('null'))]",
+								"delegations": "[if(contains(reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties, 'delegations'), reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.delegations, json('null'))]",
+								"privateLinkServiceNetworkPolicies": "[reference(parameters('subnetId'), variables('networkApiVersion'), 'Full').properties.privateLinkServiceNetworkPolicies]",
+								"privateEndpointNetworkPolicies": "Disabled"
+							}
+						}
+					]
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers",
+			"apiVersion": "[variables('serverApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('serverName')]",
+			"location": "[parameters('location')]",
+			"identity": {
+				"type": "[parameters('identityType')]"
+			},
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"administratorLogin": "[parameters('administratorLogin')]",
+				"administratorLoginPassword": "[variables('administratorLoginPassword')]",
+				"version": "[parameters('version')]",
+				"minimalTlsVersion": "[parameters('minimalTlsVersion')]",
+				"publicNetworkAccess": "[parameters('publicNetworkAccess')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/securityAlertPolicies",
+			"apiVersion": "[variables('securityAlertPolicyApiVersion')]",
+			"condition": "[parameters('enableAdvancedDataSecurity')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('securityAlertPolicyName'))]",
+			"properties": {
+				"state": "[parameters('securityAlertPolicyState')]",
+				"disabledAlerts": "[parameters('securityAlertPolicyDisabledAlerts')]",
+				"emailAddresses": "[parameters('securityAlertPolicyEmailAddresses')]",
+				"emailAccountAdmins": "[parameters('securityAlertPolicyEmailAccountAdmins')]",
+				"storageEndpoint": "[json('null')]",
+				"storageAccountAccessKey": "[json('null')]",
+				"retentionDays": "[parameters('securityAlertPolicyRetentionDays')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/vulnerabilityAssessments",
+			"apiVersion": "[variables('vulnerabilityAssessmentApiVersion')]",
+			"condition": "[parameters('enableAdvancedDataSecurity')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]",
+				"[resourceId('Microsoft.Sql/servers/securityAlertPolicies', parameters('serverName'), parameters('securityAlertPolicyName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('vulnerabilityAssessmentName'))]",
+			"properties": {
+				"storageContainerPath": "[variables('storageContainerPath')]",
+				"storageContainerSasKey": "[json('null')]",
+				"storageAccountAccessKey": "[json('null')]",
+				"recurringScans": {
+					"isEnabled": "[parameters('vulnerabilityAssessmentRecurringScansIsEnabled')]",
+					"emailSubscriptionAdmins": "[parameters('vulnerabilityAssessmentEmailSubscriptionAdmins')]",
+					"emails": "[parameters('vulnerabilityAssessmentEmailAddresses')]"
+				}
+			}
+		},
+		
+		{
+			"type": "Microsoft.Sql/servers/auditingSettings",
+			"apiVersion": "[variables('auditingSettingApiVersion')]",
+			"name": "[concat(parameters('serverName'), '/', parameters('auditingSettingName'))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"properties": {
+				"state": "[parameters('auditingSettingState')]",
+				"retentionDays": "[parameters('auditingSettingRetentionDays')]",
+				"auditActionsAndGroups": "[parameters('auditingSettingAuditActionsAndGroups')]",
+				"storageAccountSubscriptionId": "[parameters('auditingSettingStorageAccountSubscriptionId')]",
+				"storageEndpoint": "[parameters('auditingSettingStorageEndpoint')]",
+				"storageAccountAccessKey": "[parameters('auditingSettingStorageAccountAccessKey')]",
+				"isStorageSecondaryKeyInUse": "[parameters('auditingSettingIsStorageSecondaryKeyInUse')]",
+				"isAzureMonitorTargetEnabled": "[parameters('auditingSettingIsAzureMonitorTargetEnabled')]",
+				"queueDelayMs": "[parameters('auditingSettingQueueDelayMs')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/extendedAuditingSettings",
+			"apiVersion": "[variables('auditingSettingApiVersion')]",
+			"name": "[concat(parameters('serverName'), '/Default')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"properties": {
+				"state": "[parameters('auditingSettingState')]",
+				"retentionDays": "[parameters('auditingSettingRetentionDays')]",
+				"auditActionsAndGroups": "[parameters('auditingSettingAuditActionsAndGroups')]",
+				"storageAccountSubscriptionId": "[parameters('auditingSettingStorageAccountSubscriptionId')]",
+				"storageEndpoint": "[parameters('auditingSettingStorageEndpoint')]",
+				"storageAccountAccessKey": "[parameters('auditingSettingStorageAccountAccessKey')]",
+				"isStorageSecondaryKeyInUse": "[parameters('auditingSettingIsStorageSecondaryKeyInUse')]",
+				"isAzureMonitorTargetEnabled": "[parameters('auditingSettingIsAzureMonitorTargetEnabled')]",
+				"queueDelayMs": "[parameters('auditingSettingQueueDelayMs')]"
+			}
+		},
+
+		{
+			"type": "Microsoft.Sql/servers/administrators",
+			"apiVersion": "[variables('serverApiVersion')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"			
+			],
+			"name": "[concat(parameters('serverName'), '/activeDirectory')]",
+			"properties": {
+				"administratorType": "ActiveDirectory",
+				"login": "[variables('administrator').login]",
+				"sid": "[variables('administrator').sid]",
+				"tenantId": "[variables('tenantId')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/firewallRules",
+			"apiVersion": "[variables('firewallRuleApiVersion')]",
+			"condition": "[not(empty(variables('firewallRules')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"			
+			],
+			"name": "[concat(parameters('serverName'), '/', variables('firewallRules')[copyIndex()].firewallRuleName)]",
+			"properties": {
+				"startIpAddress": "[variables('firewallRules')[copyIndex()].startIpAddress]",
+				"endIpAddress": "[variables('firewallRules')[copyIndex()].endIpAddress]"
+			},
+			"copy": {
+				"name": "firewallRulesCopy",
+				"count": "[length(variables('firewallRules'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/virtualNetworkRules",
+			"apiVersion": "[variables('virtualNetworkRuleApiVersion')]",
+			"condition": "[not(empty(parameters('allowedVirtualNetworks')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', variables('virtualNetworkRules')[copyIndex()].virtualNetworkRuleName)]",
+			"properties": {
+				"virtualNetworkSubnetId": "[variables('virtualNetworkRules')[copyIndex()].virtualNetworkSubnetId]",
+				"ignoreMissingVnetServiceEndpoint": "[variables('virtualNetworkRules')[copyIndex()].ignoreMissingVnetServiceEndpoint]"
+			},
+			"copy": {
+				"name": "virtualNetworkRulesCopy",
+				"count": "[length(variables('virtualNetworkRules'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases",
+			"apiVersion": "[variables('serverApiVersion')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'))]",
+			"location": "[parameters('location')]",
+			"kind": "[parameters('databaseKind')]",
+			"tags": "[parameters('tags')]",
+			"properties": {}
+		},
+		{
+			"type": "Microsoft.Sql/servers/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Network/privateEndpoints",
+			"apiVersion": "[variables('networkApiVersion')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers', parameters('serverName'))]",
+				"disablePrivateEndpointPolicy"
+			],
+			"name": "[variables('privateEndpointName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"subnet": {
+					"id": "[parameters('subnetId')]"
+				},
+				"privateLinkServiceConnections": [
+					{
+						"name": "[concat(parameters('serverName'), '-privateEndpointConnection')]",
+						"properties": {
+							"privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]",
+							"groupIds": ["sqlServer"],
+							"requestMessage": ""
+						}
+					}
+				]
+			}
+		}
+	]
+}

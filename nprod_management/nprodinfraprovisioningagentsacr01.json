@@ -1,0 +1,66 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "registryName": {
+            "value": "nprodinfraprovisioningagentsacr01"
+        },
+        "retentionPolicyDays": {
+            "value": 1
+        },
+        "allowedVirtualNetworks": {
+            "value": [
+                "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn01",
+                "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn02",
+                "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn03"
+            ]
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "AcrPull",
+                    "principalId": "8473f4a8-3aee-4561-9c6e-29b3b2b6b554"
+                },
+                {
+                    "roleDefinitionName": "AcrPush",
+                    "principalId": "4147b0be-6f45-457a-a702-bf22e83235b3"
+                },
+                {
+                    "roleDefinitionName": "AcrPull",
+                    "principalId": "4147b0be-6f45-457a-a702-bf22e83235b3"
+                },
+                {
+                    "roleDefinitionName": "AcrPull",
+                    "principalId": "0337c9aa-2600-4f7e-a26e-3c5f96d57c76"
+                },
+                {
+                    "roleDefinitionName": "AcrPull",
+                    "principalId": "00c3461c-e082-4192-8bcd-9dceb861625b"
+                }
+            ]
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Non-Production"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "dependencies": [
+            "nprod_management/wh-int-infra-eastus2-vnet-01-sn01.json",
+            "nprod_management/wh-int-infra-eastus2-vnet-01-sn02.json",
+            "nprod_management/wh-int-infra-eastus2-vnet-01-sn03.json"
+        ],
+        "resourceGroup": "nprod-infra-provisioning-agents-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/acr-template.json"
+    }
+}

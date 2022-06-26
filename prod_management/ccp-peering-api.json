@@ -1,0 +1,63 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.2.2.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "siteName": {
+            "value": "ccp-peering-api"
+        },
+        "kind": {
+            "value": "app"
+        },
+        "serverFarmId": {
+            "value": "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-services-hosting-eastus2/providers/Microsoft.Web/serverFarms/ccp-peering-api-p-l-asp-01"
+        },
+        "hostingEnvironmentProfileId": {
+            "value": "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-services-hosting-eastus2/providers/Microsoft.Web/hostingEnvironments/rpu-prod-infra-svcs-eastus2-ase-01"
+        },
+        "isLinux": {
+            "value": true
+        },
+        "linuxFxVersion": {
+            "value": "DOCKER"
+        },
+        "alwaysOn": {
+            "value": true
+        },
+        "containerRegistryName": {
+            "value": "prodinfraprvagentsacr01"
+        },
+        "containerImageName": {
+            "value": "ccp-peering-api"
+        },
+        "containerImageTagName": {
+            "value": "latest"
+        },
+        "appSettings": {
+            "value": {
+              "HUB_RESOURCE_ID": "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/wh-mgmt-prod-int-phub-eastus2-rg/providers/Microsoft.Network/virtualHubs/wh-mgmt-prod-int-phub-eastus2-vhub-01",
+              "ALLOWED_OBJECT_IDS":"74942ba3-129a-4d1d-9321-f13a020dc6fc"
+            }
+        },
+        "identityType": {
+            "value": "SystemAssigned"
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Infrastructure"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "prod-infra-services-hosting-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/app-service-sites-template.json"
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "appserviceblobrestore"
+        },
+        "resourceID": {
+            "value": "/subscriptions/fed95c52-b08a-4a4c-b750-3f5fdce752e0/resourceGroups/todaytest/providers/Microsoft.Web/sites/cloudtest001"
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/fed95c52-b08a-4a4c-b750-3f5fdce752e0/resourceGroups/todaytest/providers/microsoft.insights/actiongroups/Application Insights Smart Detection"
+        },
+        "allOf": {
+            "value": [
+                {
+                    "field": "category",
+                    "equals": "Administrative"
+                },
+                {
+                    "field": "operationName",
+                    "equals": "microsoft.web/sites/restorefrombackupblob/action"
+                }
+            ]
+        }
+    },
+        "deploymentParameters": {
+            "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+            "subscription": "wh-nprod-management-01",
+            "templateFile": "templates/monitoring/alerts/alert-activity-template.json"
+        }
+}

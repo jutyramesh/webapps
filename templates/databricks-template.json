@@ -1,0 +1,406 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "2.0.0.0",
+  "parameters": {
+    "injectedValues": {
+      "type": "object",
+      "defaultValue": {}
+    },
+    "tags": {
+      "type": "object",
+			"metadata": {
+				"description": "The tags of the resource.",
+				"required": "yes"
+			}
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The geo-location where the resource lives",
+        "required": "yes"
+      }
+    },
+    "workspaceName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64,
+      "metadata": {
+        "description": "The name of the databricks workspace.",
+        "required": "yes",
+        "subType": "regex",
+				"pattern": "^[a-zA-Z0-9_-]*$"
+      }
+    },
+    "authorizations": {
+      "type": "array",
+      "defaultValue": [],
+      "allowedValues": [[]],
+      "metadata": {
+        "description": "The workspace provider authorizations.",
+        "required": "no",
+        "subType": "object",
+        "subTypeDefinition": {
+          "principalId": {
+            "type": "string",
+            "metadata": {
+              "description": "The provider's principal identifier. This is the identity that the provider will use to call ARM to manage the workspace resources.",
+              "required": "yes"
+            }
+          },
+          "roleDefinitionId": {
+            "type": "string",
+            "metadata": {
+              "description": "The provider's role definition identifier. This role will define all the permissions that the provider must have on the workspace's container resource group. This role definition cannot have permission to delete the resource group.",
+              "required": "yes"
+            }
+          }
+        }
+      }
+    },
+    "managedResourceGroupId": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The managed resource group is auto-generated in the variables section so this parameter is not used.",
+        "required": "no"
+      }
+    },
+    "amlWorkspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The full resource id of an Azure Machine Learning workspace to link with Databricks workspace.",
+        "required": "no"
+      }
+    },
+    "customPrivateSubnetId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The full resource id of the private subnet.",
+        "subType": "resourceId",
+        "required": "yes"
+      }
+    },
+    "customPublicSubnetId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The full resource id of the public subnet.",
+        "subType": "resourceId",
+        "required": "yes"
+      }
+    },
+		"enableNoPublicIp": {
+			"type": "bool",
+			"defaultValue": true,
+			"allowedValues": [
+			   true	
+			],
+			"metadata": {
+				"description": "Public IPs are not allowed for databricks.",
+				"required": "no"
+			}
+		},
+    "keyvaultResourceId": {
+			"type": "string",			
+			"metadata": {
+				"description": "The resource id of the key vault where the keys are stored.",
+				"required": "yes"
+			}
+		},
+    "encryptionKeyName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The name of the key that holds the databricks token. Microsoft generated keys are used so this parameter is not needed.",
+        "required": "no"
+      }
+    },
+    "encryptionKeySource": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The encryption key must be stored in a key vault.Microsoft generated keys are used so this parameter is not needed",
+        "required": "no"
+      }
+    },
+    "encryptionKeyVaultUri": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The Uri of KeyVault. Microsoft generated keys are used so this parameter is not needed",
+        "required": "no"
+      }
+    },
+    "encryptionKeyVersion": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "The version of KeyVault key. Microsoft generated keys are used so this parameter is not needed.",
+        "required": "no"
+      }
+    },
+    "loadBalancerBackendPoolName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Name of the outbound Load Balancer Backend Pool for Secure Cluster Connectivity (No Public IP).",
+        "required": "no"
+      }
+    },
+    "loadBalancerId": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Resource URI of Outbound Load balancer for Secure Cluster Connectivity (No Public IP) workspace.",
+        "required": "no"
+      }
+    },
+    "natGatewayName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Name of the NAT gateway for Secure Cluster Connectivity (No Public IP) workspace subnets. ",
+        "required": "no"
+      }
+    },
+    "prepareEncryption": {
+      "type": "bool",
+      "defaultValue": false,
+			"allowedValues": [
+			   false	
+			],
+      "metadata": {
+        "description": "Prepare the workspace for encryption. Enables the Managed Identity for managed storage account.",
+        "required": "no"
+      }
+    },
+    "publicIpName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Name of the Public IP for No Public IP workspace with managed vNet.",
+        "required": "no"
+      }
+    },
+    "requireInfrastructureEncryption": {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        false
+      ],
+      "metadata": {
+        "description": "The value which should be used for this field.",
+        "required": "no"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Default DBFS storage account name",
+        "required": "no"
+      }
+    },
+    "storageAccountSku": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Storage account SKU name, ex: Standard_GRS, Standard_LRS. Refer https://aka.ms/storageskus for valid inputs",
+        "required": "no"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [ "" ],
+      "metadata": {
+        "description": "Address prefix for Managed virtual network. Default value for this input is 10.139",
+        "required": "yes"
+      }
+    },
+    "skuTier": {
+      "type": "string",
+      "defaultValue": "Premium",
+      "allowedValues": [
+        "Premium"
+      ],
+      "metadata": {
+        "description": "The SKU tier. Only Premium tier is allowed.",
+        "required": "no"
+      }
+    },
+    "roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities.",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+  },
+  "variables": {
+    "workspaceApiVersion": "2018-04-01",
+    "roleAssignmentsApiVersion": "2019-04-01-preview",
+    "uniqueName": "[uniqueString(parameters('workspaceName'))]",
+		"authorizations": "[if(empty(parameters('authorizations')), createArray(), parameters('authorizations'))]",
+    "defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+		"managedResourceGroupName": "[concat('databricks-rg-', parameters('workspaceName'), '-', uniqueString(parameters('workspaceName'), resourceGroup().id))]",
+    "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', variables('managedResourceGroupName'))]",
+    "privateSubnet": {
+      "subscriptionId": "[split(parameters('customPrivateSubnetId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('customPrivateSubnetId'), '/')[4]]",
+      "virtualNetwork": "[split(parameters('customPrivateSubnetId'), '/')[8]]",
+      "name": "[split(parameters('customPrivateSubnetId'), '/')[10]]"
+    },
+    "vnetId": "[resourceId(variables('privateSubnet').subscriptionId, variables('privateSubnet').resourceGroup, 'Microsoft.Network/virtualNetworks', variables('privateSubnet').virtualNetwork)]",
+    "publicSubnetName": "[split(parameters('customPublicSubnetId'), '/')[10]]",
+    "requiredParameters": { 
+      "customPrivateSubnetName": {
+        "value": "[variables('privateSubnet').name]"
+      },
+      "customPublicSubnetName": {
+        "value": "[variables('publicSubnetName')]"
+      },
+      "customVirtualNetworkId": {
+        "value": "[variables('vnetId')]"
+      },
+      "enableNoPublicIp": {
+        "value": "[parameters('enableNoPublicIp')]"
+      },
+      "prepareEncryption": {
+        "value": "[parameters('prepareEncryption')]"
+      },
+      "requireInfrastructureEncryption": {
+        "value": "[parameters('requireInfrastructureEncryption')]"
+      }
+    },
+    "useAmlWorkspace": "[not(empty(parameters('amlWorkspaceId')))]",
+    "amlWorkspaceObject": {
+       "amlWorkspaceId": {
+         "value": "[parameters('amlWorkspaceId')]"
+       }
+    },
+    "amlWorkspace": "[if(variables('useAmlWorkspace'), variables('amlWorkspaceObject'), createObject())]",
+    "useLoadBalancer": "[not(empty(parameters('loadBalancerId')))]",
+    "loadBalancerObject": {
+      "loadBalancerBackendPoolName": {
+        "value": "[parameters('loadBalancerBackendPoolName')]"
+      },
+      "loadBalancerId": {
+        "value": "[parameters('loadBalancerId')]"
+      },
+      "natGatewayName": {
+        "value": "[parameters('natGatewayName')]"
+      }
+    },
+    "loadBalancer": "[if(variables('useLoadBalancer'), variables('loadBalancerObject'), createObject())]",
+    "usePublicIp": "[not(parameters('enableNoPublicIp'))]",
+    "publicIpObject": {
+      "publicIpName": {
+        "value": "[parameters('publicIpName')]"
+      }
+    },
+    "publicIp": "[if(variables('usepublicIp'), variables('publicIpObject'), createObject())]",
+    "useDbfsStorage": "[not(empty(parameters('storageAccountName')))]",
+    "dbfsStorageObject": {
+      "storageAccountName": {
+        "value": "[parameters('storageAccountName')]"
+      },
+      "storageAccountSku": {
+        "value": "[if(not(empty(parameters('storageAccountSku'))), parameters('storageAccountSku'), json('null'))]"
+      }
+    },
+    "dbfsStorage": "[if(variables('useDbfsStorage'), variables('dbfsStorageObject'), createObject())]",
+    "useManagedVnet": "[not(empty(parameters('vnetAddressPrefix')))]",
+    "managedVnetObject": {
+      "vnetAddressPrefix": {
+        "value": "[if(not(empty(parameters('vnetAddressPrefix'))), parameters('vnetAddressPrefix'), json('null'))]"
+      }
+    },
+    "managedVnet": "[if(variables('useManagedVnet'), variables('managedVnetObject'), createObject())]",
+    "useEncryption": "[parameters('prepareEncryption')]",
+    "encryptionObject": {
+       "encryption": {
+         "keyname": "[parameters('encryptionKeyName')]",
+         "keysource": "[parameters('encryptionKeySource')]",
+         "keyvaulturi": "[parameters('encryptionKeyVaultUri')]",
+         "keyVersion": "[parameters('encryptionKeyVersion')]"
+       }
+		},
+    "encryption": "[if(variables('useEncryption'), variables('encryptionObject'), createObject())]",
+    "workspaceParameters" : "[union(variables('requiredParameters'), variables('amlWorkspace'), variables('loadBalancer'), variables('publicIp'), variables('dbfsStorage'), variables('managedVnet'), variables('encryption'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "[variables('workspaceApiVersion')]",
+      "condition": true,
+      "dependsOn": [],
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('skuTier')]"
+      },
+      "properties": {
+        "authorizations": "[variables('authorizations')]",
+        "managedResourceGroupId": "[variables('managedResourceGroupId')]",
+        "parameters": "[variables('workspaceParameters')]" 
+      }
+    },
+    {
+			"type": "Microsoft.Databricks/workspaces/providers/roleAssignments",
+			"apiVersion": "2017-05-01",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Databricks/workspaces', parameters('workspaceName'))]"
+			],
+			"name": "[concat(parameters('workspaceName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+  ]
+}

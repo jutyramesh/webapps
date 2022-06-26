@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "actionGroupName": {
+            "value": "WH-CCP-NPROD"
+        },
+        "actionGroupShortName": {
+            "value": "WH-CCP"
+        },
+        "emailsReciever": {
+            "value": [
+                {
+                    "name": "WH-CCP",
+                    "emailAddress": "commoncloudplatform@walgreens.com",
+                    "useCommonAlertSchema": true
+                }
+            ]
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "templateFile": "templates/monitoring/alerts/action-group-template.json"
+    }
+}

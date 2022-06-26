@@ -1,0 +1,55 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "3.2.0.0",
+    "parameters": {
+        "tags": {
+			"value": {
+                "Deployer": "Nick Barber",
+                "CostCenter": "Healthcare Development 5004",
+                "CostCode": "1000609920",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "envType": "Production"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "vaultName": {
+            "value": "nprod-infra-kv-01"
+        },
+        "accessPolicies": {
+            "value": []
+        },
+        "enabledForDeployment": {
+            "value": false
+        },
+        "enabledForDiskEncryption": {
+            "value": false
+        },
+        "softDeleteRetentionInDays": {
+            "value": 90
+        },
+        "enableRbacAuthorization": {
+            "value": false
+        },
+        "networkAclsBypass": {
+            "value": "AzureServices"
+        },
+        "allowedIpAddresses": {
+            "value": []
+        },
+        "allowedVirtualNetworks": {
+            "value": []
+        },
+        "roleAssignments": {
+            "value": []
+        }
+    },
+    "deploymentParameters": {
+	"resourceGroup": "nprod-infra-services-hosting-eastus2",
+	"subscription": "wh-nprod-management-01",
+	"templateFile": "templates/keyvault-template.json"
+    }
+}

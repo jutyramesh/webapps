@@ -1,0 +1,79 @@
+/*
+DESCRIPTION: Adding multiple VMs (NIC) to a Load Balancer backend pool 
+
+DEPLOYMENTS: Deploy VMs to existing LB backend pool 
+
+REQUIRMENTS: When adding VMs in an availiablity set this template will only work if the Load balancer is a standard SKU
+
+DATE: 6/26/20
+
+MODIFIED BY: Heng Yon
+*/
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmsNicName": {
+            "type": "array",
+            "metadata": {
+                "description": "list of virtual machine(s) name"
+            }
+        },
+        "subnetID": {
+            "type": "string",
+            "metadata": {
+                "description": "/subscriptions/<SubID>/resourceGroups/<RGName>//providers/Microsoft.Network/virtualNetworks/sbx-network-lap/Subnets/<backend pool>"
+            }
+        },
+        "lbBackendAddressPoolsID": {
+            "type": "string",
+            "metadata": {
+                "description": "/subscriptions/<SubID>/resourceGroups/<RGName>/providers/Microsoft.Network/loadBalancers/<lb name>/backendAddressPools/<backend pool>"
+            }
+        }
+
+    },
+    "resources": [
+        /*
+            DESCRIPTION: Update nic(s) and assigned them to the backend pool. The deployment loops through the list of vms nic name 
+            
+            USAGE: Required for vm creation 
+
+            OUTPUT: Nic(s) linked to the provided load balancer backend pool 
+        */
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('vmsNicName')[copyIndex()]]",
+             "copy": {
+                "name": "nicLoop",
+                "count": "[length(parameters('vmsNicName'))]"
+            },
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+
+                        "properties": {
+                            "subnet": {
+                                "id": "[parameters('subnetID')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[parameters('lbBackendAddressPoolsID')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "deploymentStatus": {
+            "type": "string",
+            "value": "Deployment Successful"
+        }
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "baseRules": {
+        "value": [
+            {
+                "name": "Inbound_VirtualDesktop_Allow",
+                "properties": {
+                    "description": "Allow desktop pools inbound to subnet",
+                    "priority": 4025,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "sourceAddressPrefixes": [
+                        "10.0.4.0/22",
+                        "10.0.8.0/22",
+                        "10.0.12.0/22"
+                    ],
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Inbound_VPN_Allow",
+                "properties": {
+                    "description": "Allow VPN sources inbound to subnet",
+                    "priority": 4026,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "sourceAddressPrefixes": [
+                        "192.168.1.0/24"
+                    ],
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Inbound_Internal_Deny",
+                "properties": {
+                    "description": "Deny all private inbound traffic",
+                    "priority": 4050,
+                    "direction": "Inbound",
+                    "access": "Deny",
+                    "protocol": "*",
+                    "sourceAddressPrefixes": [
+                        "10.0.0.0/8",
+                        "172.16.0.0/12",
+                        "192.168.0.0/16"
+                    ],
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Inbound_Internet_Deny",
+                "properties": {
+                    "description": "Deny all internet inbound traffic",
+                    "priority": 4051,
+                    "direction": "Inbound",
+                    "access": "Deny",
+                    "protocol": "*",
+                    "sourceAddressPrefix": "Internet",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Outbound_Internal_Deny",
+                "properties": {
+                    "description": "Deny all private outbound traffic",
+                    "priority": 4052,
+                    "direction": "Outbound",
+                    "access": "Deny",
+                    "protocol": "*",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefixes": [
+                        "10.0.0.0/8",
+                        "172.16.0.0/12",
+                        "192.168.0.0/16"
+                    ],
+                    "destinationPortRange": "*"
+                }
+            }
+        ]
+    }
+}

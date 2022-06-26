@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"virtualNetworkName": {
+			"value": "wh-int-nhub-eastus2-vnet-01"
+		},
+		"subnetName": {
+			"value": "GatewaySubnet"
+		},
+		"addressPrefix": {
+			"value": "10.0.0.192/26"
+		},
+		"routeTable": {
+			"value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-nhub-eastus2-vnet-01-rg/providers/Microsoft.Network/routeTables/wh-nhub-eastus2-gw-rt-01"
+		}
+	}
+}

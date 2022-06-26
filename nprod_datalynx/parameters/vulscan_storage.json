@@ -1,0 +1,65 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.4.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+				"LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601",
+				"envType": "Non-Production"
+            }
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"storageAccountName": {
+			"value": "nprodsqlvulscanwh01"
+		},
+		"skuName": {
+			"value": "Standard_LRS"
+		},
+		"kind": {
+			"value": "StorageV2"
+		},	
+		"isdataLakeGen2": {
+			"value": true
+		},
+		"accessTier": {
+			"value": "Cool"
+		},
+		"largeFileSharesState": {
+			"value": "Disabled"
+		},
+		"allowedVirtualNetworks": {
+			"value": []
+		},
+		"allowedIpAddresses": {
+			"value": []
+		},
+		"routingPreference": {
+			"value": "MicrosoftRouting"
+		},
+		"allowBlobPublicAccess": {
+			"value": true
+		},
+		"roleAssignments": {
+			"value": [
+				{
+                    "roleDefinitionName": "Storage Blob Data Owner",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967"
+                }
+			]
+		},
+        "managementLifecycleRules" : {
+            "value": []
+        }		
+	},
+    "deploymentParameters": {
+        "resourceGroup": "dev-sql-vulnerability-scan-eastus2-01",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/storage-account-template.json"
+    }
+}

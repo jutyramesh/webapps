@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceName": {
+            "type": "String",
+            "metadata": {
+                "description": "Name of the resource"
+            }
+        },
+        "settingName": {
+            "defaultValue": "firewallDiagnostic",
+            "type": "String",
+            "metadata": {
+                "description": "Diagnostic setting Name"
+            }
+        },
+        "logAnalyticResourceID": {
+            "type": "String",
+            "metadata": {
+                "description": "Diagnostic setting Name"
+            }
+        },
+        "logTypes": {
+            "type": "Array",
+            "metadata": {
+                "description": "enable alert log types"
+            }
+        },
+        "metricTypes": {
+            "type": "Array",
+            "metadata": {
+                "description": "enable metric log types"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
+            "name": "[concat(parameters('resourceName'),'/microsoft.insights/', parameters('settingName'))]",
+            "apiVersion": "2017-05-01-preview",
+            "properties": {
+                "name": "DiagService",
+                "storageAccountId": null,
+                "eventHubAuthorizationRuleId": null,
+                "eventHubName": null,
+                "workspaceId": "[parameters('logAnalyticResourceID')]",
+                "logs": "[parameters('logTypes')]",
+                "metrics": "[parameters('metricTypes')]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,217 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags."
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"virtualNetworkGatewayName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network gateway."
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"allowedValues": [
+				"VpnGw1AZ"
+			],
+			"defaultValue": "VpnGw1AZ",
+			"metadata": {
+				"description": "Gateway SKU name."
+			}
+		},
+		"gatewayType": {
+			"type": "string",
+			"allowedValues": [
+				"Vpn"
+			],
+			"defaultValue": "Vpn",
+			"metadata": {
+				"description": "The type of this virtual network gateway.",
+				"required": "no"
+			}
+		},
+		"vpnType": {
+			"type": "string",
+			"allowedValues": [
+				"RouteBased"
+			],
+			"defaultValue": "RouteBased",
+			"metadata": {
+				"description": "The type of this virtual network gateway.",
+				"required": "no"
+			}
+		},
+		"vpnGatewayGeneration": {
+			"type": "string",
+			"allowedValues": [
+				"Generation1"
+			],
+			"defaultValue": "Generation1",
+			"metadata": {
+				"description": "The generation for this VirtualNetworkGateway. Must be None if gatewayType is not VPN.",
+				"required": "no"
+			}
+		},
+		"vpnClientConfigurationVpnClientAddressPoolAddressPrefixes": {
+			"type": "array",
+			"defaultValue": [
+				"192.168.0.0/24"
+			],
+			"metadata": {
+				"description": "A list of address blocks reserved for this virtual network in CIDR notation."
+			}
+		},
+		"vpnClientConfigurationVpnClientProtocols": {
+			"type": "array",
+			"allowedValues": [
+				"OpenVPN"
+			],
+			"defaultValue": [
+				"OpenVPN"
+			],
+			"metadata": {
+				"description": "VpnClientProtocols for Virtual network gateway."
+			}
+		},
+		"vpnClientConfigurationVpnAuthenticationTypes": {
+			"type": "array",
+			"allowedValues": [
+				"AAD"
+			],
+			"defaultValue": [
+				"AAD"
+			],
+			"metadata": {
+				"description": "VPN authentication types for the virtual network gateway."
+			}
+		},
+		"enableBgp": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether BGP is enabled for this virtual network gateway or not."
+			}
+		},
+		"enablePrivateIpAddress": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether private IP needs to be enabled on this gateway for connections or not."
+			}
+		},
+		"activeActive": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "ActiveActive flag."
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"virtualNetworkGateways": "2020-11-01"
+		},
+		"publicIpName": "[concat(parameters('virtualNetworkGatewayName'), '-pip-01')]",
+		"vpnClientConfigurationAadTenant": "[concat('https://login.microsoftonline.com/', subscription().tenantId, '/')]",
+		"vpnClientConfigurationAadAudience": "41b23e61-6c1e-4545-b367-cd054e0ed4b4",
+		"vpnClientConfigurationAadIssuer": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]"
+	},
+	"resources": [
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+			"apiVersion": "[variables('apiVersions').virtualNetworkGateways]",
+            "name": "[variables('publicIpName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ],
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+		{
+			"type": "Microsoft.Network/virtualNetworkGateways",
+			"apiVersion": "[variables('apiVersions').virtualNetworkGateways]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+			],
+			"name": "[parameters('virtualNetworkGatewayName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"enablePrivateIpAddress": "[parameters('enablePrivateIpAddress')]",
+				"ipConfigurations": [
+					{
+						"name": "vnetGatewayConfig0",
+						"properties": {
+							"privateIPAllocationMethod": "Dynamic",
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+							},
+							"subnet": {
+								"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'), 'GatewaySubnet')]"
+							}
+						}
+					}
+				],
+				"sku": {
+					"name": "[parameters('skuName')]",
+					"tier": "[parameters('skuName')]"
+				},
+				"gatewayType": "[parameters('gatewayType')]",
+				"vpnType": "[parameters('vpnType')]",
+				"enableBgp": "[parameters('enableBgp')]",
+				"activeActive": "[parameters('activeActive')]",
+				"vpnClientConfiguration": {
+					"vpnClientAddressPool": {
+						"addressPrefixes": "[parameters('vpnClientConfigurationVpnClientAddressPoolAddressPrefixes')]"
+					},
+					"vpnClientProtocols": "[parameters('vpnClientConfigurationVpnClientProtocols')]",
+					"vpnAuthenticationTypes": "[parameters('vpnClientConfigurationVpnAuthenticationTypes')]",
+					"vpnClientRootCertificates": [],
+					"vpnClientRevokedCertificates": [],
+					"radiusServers": [],
+					"vpnClientIpsecPolicies": [],
+					"aadTenant": "[variables('vpnClientConfigurationAadTenant')]",
+					"aadAudience": "[variables('vpnClientConfigurationAadAudience')]",
+					"aadIssuer": "[variables('vpnClientConfigurationAadIssuer')]"
+				},
+				"vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]"
+			}
+		}
+	]
+}

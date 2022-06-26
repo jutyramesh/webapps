@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nsgName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NSG as it will be recorded in Azure. See: https://dev.azure.com/WBA/IT Services/_git/ccp-ent-resource-names for naming standards"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location the NSG is to be deployed in, should match the VNet to which it will be associated"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "metadata": {
+        "description": "An object with Key: Value pairs for the tags to be associated with the NSG, specifically those needed to allow it to comply with the enterprise tagging policy."
+      }
+    },
+    "localRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Custom rules for the Subnet this NSG is associated with, all having a priority value less than 1000"
+      }
+    },
+    "platformRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Common rules applied to subnets of a particular classification, such as WEB, APP, or DB, all having a priority between 1000 and 1999"
+      }
+    },
+    "infraRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Common rules applied to all subnets to enable infrastructure communications, all having a priority between 2000 and 2999"
+      }
+    },
+    "microsoftRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Common Azure platform service allowance rules needed, all having a priority between 3000 and 3999"
+      }
+    },
+    "baseRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Common rules applied to all subnets to establish a consistent base configuration, all having a priority of 4000 or more"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-09-01",
+      "name": "[parameters('nsgName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": "[concat(parameters('localRules'), parameters('platformRules'), parameters('infraRules'), parameters('microsoftRules'), parameters('baseRules'))]"
+      }
+    }
+  ]
+}

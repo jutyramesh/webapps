@@ -1,0 +1,28 @@
+{
+    "$schema": " https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServicePlanName": {
+            "type": "String"
+        },
+        "logAnalyticResourceID": {
+            "type": "string"
+        },
+        "metricTypes": {
+            "type": "array"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms/providers/diagnosticsettings",
+            "name": "[concat(parameters('appServicePlanName'),'/Microsoft.Insights/service')]",
+            "apiVersion": "2016-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "workspaceId": "[parameters('logAnalyticResourceID')]",
+                "metrics": "[parameters('metricTypes')]"
+            }
+        }
+    ]
+}

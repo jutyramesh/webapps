@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"subnetName": {
+			"value": "wh-mgmt-prod-int-infra-eastus2-vnet-01-sn01"
+		},
+		"virtualNetworkName": {
+			"value": "wh-mgmt-prod-int-infra-eastus2-vnet-01"
+		},
+		"addressPrefix": {
+			"value": "10.0.1.0/27"
+		},
+		"networkSecurityGroup": {
+			"value": "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-networking-infra-eastus2/providers/Microsoft.Network/networkSecurityGroups/wh-mgmt-prod-int-infra-eastus2-vnet-01-sn01-nsg"
+		},
+		"delegations": {
+			"value": [
+				{
+					"name": "Microsoft.ContainerInstance.containerGroups",
+					"properties": {
+						"serviceName": "Microsoft.ContainerInstance/containerGroups"
+					}
+				}
+			]
+		},
+		"serviceEndpoints": {
+			"value": [
+				{
+					"service": "Microsoft.ContainerRegistry",
+					"locations": [
+						"*"
+					]
+				},
+				{
+					"service": "Microsoft.KeyVault",
+					"locations": [
+						"*"
+					]
+				}
+			]
+		}
+	},
+    "deploymentParameters": {
+        "resourceGroup": "prod-infra-networking-infra-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/virtual-network-subnet-template.json"
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.4.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "DeptName": "Innovation H3",
+                "LOB": "Innovation H3",
+                "EnvType": "Production",
+                "Sensitivity": "Sensitive",
+                "SenType": "Not Applicable",
+                "CostCenter": "Healthcare Development 5004",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "Deployer": "global-infra-automation-sp",
+                "DeployDate": "2022-02-21"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "storageAccountName": {
+            "value": "whinteast2backend"
+        },
+        "skuName": {
+            "value": "Standard_LRS"
+        },
+        "kind": {
+            "value": "StorageV2"
+        },
+        "isdataLakeGen2": {
+            "value": false
+        },
+        "accessTier": {
+            "value": "Hot"
+        },
+        "largeFileSharesState": {
+            "value": "Disabled"
+        },
+        "allowBlobPublicAccess": {
+            "value": false
+        },
+        "enableAdvancedThreatProtection": {
+            "value": false
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"subnetName": {
+			"value": "wh-sbx-nprod-infra-eastus2-vnet-02-sn01"
+		},
+		"virtualNetworkName": {
+			"value": "wh-sbx-nprod-infra-eastus2-vnet-02"
+		},
+		"addressPrefix": {
+			"value": "10.0.19.0/24"
+		},
+		"networkSecurityGroup": {
+			"value": "/subscriptions/22be09a9-d858-4ffa-a5a8-3172283218d4/resourceGroups/nprod-infra-adjoin-test-eastus2/providers/Microsoft.Network/networkSecurityGroups/wh-sbx-nprod-infra-eastus2-vnet-02-sn01-nsg"
+		},
+		"delegations": {
+			"value": []
+		},
+		"serviceEndpoints": {
+			"value": []
+		}
+	},
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-adjoin-test-eastus2",
+        "subscription": "wh-nprod-sbox-01",
+        "templateFile": "templates/virtual-network-subnet-template.json"
+    }
+}

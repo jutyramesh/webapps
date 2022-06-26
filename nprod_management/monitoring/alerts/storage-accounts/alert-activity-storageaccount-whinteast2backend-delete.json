@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "alertName": {
+      "value": "alert-activity-when-storage-account-whinteast2backend-delete"
+    },
+    "resourceID": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-nhub-eastus2-storage-01-rg/providers/Microsoft.Storage/storageAccounts/whinteast2backend"
+    },
+    "actionGroupID": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actiongroups/WH-CCP-NPROD"
+    },
+    "allOf": {
+      "value": [
+        {
+          "field": "Category",
+          "equals": "Autoscale"
+        },
+        {
+          "field": "operationName",
+          "equals": "Microsoft.Storage/storageAccounts/delete"
+        }
+      ]
+    }
+  },
+  "deploymentparameters": {
+    "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+    "subscription": "wh-nprod-management-01",
+    "templateFile": "templates/monitoring/alerts/alert-activity-template.json"
+}
+}

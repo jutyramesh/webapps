@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaultName": {
+            "value": "np-inf-prv-agents-kv-01"
+        },
+        "settingName": {
+            "value": "service"
+        },
+        "logAnalyticResourceID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourcegroups/wh-nprod-globplat-security-rg-eastus2-01/providers/microsoft.operationalinsights/workspaces/wh-nprod-globplat-seclaws-eastus2-01"
+        },
+        "logTypes": {
+            "value":  [
+                {
+                    "category": "AuditEvent",
+                    "enabled": true
+                }
+            ]
+        },
+        "metricTypes": {
+            "value": [
+                {
+                    "category": "AllMetrics",
+                    "enabled": true
+                }
+            ]
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "nprod-infra-provisioning-agents-eastus2",
+        "templateFile": "templates/monitoring/enable-logs-diagnostics/enable-diagnostics-keyvault.json"
+    }
+}

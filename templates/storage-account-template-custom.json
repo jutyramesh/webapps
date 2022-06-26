@@ -1,0 +1,432 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.5.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Required. Sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East US, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo region is specified on update, the request will succeed.",
+				"required": "yes"
+			}
+		},
+		"storageAccountName": {
+			"type": "string",
+			"minLength": 3,
+			"maxLength": 24,
+			"metadata": {
+				"description": "The name of the storage account within the specified resource group. Storage account names must be between 3 and 24 characters in length and use numbers and lower-case letters only.",
+				"required": "yes",
+				"subType": "regex",
+				"pattern": "^[a-z0-9](?:[a-z0-9]|(\\-(?!\\-))){1,22}[a-z0-9]$"
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_LRS",
+				"Standard_GRS",
+				"Standard_RAGRS",
+				"Standard_ZRS",
+				"Premium_LRS",
+				"Premium_ZRS",
+				"Standard_GZRS",
+				"Standard_RAGZRS"
+			],
+			"defaultValue": "Standard_LRS",
+			"metadata": {
+				"description": "The SKU name. Required for account creation; optional for update. Note that in older versions, SKU name was called accountType.",
+				"required": "yes"
+			}
+		},
+		"kind": {
+			"type": "string",
+			"allowedValues": [
+				"StorageV2",
+				"BlobStorage",
+				"FileStorage",
+				"BlockBlobStorage"
+			],
+			"defaultValue": "StorageV2",
+			"metadata": {
+				"description": "Required. Indicates the type of storage account.",
+				"required": "yes"
+			}
+		},	
+		"isdataLakeGen2": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enable or disable Heirarchial Name space (Data Lake Storage). Set value to true for building Data Lake storage account",
+				"required": "no"
+			}
+		},
+		"accessTier": {
+			"type": "string",
+			"allowedValues": [
+				"Hot",
+				"Cool",
+                "Archive"
+			],
+			"defaultValue": "Hot",
+			"metadata": {
+				"description": "Required for storage accounts. The access tier used for billing.",
+				"required": "no"
+			}
+		},
+		"largeFileSharesState": {
+			"type": "string",
+			"allowedValues": [
+				"Disabled",
+				"Enabled"
+			],
+			"defaultValue": "Disabled",
+			"metadata": {
+				"description": "Allow large file shares if sets to Enabled. It cannot be disabled once it is enabled.",
+				"required": "no"
+			}
+		},
+		"allowedVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of virtual networks that are allowed to talk to this resource.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"allowedIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of IpRules",
+				"subType": "ipv4"
+			}
+		},
+		"routingPreference": {
+			"type": "string",
+			"allowedValues": [
+				"MicrosoftRouting",
+				"InternetRouting"
+			],
+			"defaultValue": "MicrosoftRouting",
+			"metadata": {
+				"description": "Routing Choice defines the kind of network routing opted by the user.",
+				"required": "no"
+			}
+		},
+		"allowBlobPublicAccess": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Allow or disallow public access to all blobs or containers in the storage account. The default interpretation is true for this property.",
+				"required": "no"
+			}
+		},
+		"enableAdvancedThreatProtection": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Enable or disable Advanced Threat Protection."
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities.",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Storage Account Contributor",
+							"Storage Account Key Operator Service Role",
+							"Storage Blob Data Contributor",
+							"Storage Blob Data Owner",
+							"Storage Blob Data Reader",
+							"Storage File Data SMB Share Contributor",
+							"Storage File Data SMB Share Elevated Contributor",
+							"Storage File Data SMB Share Reader",
+                            "Storage Queue Data Contributor",
+                            "Storage Queue Data Message Processor",
+                            "Storage Queue Data Message Sender",
+                            "Storage Queue Data Reader",
+							"Reader and Data Access",
+							"Reader",
+							"WBA - LEAP - Resource Deletion"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					}
+				}
+			}
+		},
+        "managementLifecycleRules" : {
+            "type" : "array",
+            "defaultValue": [],
+			"metadata": {
+				"description": "A list of rules for lifecycle management",
+				"subType": "object",
+				"subTypeDefinition": {
+					"enabled": {
+						"type": "boolean",
+						"defaultValue": true,
+						"metadata": {
+							"required": "no",
+							"description": "Rule is enabled if set to true."
+						}
+					},
+					"name": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "A rule name can contain any combination of alpha numeric characters. Rule name is case-sensitive. It must be unique within a policy."
+						}
+					},
+					"type": {
+						"type": "string",
+                        "allowedValues" : [ "Lifecycle" ],
+                        "defaultValue" : "Lifecycle",
+						"metadata": {
+							"required": "yes",
+							"description": "The valid value is Lifecycle - Lifecycle"
+						}
+					},
+					"definition": {
+						"type": "object",
+						"metadata": {
+							"required": "yes",
+							"description": "An object that defines the Lifecycle rule. https://docs.microsoft.com/en-us/azure/templates/microsoft.storage/2019-04-01/storageaccounts/managementpolicies?tabs=json#managementpolicydefinition-object",
+							"subTypeDefinition": {
+								"actions": {
+									"type": "object",
+									"metadata": {
+										"required": "no",
+										"description": "An object that defines the action set.https://docs.microsoft.com/en-us/azure/templates/microsoft.storage/2019-04-01/storageaccounts/managementpolicies?tabs=json#managementpolicyaction-object",
+										"subTypeDefinition" : {
+											"baseBlob" : {
+												"type" : "object",
+												"metadata" : {
+													"required" : "no",
+													"description" : "The management policy action for base blob"
+												}
+											},
+											"snapshot" : {
+												"type" : "object",
+												"metadata" : {
+													"required" : "no",
+													"description" : "The management policy action for snapshot "
+												}
+											}
+										}
+									}
+								},
+								"filters": {
+									"type": "object",
+									"metadata": {
+										"required": "no",
+										"description": "An object that defines the filter set.",
+										"subTypeDefinition" : {
+											"prefixMatch" : {
+												"type" : "array",
+												"metadata" : {
+													"required" : "no",
+													"description" : "An array of strings for prefixes to be match."
+												}
+											},
+											"blobTypes" : {
+												"type" : "array",
+												"metadata" : {
+													"required" : "yes",
+													"description" : "An array of predefined enum values. Only blockBlob is supported.."
+												}
+											}											
+										}
+									}
+								}
+							}
+						}
+					}                    
+				}
+			}
+        }		
+	},
+	"variables": {
+		"uniqueName": "[uniqueString(parameters('storageAccountName'))]",
+                "isProd": "[equals(parameters('tags').envType, 'Production')]",
+                "gatewayIpAddresses": [                        
+                        "204.15.117.96/30",
+                        "204.15.117.100/30",
+                        "204.15.117.104/29"
+                ],
+                "datacenterIpAddresses": [
+                        "63.73.199.0/24",
+                        "63.239.17.0/24",
+                        "204.15.116.0/22",
+                        "209.65.11.0/24"
+                ],
+                "prodIpAddresses": [
+                        "40.67.188.50",
+                        "52.177.84.230",
+                        "52.155.224.242",
+                        "51.105.163.210",
+                        "20.36.252.188"
+                ],
+                "nonProdIpAddresses": [
+                        "52.230.220.128",
+                        "40.65.233.76",
+                        "52.155.224.148",
+                        "51.105.144.11"
+                ],
+                "allowedIpAddresses": "[union(variables('gatewayIpAddresses'), variables('datacenterIpAddresses'), if(variables('isProd'), variables('prodIpAddresses'), variables('nonProdIpAddresses')), parameters('allowedIpAddresses'))]",		
+		
+        "copy": [{
+				"name": "networkAclsVirtualNetworkRules",
+				"count": "[length(parameters('allowedVirtualNetworks'))]",
+				"input": {
+					"id": "[parameters('allowedVirtualNetworks')[copyIndex('networkAclsVirtualNetworkRules')]]",
+					"action": "Allow"
+				}
+			},
+			{
+				"name": "networkAclsIpRules",
+				"count": "[length(variables('allowedIpAddresses'))]",
+				"input": {
+					"value": "[variables('allowedIpAddresses')[copyIndex('networkAclsIpRules')]]",
+					"action": "Allow"
+				}
+			}
+		],
+		"routingPreference": {
+			"routingChoice": "[parameters('routingPreference')]",
+			"publishMicrosoftEndpoints": false,
+			"publishInternetEndpoints": false
+		},
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+            "principalName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"skuTier": "[split(parameters('skuName'), '_')[0]]",
+		"Storage Account Contributor": "17d1049b-9a84-46fb-8f53-869881c3d3ab",
+		"Storage Account Key Operator Service Role": "81a9662b-bebf-436f-a333-f67b29880f12",
+		"Storage Blob Data Contributor": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+		"Storage Blob Data Owner": "b7e6dc6d-f1e8-4753-8033-0f276bb0955b",
+		"Storage Blob Data Reader": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1",
+		"Storage File Data SMB Share Contributor": "0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb",
+		"Storage File Data SMB Share Elevated Contributor": "a7264617-510b-434b-a828-9731dc254ea7",
+		"Storage File Data SMB Share Reader": "aba4ae5f-2193-4029-9191-0cb91df5e314",
+		"Storage Queue Data Contributor": "974c5e8b-45b9-4653-ba55-5f855dd0fb88",
+		"Storage Queue Data Message Processor": "8a0f0c08-91a1-4084-bc3d-661d67233fed",
+		"Storage Queue Data Message Sender": "c6a89b2d-59bc-44d0-9896-0f6e12d7b80a",
+		"Storage Queue Data Reader": "19e7f393-937e-4f77-808e-94535e297925",
+		"Reader and Data Access": "c12c1c16-33a1-487b-954d-41c89c60f349",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+		"WBA - LEAP - Resource Deletion":  "0b554e07-b285-4549-b42c-53fcdd1b6b0e"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"apiVersion": "2019-06-01",
+			"condition": true,
+			"name": "[parameters('storageAccountName')]",
+			"location": "[parameters('location')]",
+			"sku": {
+				"tier": "[variables('skuTier')]",
+				"name": "[parameters('skuName')]"
+			},
+			"kind": "[parameters('kind')]",
+			"tags": "[parameters('tags')]",
+			"identity": {
+				"type": "SystemAssigned"
+			},
+			"properties": {
+				"networkAcls": {
+					"bypass": "AzureServices",
+					"virtualNetworkRules": "[variables('networkAclsVirtualNetworkRules')]",
+					"ipRules": "[variables('networkAclsIpRules')]",
+					"defaultAction": "Deny"
+				},
+				"accessTier": "[parameters('accessTier')]",
+				"supportsHttpsTrafficOnly": true,
+				"isHnsEnabled": "[parameters('isdataLakeGen2')]",
+				"largeFileSharesState": "[parameters('largeFileSharesState')]",
+				"routingPreference": "[json('null')]",
+				"allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]",
+				"minimumTlsVersion": "TLS1_2"
+			}
+		},
+		{
+			"condition": "[parameters('enableAdvancedThreatProtection')]",			
+			"type": "Microsoft.Storage/storageAccounts/providers/advancedThreatProtectionSettings",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('storageAccountName'), '/Microsoft.Security/current')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+			],
+			"properties": {
+				"isEnabled": true
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
+			"apiVersion": "2019-04-01-preview",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+			],
+			"name": "[concat(parameters('storageAccountName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		},
+
+        {
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+			"condition": "[not(empty(parameters('managementLifecycleRules')))]",
+            "apiVersion": "2019-06-01",
+            "dependsOn": [
+                "[parameters('storageAccountName')]"
+            ],
+            "properties": {
+                "policy": {
+                    "rules": "[parameters('managementLifecycleRules')]"
+                }
+            }
+        }
+	]
+}

@@ -1,0 +1,86 @@
+{
+    "platformRules": {
+        "value": [
+            {
+                "name": "Outbound_AcrAgentPool_AzureKeyVault_Allow",
+                "properties": {
+                    "description": "Outbound ACR AgentPool KeyVault Allowance",
+                    "priority": 1200,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "AzureKeyVault",
+                    "destinationPortRanges": [
+                        "443"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_AcrAgentPool_Storage_Allow",
+                "properties": {
+                    "description": "Outbound ACR AgentPool Storage Allowance",
+                    "priority": 1210,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "Storage",
+                    "destinationPortRanges": [
+                        "443"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_AcrAgentPool_EventHub_Allow",
+                "properties": {
+                    "description": "Outbound ACR AgentPool EventHub Allowance",
+                    "priority": 1220,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "EventHub",
+                    "destinationPortRanges": [
+                        "443"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_AcrAgentPool_AzureActiveDirectory_Allow",
+                "properties": {
+                    "description": "Outbound ACR AgentPool AAD Allowance",
+                    "priority": 1230,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "AzureActiveDirectory",
+                    "destinationPortRanges": [
+                        "443"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_AcrAgentPool_AzureMonitor_Allow",
+                "properties": {
+                    "description": "Outbound ACR AgentPool AzureMonitor Allowance",
+                    "priority": 1240,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "AzureMonitor",
+                    "destinationPortRanges": [
+                        "443"
+                    ]
+                }
+            }
+        ]
+    }
+}

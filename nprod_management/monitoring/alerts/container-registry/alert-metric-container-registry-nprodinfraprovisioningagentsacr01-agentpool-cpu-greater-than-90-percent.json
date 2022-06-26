@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-when-container-registry-nprodinfraprovisioningagentsacr01-agentpool-cpu-greater-than-90-percent"
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-provisioning-agents-eastus2/providers/Microsoft.ContainerRegistry/registries/nprodinfraprovisioningagentsacr01"
+        },
+        "metricName": {
+            "value": "AgentPoolCPUTime"
+        },
+        "threshold": {
+            "value": 90
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actiongroups/WH-CCP-NPROD"
+        },
+        "evaluationFrequency": {
+            "value": "PT5M"
+        },
+        "windowSize": {
+            "value": "PT5M"
+        },
+        "timeAggregation": {
+            "value": "Maximum"
+        },
+        "alertSeverity": {
+            "value": 3
+        },
+        "operator": {
+            "value": "GreaterThanOrEqual"
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+    }
+}

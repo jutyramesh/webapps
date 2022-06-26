@@ -1,0 +1,35 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverfarmName": {
+            "value": "ccp-peering-api-p-l-asp-01"
+        },
+        "hostingEnvironmentProfileId": {
+            "value": "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-services-hosting-eastus2/providers/Microsoft.Web/hostingEnvironments/rpu-prod-infra-svcs-eastus2-ase-01"
+        },
+        "isLinux": {
+            "value": true
+        },
+        "skuName": {
+            "value": "I2V2"
+        },
+        "kind": {
+            "value": "app"
+        }
+    },
+    "deploymentParameters": {
+        "forcedUpdate": 1,
+        "resourceGroup": "prod-infra-services-hosting-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/app-service-plan-template.json"
+    }
+}

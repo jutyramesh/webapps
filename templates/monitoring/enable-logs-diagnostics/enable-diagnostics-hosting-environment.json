@@ -1,0 +1,43 @@
+{
+    "$schema": "https: //schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServicePlanName": {
+            "type": "string"
+        },
+        "settingName": {
+            "type": "string"
+        },
+        "storageAccountId": {
+            "type": "string"
+        },
+        "logAnalyticResourceID": {
+            "type": "string"
+        },
+        "logTypes": {
+            "type": "array"
+        },
+        "metricTypes": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "empty": ""
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/hostingEnvironments/providers/diagnosticSettings",
+            "name": "[concat(parameters('appServicePlanName'),'/Microsoft.Insights/', parameters('settingName'))]",
+            "apiVersion": "2016-09-01",
+            "kind": "ASEV3",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "workspaceId": "[parameters('logAnalyticResourceID')]",
+                "storageAccountId": "[if(empty(parameters('storageAccountId')), json('null'), parameters('storageAccountId'))]",
+                "logs": "[parameters('logTypes')]",
+                "metrics": "[parameters('metricTypes')]"
+            }
+        }
+    ]
+}

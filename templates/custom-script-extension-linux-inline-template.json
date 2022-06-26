@@ -1,0 +1,55 @@
+/*
+DESCRIPTION: Deploy an inline custom script extension to a linux virtual machine 
+
+DEPLOYMENTS: Deploy custom script extension 
+
+REQUIRMENTS: Existing virutal machine 
+
+DATE: 5/10/22
+
+MODIFIED BY: EY Build Team 
+
+SCRIPT EXAMPLE: "apt update && apt -y upgrade && apt install -y python3-pip"  
+*/
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "existingVMName": {
+            "type": "string",
+            "metadata": {
+                "description": "VMs name where the custom script extension will be applied"
+            }
+        },
+        "commandToExecute": {
+            "type": "string",
+            "metadata": {
+                "description": ".sh script inline - must be in a string format"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('existingVMName'),'/CustomScriptExtension')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": "[parameters('commandToExecute')]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "deploymentStatus": {
+            "type": "string",
+            "value": "Template Deployment Successful"
+        }
+    }
+}

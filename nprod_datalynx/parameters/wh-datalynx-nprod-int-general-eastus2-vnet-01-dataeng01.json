@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"subnetName": {
+			"value": "wh-datalynx-nprod-int-general-eastus2-vnet-01-dataeng01"
+		},
+		"virtualNetworkName": {
+			"value": "wh-datalynx-nprod-int-general-eastus2-vnet-01"
+		},
+		"addressPrefix": {
+			"value": "10.255.0.0/24"
+		},
+		"networkSecurityGroup": {
+			"value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet01-eastus2/providers/Microsoft.Network/networkSecurityGroups/wh-datalynx-nprod-int-general-eastus2-vnet-01-dataeng01-nsg"
+		},
+		"delegations": {
+			"value": [
+				{
+					"name": "Microsoft.Databricks.workspaces",
+					"properties": {
+						"serviceName": "Microsoft.Databricks/workspaces"
+					}
+				}
+			]
+		},
+		"serviceEndpoints": {
+			"value": [
+				{
+					"service": "Microsoft.Storage",
+					"locations": [
+						"*"
+					]
+				},
+				{
+					"service": "Microsoft.KeyVault",
+					"locations": [
+						"*"
+					]
+				},
+				{
+					"service": "Microsoft.Web",
+					"locations": [
+						"*"
+					]
+				}
+			]
+		}
+	},
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-vnet01-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/virtual-network-subnet-template.json"
+    }
+}

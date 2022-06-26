@@ -1,0 +1,117 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.1.0.0",
+    "parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Sets a list of key value pairs that describe the resource.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. East US2, Central US, etc.). The geo region of a resource cannot be changed once it is created.",
+				"required": "yes"
+			}
+		},
+		"storageAccountName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the existing storage account where containers will be created in",
+				"required": "yes"
+			}
+		},
+		"containers": {
+			"type": "array",
+			"metadata": {
+				"subType": "object",
+				"subTypeDefinition": {
+					"containerName": {
+						"type": "string",
+						"minLength": 3,
+						"maxLength": 63,
+						"metadata": {
+							"description": "Container name must be unique within a storage account and must be between 3 and 63 characters. The name cannot begin with a number.",
+							"required": "yes",
+							"subType": "regex",
+							"pattern": "^[a-z0-9]([a-z0-9]|(-(?!-))){1,61}[a-z0-9]$"
+						}
+					}
+				}
+			}
+        },
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Storage Blob Data Contributor",
+							"Storage Blob Data Owner",
+							"Storage Blob Data Reader",
+							"WBA - LEAP - Resource Deletion"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					},
+					"containerName": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Container name to set the respective role assignment"
+						}
+					}			
+				}
+			}
+		}
+    },
+    "variables": {
+		"uniqueName": "[uniqueString(parameters('storageAccountName'))]",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+            "principalId": "UNSET",
+            "principalName": "UNSET",
+			"containerName": "UNSET"
+		}        
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'),'/default/', parameters('containers')[copyIndex()].containerName)]",
+            "properties": {
+                "publicAccess": "None"
+            },
+            "copy": {
+                "name": "containerCopy",
+                "count": "[length(parameters('containers'))]"
+            }
+        }
+    ]
+}

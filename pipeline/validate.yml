@@ -1,0 +1,94 @@
+#
+# Azure State Repository - Deployment Pre-Validation Pipeline
+#
+trigger:
+  branches:
+    exclude:
+    - main
+
+
+jobs:
+#
+# Non-Production Validation Job
+#
+- job: NprodValidation
+  pool: wh-np-ccp-agents
+  steps:
+  - task: PowerShell@2
+    displayName: Identify State Changes
+    inputs:
+      pwsh: true
+      targetType: filePath
+      filePath: pipeline/Build-EnvironmentLists.ps1
+      arguments: -Environments "sandbox", "nprod_management", "nprod_datalynx", "nprod_datascience"
+
+  #
+  # Sandbox
+  #
+  - task: AzureCLI@2
+    displayName: Sandbox Environment Validation
+    inputs:
+      azureSubscription: wh-np-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Validate-EnvironmentUpdates.ps1
+      arguments: -DeploymentList "$(sandbox)"
+
+  #
+  # Non-Production Management Plane Environment
+  #
+  - task: AzureCLI@2
+    displayName: NPROD Management Environment Validation
+    inputs:
+      azureSubscription: wh-np-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Validate-EnvironmentUpdates.ps1
+      arguments: -DeploymentList "$(nprod_management)"
+
+  #
+  # Non-Production DataLynx Environment
+  #
+  - task: AzureCLI@2
+    displayName: NPROD DataLynx Environment Validation
+    inputs:
+      azureSubscription: wh-np-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Validate-EnvironmentUpdates.ps1
+      arguments: -DeploymentList "$(nprod_datalynx)"
+
+  #
+  # Non-Production Data Science Environment
+  #
+  - task: AzureCLI@2
+    displayName: NPROD Data Science Environment Validation
+    inputs:
+      azureSubscription: wh-np-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Validate-EnvironmentUpdates.ps1
+      arguments: -DeploymentList "$(nprod_datascience)"
+
+
+#
+# Production Validation Job
+#
+- job: ProdValidation
+  pool: wh-p-ccp-agents
+  dependsOn: NprodValidation
+  steps:
+  - task: PowerShell@2
+    displayName: Identify State Changes
+    inputs:
+      pwsh: true
+      targetType: filePath
+      filePath: pipeline/Build-EnvironmentLists.ps1
+      arguments: -Environments "prod_management"
+
+  #
+  # Production Management Plane Environment
+  #
+  - task: AzureCLI@2
+    displayName: PRODUCTION Management Environment Validation
+    inputs:
+      azureSubscription: wh-p-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Validate-EnvironmentUpdates.ps1
+      arguments: -DeploymentList "$(prod_management)"

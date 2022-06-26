@@ -1,0 +1,62 @@
+{
+    "platformRules": {
+        "value": [
+            {
+                "name": "Inbound_AKS_IntraSubnet_Allow",
+                "properties": {
+                    "description": "AKS Cluster Infrastructure Allowances",
+                    "priority": 1000,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "SourceAddressPrefix": "[INJECT <Subnet>]",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Inbound_AKS_IntraPod_Allow",
+                "properties": {
+                    "description": "AKS Cluster Infrastructure Allowances",
+                    "priority": 1001,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "SourceAddressPrefix": "10.123.0.0/17",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Outbound_AKS_IntraSubnet_Allow",
+                "properties": {
+                    "description": "AKS Cluster Infrastructure Allowances",
+                    "priority": 1000,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "*",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "[INJECT <Subnet>]",
+                    "destinationPortRange": "*"
+                }
+            },
+            {
+                "name": "Outbound_AKS_IntraPod_Allow",
+                "properties": {
+                    "description": "AKS Cluster Infrastructure Allowances",
+                    "priority": 1001,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Udp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "10.123.0.0/17",
+                    "destinationPortRange": "*"
+                }
+            }
+        ]
+    }
+}

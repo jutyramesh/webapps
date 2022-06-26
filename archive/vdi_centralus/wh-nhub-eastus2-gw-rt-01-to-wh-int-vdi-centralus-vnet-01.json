@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+                "DeptName": "Innovation H3",
+                "LOB": "Innovation H3",
+                "EnvType": "Production",
+                "Sensitivity": "Sensitive",
+                "SenType": "Not Applicable",
+                "CostCenter": "Healthcare Development 5004",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "Deployer": "global-infra-automation-sp",
+                "DeployDate": "2022-02-02"
+            }
+		},
+		"location": {
+			"value": "centralus"
+		},
+		"routeTableName": {
+			"value": "wh-nhub-eastus2-gw-rt-01"
+		},
+		"routes": {
+			"value": [
+				{
+					"name": "wh-int-vdi-centralus-vnet-01-a",
+					"addressPrefix": "10.0.3.64/27",
+					"nextHopType": "VirtualAppliance",
+					"nextHopIpAddress": "10.0.0.4"
+				},
+				{
+					"name": "wh-int-vdi-centralus-vnet-01-b",
+					"addressPrefix": "10.0.3.96/27",
+					"nextHopType": "VirtualAppliance",
+					"nextHopIpAddress": "10.0.0.4"
+				},
+				{
+					"name": "wh-int-vdi-centralus-vnet-01-c",
+					"addressPrefix": "10.0.8.0/22",
+					"nextHopType": "VirtualAppliance",
+					"nextHopIpAddress": "10.0.0.4"
+				}
+			]
+		}
+	}
+}

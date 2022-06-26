@@ -1,0 +1,95 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"subnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the subnet."
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"addressPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Address prefix designated for the subnet"
+			}
+		},
+		"privateEndpointNetworkPolicies": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled",
+				"Disabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Whether private endpoint network policies are enabled. They are enabled by default"
+			}
+		},
+		"privateLinkServiceNetworkPolicies": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled",
+				"Disabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Whether private link network policies are enabled. They are enabled by default"
+			}
+		},
+		"routeTable": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Route table resource."
+			}
+		},
+		"networkSecurityGroup": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "NetworkSecurityGroup resource."
+			}
+		},
+		"delegations": {
+			"type": "array",
+			"defaultValue": []
+		},
+		"serviceEndpoints": {
+			"type": "array",
+			"defaultValue": []
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"virtualNetworks": "2020-11-01"
+		},
+		"networkSecurityGroup": {
+			"id": "[parameters('networkSecurityGroup')]"
+		},
+		"routeTable": {
+			"id": "[parameters('routeTable')]"
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/virtualNetworks/subnets",
+			"apiVersion": "[variables('apiVersions').virtualNetworks]",
+			"name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'))]",
+			"properties": {
+				"addressPrefix": "[parameters('addressPrefix')]",
+				"delegations": "[parameters('delegations')]",
+				"serviceEndpoints": "[parameters('serviceEndpoints')]",
+				"privateEndpointNetworkPolicies": "[parameters('privateEndpointNetworkPolicies')]",
+				"privateLinkServiceNetworkPolicies": "[parameters('privateLinkServiceNetworkPolicies')]",
+				"networkSecurityGroup": "[if(not(empty(parameters('networkSecurityGroup'))), variables('networkSecurityGroup'), json('null'))]",
+				"routeTable": "[if(not(empty(parameters('routeTable'))), variables('routeTable'), json('null'))]"
+			}
+		}
+	]
+}

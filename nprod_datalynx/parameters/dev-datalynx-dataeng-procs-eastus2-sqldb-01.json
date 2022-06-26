@@ -1,0 +1,46 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.6.2.0",
+    "parameters": {
+        "tags": {
+            "value": {
+				"LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Non-Production"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverName": {
+            "value": "dev-datalynx-dataeng-ingest-eastus2-sqlsrv-01"
+        },
+        "databaseName": {
+            "value": "dev-datalynx-dataeng-procs-eastus2-sqldb-01"
+        },
+        "databaseType": {
+            "value": "Database"
+        },
+        "skuName": {
+            "value": "GP_Gen5"
+        },
+        "applicationAccounts": {
+            "value": ["wh-np-dae-contributors"]
+        },
+        "distributionLists": {
+            "value": ["DNADATAOPS"]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/sql-database-template.json"
+    }
+}

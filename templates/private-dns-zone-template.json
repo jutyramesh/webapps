@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateZoneName": {
+            "type": "string"
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {}
+        },
+        "linkedVirtualNetworks": {
+            "type": "array",
+            "defaultValue": []
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "DNS zones are global objects, this property is used for resource group creation only"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('privateZoneName')]",
+            "location": "global",
+            "tags": "[parameters('tags')]"
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privateZoneName'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateZoneName'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "copy": {
+                "name": "vnetLinksCopy",
+                "count": "[length(parameters('linkedVirtualNetworks'))]"
+            },
+            "name": "[concat(parameters('privateZoneName'), '/', last(split(parameters('linkedVirtualNetworks')[copyIndex()], '/')))]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateZoneName'))]"
+            ],
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[parameters('linkedVirtualNetworks')[copyIndex()]]"
+                }
+            }
+        }
+    ]
+}

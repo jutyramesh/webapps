@@ -1,0 +1,163 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Sets a list of key value pairs that describe the resource.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. East US2, Central US, etc.). The geo region of a resource cannot be changed once it is created.",
+				"required": "yes"
+			}
+		},
+		"storageAccountName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the storage account where fileshares will be created in",
+				"required": "yes"
+			}
+		},
+		"shares": {
+			"type": "array",
+			"metadata": {
+				"subType": "object",
+				"subTypeDefinition": {
+					"shareName": {
+						"type": "string",
+						"minLength": 3,
+						"maxLength": 63,
+						"metadata": {
+							"description": "The name of the file share within the specified storage account. File share names must be between 3 and 63 characters in length and use numbers, lower-case letters and dash (-) only. Every dash (-) character must be immediately preceded and followed by a letter or number.",
+							"required": "yes",
+							"subType": "regex",
+							"pattern": "^[a-z0-9](?:[a-z0-9]|(\\-(?!\\-))){1,61}[a-z0-9]$"
+						}
+					},
+					"shareSize": {
+						"type": "int",
+						"minValue": 1,
+						"maxValue": 102400,
+						"metadata": {
+							"description": "The maximum size of the share, in gigabytes. Must be greater than 0, and less than or equal to 5TB (5120). For Large File Shares, the maximum size is 102400.",
+							"required": "no"
+						}
+					},
+					"metadata": {
+						"type": "object",
+						"metadata": {
+							"description": "A name-value pair to associate with the share as metadata.",
+							"required": "no"
+						}
+					},
+					"accessTier": {
+						"type": "string",
+						"allowedValues": [
+							"TransactionOptimized",
+							"Hot",
+							"Cool",
+							"Premium"
+						],
+						"metadata": {
+							"description": "Access tier for specific share. GpV2 account can choose between TransactionOptimized (default), Hot, and Cool. FileStorage account can choose Premium.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Storage File Data SMB Share Contributor",
+							"Storage File Data SMB Share Elevated Contributor",
+							"Storage File Data SMB Share Reader",
+							"WBA - LEAP - Resource Deletion"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}					
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"uniqueName": "[uniqueString(parameters('storageAccountName'))]",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Storage File Data SMB Share Contributor": "0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb",
+		"Storage File Data SMB Share Elevated Contributor": "a7264617-510b-434b-a828-9731dc254ea7",
+		"Storage File Data SMB Share Reader": "aba4ae5f-2193-4029-9191-0cb91df5e314",
+		"WBA - LEAP - Resource Deletion":  "0b554e07-b285-4549-b42c-53fcdd1b6b0e"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+			"apiVersion": "2019-06-01",
+			"condition": "[not(empty(parameters('shares')))]",
+			"dependsOn": [],
+			"name": "[concat(parameters('storageAccountName'), '/default/', parameters('shares')[copyIndex()].shareName)]",
+			"properties": {
+				"metadata": "[if(contains(parameters('shares')[copyIndex()], 'metadata'), parameters('shares')[copyIndex()].metadata, json('null'))]",
+				"shareQuota": "[if(contains(parameters('shares')[copyIndex()], 'shareSize'), parameters('shares')[copyIndex()].shareSize, json('null'))]",
+				
+				"accessTier": "[if(contains(parameters('shares')[copyIndex()], 'accessTier'), parameters('shares')[copyIndex()].accessTier, json('null'))]"
+			},
+			"copy": {
+				"name": "sharesCopy",
+				"count": "[length(parameters('shares'))]"
+			}
+		},
+ 		{
+			"type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
+			"apiVersion": "2019-04-01-preview",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": ["sharesCopy"],
+			"name": "[concat(parameters('storageAccountName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName, variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}		
+	]
+}

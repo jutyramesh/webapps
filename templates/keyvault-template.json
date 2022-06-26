@@ -1,0 +1,541 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "3.1.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "The tags that will be assigned to the key vault.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "The supported Azure location where the key vault should be created.",
+				"required": "yes"
+			}
+		},
+		"vaultName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the vault",
+				"required": "yes",
+				"subType": "regex",
+				"pattern": "^[a-zA-Z0-9-]{3,24}$"
+			}
+		},
+		"tenantId": {
+			"type": "string",
+			"defaultValue": "dec32715-7ca7-40c9-b658-a9acce8a39cc",
+			"allowedValues": [
+				"dec32715-7ca7-40c9-b658-a9acce8a39cc",
+				"43d2f056-2a0f-4a87-a552-1bbcec447cd1"
+			],
+			"metadata": {
+				"description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
+				"required": "yes"
+			}
+		},
+		"skuFamily": {
+			"type": "string",
+			"allowedValues": [
+				"A"
+			],
+			"defaultValue": "A",
+			"metadata": {
+				"description": "SKU family name",
+				"required": "yes"
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"allowedValues": [
+				"premium"
+			],
+			"defaultValue": "premium",
+			"metadata": {
+				"description": "SKU name to specify whether the key vault is a standard vault or a premium vault.",
+				"required": "yes"
+			}
+		},
+		"accessPolicies": {
+			"type": "array",
+			"defaultValue":[],
+			"metadata": {
+				"description": "An array of 0 to 1024 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"objectId": {
+						"type": "string",
+						"metadata": {
+							"description": "The object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies.",
+							"required": "yes"
+						}
+					},
+					"applicationId": {
+						"type": "string",
+						"metadata": {
+							"description": "Application ID of the client making request on behalf of a principal",
+							"required": "no"
+						}
+					},
+					"keyPermissions": {
+						"type": "array",
+						"defaultValue": [],
+						"allowedValues": [
+							"Get",
+							"List",
+							"Update",
+							"Create",
+							"Import",
+							"Delete",
+							"Recover",
+							"Backup",
+							"Restore",
+							"Decrypt",
+							"Encrypt",
+							"UnwrapKey",
+							"WrapKey",
+							"Verify",
+							"Sign",
+							"Purge"
+						],
+						"metadata": {
+							"description": "Permissions to keys",
+							"required": "no"
+						}
+					},
+					"secretPermissions": {
+						"type": "array",
+						"defaultValue": [],
+						"allowedValues": [
+							"Get",
+							"List",
+							"Set",
+							"Delete",
+							"Recover",
+							"Backup",
+							"Restore",
+							"Purge"
+						],
+						"metadata": {
+							"description": "Permissions to secrets",
+							"required": "no"
+						}
+					},
+					"certificatePermissions": {
+						"type": "array",
+						"defaultValue": [],
+						"allowedValues": [
+							"Get",
+							"List",
+							"Update",
+							"Create",
+							"Import",
+							"Delete",
+							"Recover",
+							"Backup",
+							"Restore",
+							"ManageContacts",
+							"ManageIssuers",
+							"GetIssuers",
+							"ListIssuers",
+							"SetIssuers",
+							"DeleteIssuers",
+							"Purge"
+						],
+						"metadata": {
+							"description": "Permissions to certificates",
+							"required": "no"
+						}
+					},
+					"storagePermissions": {
+						"type": "array",
+						"defaultValue": [],
+						"allowedValues": [
+							"Get",
+							"List",
+							"Update",
+							"Set",
+							"Delete",
+							"Recover",
+							"Backup",
+							"Restore",
+							"Regeneratekey",
+							"GetSAS",
+							"ListSAS",
+							"SetSAS",
+							"DeleteSAS",
+							"Purge"
+						],
+						"metadata": {
+							"description": "Permissions to storage accounts",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"enabledForDeployment": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.",
+				"required": "no"
+			}
+		},
+		"enabledForDiskEncryption": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Property to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys.",
+				"required": "no"
+			}
+		},
+		"enabledForTemplateDeployment": {
+			"type": "bool",
+			"defaultValue": true,
+			"allowedValues": [
+				true
+			],
+			"metadata": {
+				"description": "Property to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault.",
+				"required": "no"
+			}
+		},
+		"enableSoftDelete": {
+			"type": "bool",
+			"defaultValue": true,
+			"allowedValues": [
+				true
+			],
+			"metadata": {
+				"description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault. If it's not set to any value(true or false) when creating new key vault, it will be set to true by default. Once set to true, it cannot be reverted to false.",
+				"required": "no"
+			}
+		},
+		"softDeleteRetentionInDays": {
+			"type": "int",
+			"minValue": 7,
+			"maxValue": 90,
+			"defaultValue": 90,
+			"metadata": {
+				"description": "softDelete data retention days. It accepts >=7 and <=90.",
+				"required": "no"
+			}
+		},
+		"enableRbacAuthorization": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be ignored (warning: this is a preview feature). When false, the key vault will use the access policies specified in vault properties, and any policy stored on Azure Resource Manager will be ignored. If null or not specified, the vault is created with the default value of false. Note that management actions are always authorized with RBAC.",
+				"required": "no"
+			}
+		},
+		"createMode": {
+			"type": "string",
+			"allowedValues": [
+				"default",
+				"recover"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The vault's create mode to indicate whether the vault need to be recovered or not.",
+				"required": "no"
+			}
+		},
+		"enablePurgeProtection": {
+			"type": "bool",
+			"defaultValue": true,
+			"allowedValues": [
+				true
+			],
+			"metadata": {
+				"description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
+				"required": "no"
+			}
+		},
+		"networkAclsBypass": {
+			"type": "string",
+			"allowedValues": [
+				"AzureServices",
+				"None"
+			],
+			"defaultValue": "AzureServices",
+			"metadata": {
+				"description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'. If not specified the default is 'AzureServices'.",
+				"required": "no"
+			}
+		},
+		"networkAclsDefaultAction": {
+			"type": "string",
+			"allowedValues": [
+				"Deny"
+			],
+			"defaultValue": "Deny",
+			"metadata": {
+				"description": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated.",
+				"required": "no"
+			}
+		},
+		"allowedIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).",
+				"required": "no",
+				"subType": "ipv4"
+			}
+		},
+		"allowedVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to group/user/service principals.",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Key Vault Contributor",
+							"Key Vault Administrator",
+							"WBA - LEAP - Resource Deletion",
+							"Key Vault Certificates Officer",
+							"Key Vault Crypto Officer",
+							"Key Vault Crypto Service Encryption User",
+							"Key Vault Crypto User",
+							"Key Vault Reader",
+							"Key Vault Secrets Officer",
+							"Key Vault Secrets User",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		},
+		"sckRoleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to group/user/service principals at secrets/certificates/keys level.",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Key Vault Contributor",
+							"Key Vault Administrator",
+							"WBA - LEAP - Resource Deletion",
+							"Key Vault Certificates Officer",
+							"Key Vault Crypto Officer",
+							"Key Vault Crypto Service Encryption User",
+							"Key Vault Crypto User",
+							"Key Vault Reader",
+							"Key Vault Secrets Officer",
+							"Key Vault Secrets User",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal."
+						}
+					},
+					"type": {
+						"type": "string",
+						"allowedValues": [
+							"secrets",
+							"keys",
+							"certificates"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "type of role assignment if it is a key, certificate or secret"
+						}
+					},
+					"name": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "name of the key, certificate or secret"
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"vaultApiVersion": "2019-09-01",
+		"roleAssignmentsApiVersion": "2018-09-01-preview",
+		"uniqueName": "[uniqueString(parameters('vaultName'))]",
+		"emptyArray": [],
+		"isProd": "[equals(parameters('injectedValues').envType, 'Production')]",
+		"datacenterIpAddresses": [
+			"63.73.199.0/24",
+			"63.239.17.0/24",
+			"204.15.116.0/22",
+			"209.65.11.0/24"
+		],
+		"prodIpAddresses": [
+			"40.67.188.50",
+			"52.177.84.230",
+			"52.155.224.242",
+			"51.105.163.210",
+			"20.36.252.188"
+		],
+		"nonProdIpAddresses": [
+			"52.230.220.128",
+			"40.65.233.76",
+			"52.155.224.148",
+			"51.105.144.11"
+		],
+		"allowedIpAddresses": "[union(parameters('allowedIpAddresses'), variables('datacenterIpAddresses'), if(variables('isProd'), variables('prodIpAddresses'), variables('nonProdIpAddresses')))]",
+		"copy": [
+			{
+				"name": "accessPolicies",
+				"count": "[length(parameters('accessPolicies'))]",
+				"input": {
+					"tenantId": "[parameters('tenantId')]",
+					"objectId": "[parameters('accessPolicies')[copyIndex('accessPolicies')].objectId]",
+					"applicationId": "[if(contains(parameters('accessPolicies')[copyIndex('accessPolicies')], 'applicationId'), parameters('accessPolicies')[copyIndex('accessPolicies')].applicationId, '')]",
+					"permissions": {
+						"keys": "[if(contains(parameters('accessPolicies')[copyIndex('accessPolicies')], 'keyPermissions'), parameters('accessPolicies')[copyIndex('accessPolicies')].keyPermissions, variables('emptyArray'))]",
+						"secrets": "[if(contains(parameters('accessPolicies')[copyIndex('accessPolicies')], 'secretPermissions'), parameters('accessPolicies')[copyIndex('accessPolicies')].secretPermissions, variables('emptyArray'))]",
+						"certificates": "[if(contains(parameters('accessPolicies')[copyIndex('accessPolicies')], 'certificatePermissions'), parameters('accessPolicies')[copyIndex('accessPolicies')].certificatePermissions, variables('emptyArray'))]",
+						"storage": "[if(contains(parameters('accessPolicies')[copyIndex('accessPolicies')], 'storagePermissions'), parameters('accessPolicies')[copyIndex('accessPolicies')].storagePermissions, variables('emptyArray'))]"
+					}
+				}
+			},
+			{
+				"name": "networkAclsIpRules",
+				"count": "[length(variables('allowedIpAddresses'))]",
+				"input": {
+					"value": "[variables('allowedIpAddresses')[copyIndex('networkAclsIpRules')]]"
+				}
+			},
+			{
+				"name": "networkAclsVirtualNetworkRules",
+				"count": "[length(parameters('allowedVirtualNetworks'))]",
+				"input": {
+					"id": "[parameters('allowedVirtualNetworks')[copyIndex('networkAclsVirtualNetworkRules')]]"
+				}
+			}
+		],
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+	
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Key Vault Contributor": "f25e0fa2-a7c8-4377-a976-54943a77a395",
+		"Key Vault Certificates Officer": "a4417e6f-fecd-4de8-b567-7b0420556985",
+		"Key Vault Crypto Officer": "14b46e9e-c2b7-41b4-b07b-48a6ebf60603",
+		"Key Vault Crypto Service Encryption User": "e147488a-f6f5-4113-8e2d-b22465e65bf6",
+		"Key Vault Crypto User": "12338af0-0e69-4776-bea7-57ae8d297424",
+		"Key Vault Reader": "21090545-7ca7-4776-b22c-e363652d74d2",
+		"Key Vault Secrets Officer": "b86a8fe4-44ce-4948-aee5-eccb2c155cd7",
+		"Key Vault Secrets User": "4633458b-17de-408a-b874-0445c86b69e6",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Key Vault Administrator": "00482a5a-887f-4fb3-b363-3b7fe8e74483",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.KeyVault/vaults",
+			"apiVersion": "[variables('vaultApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('vaultName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"tenantId": "[parameters('tenantId')]",
+				"sku": {
+					"family": "[parameters('skuFamily')]",
+					"name": "[parameters('skuName')]"
+				},
+				"accessPolicies": "[variables('accessPolicies')]",
+				"enabledForDeployment": "[parameters('enabledForDeployment')]",
+				"enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
+				"enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+				"enableSoftDelete": "[parameters('enableSoftDelete')]",
+				"softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+				"enableRbacAuthorization": "[parameters('enableRbacAuthorization')]",
+				"createMode": "[parameters('createMode')]",
+				"enablePurgeProtection": "[parameters('enablePurgeProtection')]",
+				"networkAcls": {
+					"bypass": "[if(or(parameters('enabledForDeployment'), parameters('enabledForTemplateDeployment')), 'AzureServices', 'None')]",
+					"defaultAction": "[parameters('networkAclsDefaultAction')]",
+					"ipRules": "[variables('networkAclsIpRules')]",
+					"virtualNetworkRules": "[variables('networkAclsVirtualNetworkRules')]"
+				}
+			}
+		},
+		
+		{
+			"type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+			],
+			"name": "[concat(parameters('vaultName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+
+	]
+}

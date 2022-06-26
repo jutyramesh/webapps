@@ -1,0 +1,37 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.2.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "hostingEnvironmentName": {
+            "value": "rpu-nprod-infra-svcs-eastus2-ase-01"
+        },
+        "hasLinuxWorkers": {
+            "value": true
+        },
+        "kind": {
+            "value": "ASEV3"
+        },
+        "subnetId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn02"
+        },
+        "networkAccessControlList": {
+            "value": []
+        },
+        "internalLoadBalancingMode": {
+            "value": "Web,Publishing"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/app-service-environment-template.json"
+    }
+}

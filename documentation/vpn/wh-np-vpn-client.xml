@@ -1,0 +1,54 @@
+<AzVpnProfile xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/">
+  <any xmlns:d2p1="http://schemas.datacontract.org/2004/07/System.Xml"
+    i:nil="true" />
+  <clientauth>
+    <aad>
+      <audience>41b23e61-6c1e-4545-b367-cd054e0ed4b4</audience>
+      <cachesigninuser>true</cachesigninuser>
+      <enablegrouptoken>false</enablegrouptoken>
+      <issuer>https://sts.windows.net/dec32715-7ca7-40c9-b658-a9acce8a39cc/</issuer>
+      <tenant>https://login.microsoftonline.com/dec32715-7ca7-40c9-b658-a9acce8a39cc/</tenant>
+    </aad>
+    <cert
+      i:nil="true" />
+    <type>aad</type>
+    <usernamepass
+      i:nil="true" />
+  </clientauth>
+  <clientconfig>
+<includeroutes>
+<route>
+<destination>0.0.0.0</destination><mask>1</mask>
+</route>
+<route>
+<destination>128.0.0.0</destination><mask>1</mask>
+</route>
+</includeroutes>
+	<dnsservers>
+		<dnsserver>168.63.129.16</dnsserver>
+	</dnsservers>
+</clientconfig>
+  <name>Walgreens Health (NP)</name>
+  <protocolconfig>
+    <sslprotocolConfig>
+      <transportprotocol>tcp</transportprotocol>
+    </sslprotocolConfig>
+  </protocolconfig>
+  <serverlist>
+    <ServerEntry>
+      <displayname
+        i:nil="true" />
+      <fqdn>wan.ct7c0zi8gum6osfm2246bcc49.vpn.azure.com</fqdn>
+    </ServerEntry>
+  </serverlist>
+  <servervalidation>
+    <cert>
+      <hash>A8985D3A65E5E5C4B2D7D66D40C6DD2FB19C5436</hash>
+      <issuer
+        i:nil="true" />
+    </cert>
+    <serversecret>20ecd879b8deae5be2d3aa7fcb333954773e039ec654cc418f0ff0ec3a74f5553a8a10e96f822c4a1cafe79345fc656a38bc955a37a87cb58df38420f674bd772805557e1ce734c1ed47feb95d25ed7cc20a36ac330c59eba123f99766961d389f272affa81fc86f4c3b7a39ab46b51ed3cb7baffcb7e01532942a91bbc085fabb18a590eaf44521b81464b89fe802a0b99e29bf79f768abe096d1e1d959a2dca7c828ad2df9ada4ed0f277dc75e37601392604cce7ae70c64b176d7df3b7563d83b18e6d689b0779871267390df30cd9a70b2eb45ef5c8a1ceac5e256d44feea7f0bf764a0fbbcf5f3dae4a0109b2304920d3a9a1ee89b6521611a73ea2a075</serversecret>
+    <type>cert</type>
+  </servervalidation>
+  <version>1</version>
+</AzVpnProfile>

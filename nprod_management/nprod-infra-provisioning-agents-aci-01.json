@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "value": "nprod-infra-provisioning-agents-acg-01"
+    },
+    "containerName": {
+      "value": "nprod-infra-provisioning-agents-aci-01"
+    },
+    "image": {
+      "value": "nprodinfraprovisioningagentsacr01.azurecr.io/ccp-vsts-agent:latest"
+    },
+    "identity": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-provisioning-agents-eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/nprod-infra-provisioning-agents-id-01"
+    },
+    "subnetResourceId": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn01"
+    },
+    "environmentVariables": {
+      "value": [
+        {
+          "name": "AZP_URL",
+          "value": "https://dev.azure.com/walgreens-health-services"
+        },
+        {
+          "name": "AZP_POOL",
+          "value": "wh-np-ccp-agents"
+        },
+        {
+          "name": "AZP_TOKEN_FROM_MI",
+          "value": "https://np-inf-prv-agents-kv-01.vault.azure.net/secrets/wh-ccp-agents-pat/"
+        }
+      ]
+    }
+  },
+  "deploymentParameters": {
+    "resourceGroup": "nprod-infra-provisioning-agents-eastus2",
+    "subscription": "wh-nprod-management-01",
+    "templateFile": "templates/acg-template.json"
+  }
+}

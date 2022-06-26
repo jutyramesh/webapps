@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageName": {
+      "type": "String"
+    },
+    "settingName": {
+      "type": "String"
+    },
+    "logAnalyticResourceID": {
+      "type": "String"
+    },
+    "logTypes": {
+      "type": "Array"
+    },
+    "metricTypes": {
+      "type": "Array"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts/providers/diagnosticsettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('storageName'),'/Microsoft.Insights/', parameters('settingName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticResourceID')]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+        "metrics": "[parameters('metricTypes')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticsettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('storageName'),'/default/Microsoft.Insights/', parameters('settingName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticResourceID')]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+        "logs": "[parameters('logTypes')]",
+        "metrics": "[parameters('metricTypes')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices/providers/diagnosticsettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('storageName'),'/default/Microsoft.Insights/', parameters('settingName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticResourceID')]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+        "logs": "[parameters('logTypes')]",
+        "metrics": "[parameters('metricTypes')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices/providers/diagnosticsettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('storageName'),'/default/Microsoft.Insights/', parameters('settingName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticResourceID')]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+        "logs": "[parameters('logTypes')]",
+        "metrics": "[parameters('metricTypes')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices/providers/diagnosticsettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('storageName'),'/default/Microsoft.Insights/', parameters('settingName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticResourceID')]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+        "logs": "[parameters('logTypes')]",
+        "metrics": "[parameters('metricTypes')]"
+      }
+    }
+  ]
+}

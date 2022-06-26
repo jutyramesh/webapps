@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "value": "wh-nprod-globplat-seclaws-eastus2-01"
+    },
+    "sku": {
+      "value": "pergb2018"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "resourcePermissions": {
+      "value": true
+    },
+    "heartbeatTableRetention": {
+      "value": 30
+    }
+  },
+    "deploymentParameters": {
+        "resourceGroup": "wh-nprod-globplat-security-rg-eastus2-01",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/log-analytics-workspace-template.json"
+    }
+}

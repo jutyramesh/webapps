@@ -1,0 +1,413 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "3.0.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "The resource tags.",
+				"required": "yes"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "The resource location.",
+				"required": "yes"
+			}
+		},
+		"workflowName": {
+			"type": "string",
+			"metadata": {
+				"description": "The workflow name.",
+				"required": "yes"
+			}
+		},
+		"identityType": {
+			"type": "string",
+			"allowedValues": [
+				"SystemAssigned"
+			],
+			"defaultValue": "SystemAssigned",
+			"metadata": {
+				"description": "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for the resource.",
+				"required": "no"
+			}
+		},
+		"state": {
+			"type": "string",
+			"allowedValues": [
+				"NotSpecified",
+				"Completed",
+				"Enabled",
+				"Disabled",
+				"Deleted",
+				"Suspended"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "The workflow state.",
+				"required": "no"
+			}
+		},
+		"endpointsConfigurationWorkflowOutgoingIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The outgoing ip address.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"endpointsConfigurationWorkflowAccessEndpointIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The access endpoint ip address.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"endpointsConfigurationConnectorOutgoingIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The outgoing ip address.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"endpointsConfigurationConnectorAccessEndpointIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The access endpoint ip address.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"accessControlTriggersAllowedCallerIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The allowed caller IP address ranges.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"accessControlTriggersOpenAuthenticationPolicies": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Open authentication policies.",
+				"required": "no"
+			}
+		},
+		"accessControlContentsAllowedCallerIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The allowed caller IP address ranges.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"accessControlContentsOpenAuthenticationPolicies": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Open authentication policies.",
+				"required": "no"
+			}
+		},
+		"accessControlActionsAllowedCallerIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The allowed caller IP address ranges.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"accessControlActionsOpenAuthenticationPolicies": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Open authentication policies.",
+				"required": "no"
+			}
+		},
+		"accessControlWorkflowManagementAllowedCallerIpAddresses": {
+			"type": "array",
+			"metadata": {
+				"description": "The allowed caller IP address ranges.",
+				"required": "no",
+				"subType": "string"
+			}
+		},
+		"accessControlWorkflowManagementOpenAuthenticationPolicies": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Open authentication policies.",
+				"required": "no"
+			}
+		},
+		"integrationAccountId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource id.",
+				"required": "no"
+			}
+		},
+		"integrationServiceEnvironmentId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource id.",
+				"required": "no"
+			}
+		},
+		"definition": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Definition for the Logic App.",
+				"required": "no"
+			}
+		},
+		"parameters": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "The parameters for the Logic App.",
+				"required": "no"
+			}
+		},
+		"roleAssignments": {
+			"defaultValue": [],
+			"type": "array",
+			"metadata": {
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						},
+						"type": "string",
+						"allowedValues": [
+							"Logic App Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						]
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					}
+				},
+				"subType": "object",
+				"description": "A list of role assignments mapped to identities"
+			}
+		}
+	},
+	"variables": {
+		"isProd": "[equals(parameters('injectedValues').envType, 'Production')]",
+		"apiVersions": {
+			"workflow": "2019-05-01"
+		},
+		"datacenterIpAddresses": [
+			"63.73.199.0/24",
+			"63.239.17.0/24",
+			"204.15.116.0/22",
+			"209.65.11.0/24"
+		],
+		"prodIpAddresses": [
+			"40.67.188.50/32",
+			"52.177.84.230/32",
+			"52.155.224.242/32",
+			"51.105.163.210/32",
+			"20.36.252.188/32"
+		],
+		"nonProdIpAddresses": [
+			"52.230.220.128/32",
+			"40.65.233.76/32",
+			"52.155.224.148/32",
+			"51.105.144.11/32"
+		],
+		"wbaEgressAllowedIpAddresses": "[union(variables('datacenterIpAddresses'), if(variables('isProd'), variables('prodIpAddresses'), variables('nonProdIpAddresses')))]",
+		"accessControlActionsAllowedCallerIpAddressesWithInternalAddresses" : "[union(parameters('accessControlActionsAllowedCallerIpAddresses'), variables('wbaEgressAllowedIpAddresses'))]",
+		"accessControlContentAllowedCallerIpAddressesWithInternalAddresses" : "[union(parameters('accessControlContentsAllowedCallerIpAddresses'), variables('wbaEgressAllowedIpAddresses'))]",
+		"accessControlWorkflowManagementAllowedCallerIpAddressesWithInternalAddresses" : "[union(parameters('accessControlWorkflowManagementAllowedCallerIpAddresses'), variables('wbaEgressAllowedIpAddresses'))]",
+		"accessControlTriggersAllowedCallerIpAddressesWithInternalAddresses" : "[union(parameters('accessControlTriggersAllowedCallerIpAddresses'), variables('wbaEgressAllowedIpAddresses'))]",
+		"uniqueName": "[uniqueString(parameters('workflowName'))]",
+		"definition": {
+			"$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+			"contentVersion": "1.0.0.0",
+			"parameters": {},
+			"triggers": {},
+			"actions": {},
+			"outputs": {}
+		},
+
+		"copy": [
+			{
+				"name": "endpointsConfigurationWorkflowOutgoingIpAddresses",
+				"count": "[length(parameters('endpointsConfigurationWorkflowOutgoingIpAddresses'))]",
+				"input": {
+					"address": "[parameters('endpointsConfigurationWorkflowOutgoingIpAddresses')[copyIndex('endpointsConfigurationWorkflowOutgoingIpAddresses')]]"
+				}
+			},
+			{
+				"name": "endpointsConfigurationWorkflowAccessEndpointIpAddresses",
+				"count": "[length(parameters('endpointsConfigurationWorkflowAccessEndpointIpAddresses'))]",
+				"input": {
+					"address": "[parameters('endpointsConfigurationWorkflowAccessEndpointIpAddresses')[copyIndex('endpointsConfigurationWorkflowAccessEndpointIpAddresses')]]"
+				}
+			},
+			{
+				"name": "endpointsConfigurationConnectorOutgoingIpAddresses",
+				"count": "[length(parameters('endpointsConfigurationConnectorOutgoingIpAddresses'))]",
+				"input": {
+					"address": "[parameters('endpointsConfigurationConnectorOutgoingIpAddresses')[copyIndex('endpointsConfigurationConnectorOutgoingIpAddresses')]]"
+				}
+			},
+			{
+				"name": "endpointsConfigurationConnectorAccessEndpointIpAddresses",
+				"count": "[length(parameters('endpointsConfigurationConnectorAccessEndpointIpAddresses'))]",
+				"input": {
+					"address": "[parameters('endpointsConfigurationConnectorAccessEndpointIpAddresses')[copyIndex('endpointsConfigurationConnectorAccessEndpointIpAddresses')]]"
+				}
+			},
+			{
+				"name": "accessControlTriggersAllowedCallerIpAddresses",
+				"count": "[length(variables('accessControlTriggersAllowedCallerIpAddressesWithInternalAddresses'))]",
+				"input": {
+					"addressRange": "[variables('accessControlTriggersAllowedCallerIpAddressesWithInternalAddresses')[copyIndex('accessControlTriggersAllowedCallerIpAddresses')]]"
+				}
+			},
+			{
+				"name": "accessControlContentsAllowedCallerIpAddresses",
+				"count": "[length(variables('accessControlContentAllowedCallerIpAddressesWithInternalAddresses'))]",
+				"input": {
+					"addressRange": "[variables('accessControlContentAllowedCallerIpAddressesWithInternalAddresses')[copyIndex('accessControlContentsAllowedCallerIpAddresses')]]"
+				}
+			},
+			{
+				"name": "accessControlActionsAllowedCallerIpAddresses",
+				"count": "[length(variables('accessControlActionsAllowedCallerIpAddressesWithInternalAddresses'))]",
+				"input": {
+					"addressRange": "[variables('accessControlActionsAllowedCallerIpAddressesWithInternalAddresses')[copyIndex('accessControlActionsAllowedCallerIpAddresses')]]"
+				}
+			},
+			{
+				"name": "accessControlWorkflowManagementAllowedCallerIpAddresses",
+				"count": "[length(variables('accessControlWorkflowManagementAllowedCallerIpAddressesWithInternalAddresses'))]",
+				"input": {
+					"addressRange": "[variables('accessControlWorkflowManagementAllowedCallerIpAddressesWithInternalAddresses')[copyIndex('accessControlWorkflowManagementAllowedCallerIpAddresses')]]"
+				}
+			}
+		],
+		"accessControlTriggersOpenAuthenticationPolicies": {
+			"policies": "[parameters('accessControlTriggersOpenAuthenticationPolicies')]"
+		},
+		"accessControlContentsOpenAuthenticationPolicies": {
+			"policies": "[parameters('accessControlContentsOpenAuthenticationPolicies')]"
+		},
+		"accessControlActionsOpenAuthenticationPolicies": {
+			"policies": "[parameters('accessControlActionsOpenAuthenticationPolicies')]"
+		},
+		"accessControlWorkflowManagementOpenAuthenticationPolicies": {
+			"policies": "[parameters('accessControlWorkflowManagementOpenAuthenticationPolicies')]"
+		},
+		"integrationAccount": {
+			"id": "[parameters('integrationAccountId')]"
+		},
+		"integrationServiceEnvironment": {
+			"id": "[parameters('integrationServiceEnvironmentId')]"
+		},
+		"roleAssignmentsApiVersion": "2019-04-01-preview",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Logic App Contributor": "87a39d53-fc1b-424a-814c-f7e04687dc9e",
+		"WBA - LEAP - Resource Deletion":  "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Logic/workflows",
+			"apiVersion": "[variables('apiVersions').workflow]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('workflowName')]",
+			"location": "[parameters('location')]",
+			"identity": {
+				"type": "[parameters('identityType')]"
+			},
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"state": "[parameters('state')]",
+				"definition": "[if(not(empty(parameters('definition'))), parameters('definition'), variables('definition'))]",
+				"parameters": "[parameters('parameters')]",
+				"endpointsConfiguration": {
+					"workflow": {
+						"outgoingIpAddresses": "[variables('endpointsConfigurationWorkflowOutgoingIpAddresses')]",
+						"accessEndpointIpAddresses": "[variables('endpointsConfigurationWorkflowAccessEndpointIpAddresses')]"
+					},
+					"connector": {
+						"outgoingIpAddresses": "[variables('endpointsConfigurationConnectorOutgoingIpAddresses')]",
+						"accessEndpointIpAddresses": "[variables('endpointsConfigurationConnectorAccessEndpointIpAddresses')]"
+					}
+				},
+				"accessControl": {
+					"triggers": {
+						"allowedCallerIpAddresses": "[variables('accessControlTriggersAllowedCallerIpAddresses')]",
+						"openAuthenticationPolicies": "[if(not(empty(parameters('accessControlTriggersOpenAuthenticationPolicies'))), variables('accessControlTriggersOpenAuthenticationPolicies'), json('null'))]"
+					},
+					"contents": {
+						"allowedCallerIpAddresses": "[variables('accessControlContentsAllowedCallerIpAddresses')]",
+						"openAuthenticationPolicies": "[if(not(empty(parameters('accessControlContentsOpenAuthenticationPolicies'))), variables('accessControlContentsOpenAuthenticationPolicies'), json('null'))]"
+					},
+					"actions": {
+						"allowedCallerIpAddresses": "[variables('accessControlActionsAllowedCallerIpAddresses')]",
+						"openAuthenticationPolicies": "[if(not(empty(parameters('accessControlActionsOpenAuthenticationPolicies'))), variables('accessControlActionsOpenAuthenticationPolicies'), json('null'))]"
+					},
+					"workflowManagement": {
+						"allowedCallerIpAddresses": "[variables('accessControlWorkflowManagementAllowedCallerIpAddresses')]",
+						"openAuthenticationPolicies": "[if(not(empty(parameters('accessControlWorkflowManagementOpenAuthenticationPolicies'))), variables('accessControlWorkflowManagementOpenAuthenticationPolicies'), json('null'))]"
+					}
+				},
+				"integrationAccount": "[if(not(empty(parameters('integrationAccountId'))), variables('integrationAccount'), json('null'))]",
+				"integrationServiceEnvironment": "[if(not(empty(parameters('integrationServiceEnvironmentId'))), variables('integrationServiceEnvironment'), json('null'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Logic/workflows/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Logic/workflows', parameters('workflowName'))]"
+			],
+			"name": "[concat(parameters('workflowName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "o",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

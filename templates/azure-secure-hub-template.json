@@ -1,0 +1,243 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags."
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"virtualWanName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network gateway."
+			}
+		},
+		"virtualHubName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network gateway."
+			}
+		},
+		"addressPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": ""
+			}
+		},
+		"vpnClientAddressPool": {
+			"type": "string",
+			"metadata": {
+				"description": ""
+			}
+		},
+		"threatIntelMode": {
+			"type": "string",
+			"allowedValues": [
+				"Alert",
+				"Deny"
+			],
+			"defaultValue": "Alert",
+			"metadata": {
+				"description": "The operation mode for Threat Intel.",
+				"required": "no"
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"virtualWans": "2020-11-01",
+			"virtualHubs": "2020-11-01",
+			"azureFirewalls": "2020-11-01",
+			"firewallPolicies": "2020-11-01",
+			"p2sVpnGateways": "2020-11-01",
+			"vpnServerConfigurations": "2021-08-01"
+		},
+		"azureFirewallName": "[concat(parameters('virtualHubName'), '-fw-01')]",
+		"firewallPolicyName": "[concat(variables('azureFirewallName'), '-policy')]",
+		"virtualWanId": "[resourceId('Microsoft.Network/virtualWans', parameters('virtualWanName'))]",
+		"virtualHubId": "[resourceId('Microsoft.Network/virtualHubs', parameters('virtualHubName'))]",
+		"hubRouteTableId": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', parameters('virtualHubName'), 'defaultRouteTable')]",
+		"azureFirewallId": "[resourceId('Microsoft.Network/azureFirewalls', variables('azureFirewallName'))]",
+		"firewallPolicyId": "[resourceId('Microsoft.Network/firewallPolicies', variables('firewallPolicyName'))]",
+		"vpnGatewayName": "[concat(parameters('virtualHubName'), '-vpngw')]",
+		"vpnServerConfigurationName": "[concat(variables('vpnGatewayName'), '-user-config')]",
+		"vpnServerConfigurationId": "[resourceId('Microsoft.Network/vpnServerConfigurations', variables('vpnServerConfigurationName'))]",
+		"aadAudience": "41b23e61-6c1e-4545-b367-cd054e0ed4b4"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/virtualWans",
+			"apiVersion": "[variables('apiVersions').virtualWans]",
+			"name": "[parameters('virtualWanName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"type": "Standard"
+			}
+		},
+		{
+			"type": "Microsoft.Network/virtualHubs",
+			"apiVersion": "[variables('apiVersions').virtualHubs]",
+			"dependsOn": [
+				"[variables('virtualWanId')]"
+			],
+			"name": "[parameters('virtualHubName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"sku": "Standard",
+				"addressPrefix": "[parameters('addressPrefix')]",
+				"virtualWan": {
+					"id": "[variables('virtualWanId')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Network/firewallPolicies",
+			"apiVersion": "[variables('apiVersions').firewallPolicies]",
+			"name": "[variables('firewallPolicyName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"sku": {
+					"tier": "Standard"
+				},
+				"threatIntelMode": "[parameters('threatIntelMode')]"
+			}
+		},
+		{
+			"type": "Microsoft.Network/azureFirewalls",
+			"apiVersion": "[variables('apiVersions').azureFirewalls]",
+			"dependsOn": [
+				"[variables('virtualHubId')]",
+				"[variables('firewallPolicyId')]"
+			],
+			"name": "[variables('azureFirewallName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"sku": {
+					"name": "AZFW_Hub",
+					"tier": "Standard"
+				},
+				"hubIPAddresses": {
+					"publicIPs": {
+						"addresses": [],
+						"count": 1
+					}
+				},
+				"virtualHub": {
+					"id": "[variables('virtualHubId')]"
+				},
+				"firewallPolicy": {
+					"id": "[variables('firewallPolicyId')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Network/virtualHubs/hubRouteTables",
+			"apiVersion": "[variables('apiVersions').virtualHubs]",
+			"dependsOn": [
+				"[variables('virtualHubId')]",
+				"[variables('azureFirewallId')]"
+			],
+			"name": "[concat(parameters('virtualHubName'), '/defaultRouteTable')]",
+			"properties": {
+				"routes": [
+					{
+						"name": "all_traffic",
+						"destinationType": "CIDR",
+						"destinations": [
+							"0.0.0.0/0",
+							"10.0.0.0/8",
+							"172.16.0.0/12",
+							"192.168.0.0/16"
+						],
+						"nextHopType": "ResourceId",
+						"nextHop": "[variables('azureFirewallId')]"
+					}
+				],
+				"labels": [
+					"default"
+				]
+			}
+		},
+		{
+			"type": "Microsoft.Network/vpnServerConfigurations",
+			"apiVersion": "[variables('apiVersions').vpnServerConfigurations]",
+			"name": "[variables('vpnServerConfigurationName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"vpnProtocols": [
+					"OpenVPN"
+				],
+				"vpnAuthenticationTypes": [
+					"AAD"
+				],
+				"aadAuthenticationParameters": {
+					"aadTenant": "[concat('https://login.microsoftonline.com/', subscription().tenantId, '/')]",
+					"aadAudience": "[variables('aadAudience')]",
+					"aadIssuer": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Network/p2sVpnGateways",
+			"apiVersion": "[variables('apiVersions').p2sVpnGateways]",
+			"dependsOn": [
+				"[variables('vpnServerConfigurationId')]",
+				"[variables('virtualHubId')]",
+				"[variables('hubRouteTableId')]"
+			],
+			"name": "[variables('vpnGatewayName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"virtualHub": {
+					"id": "[variables('virtualHubId')]"
+				},
+				"vpnServerConfiguration": {
+					"id": "[variables('vpnServerConfigurationId')]"
+				},
+				"p2SConnectionConfigurations": [
+					{
+						"name": "P2SConnectionConfigDefault",
+						"properties": {
+							"routingConfiguration": {
+								"associatedRouteTable": {
+									"id": "[variables('hubRouteTableId')]"
+								},
+								"propagatedRouteTables": {
+									"labels": [
+										"default"
+									],
+									"ids": [
+										{
+											"id": "[variables('hubRouteTableId')]"
+										}
+									]
+								}
+							},
+							"vpnClientAddressPool": {
+								"addressPrefixes": [
+									"[parameters('vpnClientAddressPool')]"
+								]
+							},
+							"enableInternetSecurity": true
+						}
+					}
+				],
+				"isRoutingPreferenceInternet": false
+			}
+		}
+	]
+}

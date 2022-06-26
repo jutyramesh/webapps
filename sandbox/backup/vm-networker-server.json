@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNamePrefix": {
+            "value": "anaibkdzp1la002"
+        },
+        "vmCount": {
+            "value": 1
+        },
+        "vmSize": {
+            "value": "Standard_D16s_v3"
+        },
+        "vmAdminUID": {
+            "value": "whadmin"
+        },
+        "vmAdminPWD": {
+            "value": "`_69txR~cHsakf7V"
+        },
+        "vmEnableAcceleratedNetworking": {
+            "value": false
+        },
+        "vmSubnetID": {
+            "value": "/subscriptions/22be09a9-d858-4ffa-a5a8-3172283218d4/resourceGroups/nprod-infra-chef-infra-eastus2/providers/Microsoft.Network/virtualNetworks/wh-sbx-nprod-infra-eastus2-vnet-01/Subnets/sbx-wh-int-infra-eastus2-vnet-01-sn05"
+        },
+        "availabilitySetFaultDomains": {
+            "value": 2
+        },
+        "availabilitySetUpdateDomains": {
+            "value": 2
+        },
+        "vmImageReference": {
+            "value": {
+                "publisher": "RedHat",
+                "offer": "RHEL",
+                "sku": "76-gen2",
+                "version": "latest"
+            }
+        },
+        "vmDisksAppSize": {
+            "value": 1024
+        },
+        "vmDisksSharedQuantity": {
+            "value": 0
+        },
+        "vmDisksSharedSize": {
+            "value": 0
+        },
+        "resourceTypeSuffix": {
+            "value": true
+        },
+        "tags": {
+            "value": {
+                "deployer": "heng.yon"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "sbox-templates-playground",
+        "subscription": "wh-nprod-sbox-01",
+        "templateFile": "templates/virtual-machine-avset-template.json"
+    }
+}

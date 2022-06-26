@@ -1,0 +1,129 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags."
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"routeTableName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the route table.",
+				"required": "yes"
+			}
+		},
+		"routes": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Collection of routes contained within a route table.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "The name of the resource that is unique within a resource group. This name can be used to access the resource.",
+							"required": "no"
+						}
+					},
+					"addressPrefix": {
+						"type": "string",
+						"metadata": {
+							"description": "The destination CIDR to which the route applies.",
+							"required": "no"
+						}
+					},
+					"nextHopType": {
+						"type": "string",
+						"allowedValues": [
+							"VirtualNetworkGateway",
+							"VnetLocal",
+							"Internet",
+							"VirtualAppliance",
+							"None"
+						],
+						"metadata": {
+							"description": "The type of Azure hop the packet should be sent to.",
+							"required": "no"
+						}
+					},
+					"nextHopIpAddress": {
+						"type": "string",
+						"metadata": {
+							"description": "The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance.",
+							"required": "no"
+						}
+					},
+					"hasBgpOverride": {
+						"type": "bool",
+						"defaultValue": false,
+						"metadata": {
+							"description": "A value indicating whether this route overrides overlapping BGP routes regardless of LPM."
+						}
+					}
+				}
+			}
+		},
+		"disableBgpRoutePropagation": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Whether to disable the routes learned by BGP on that route table. True means disable.",
+				"required": "no"
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"routeTables": "2020-11-01"
+		},
+		"defaultRoute": {
+			"name": "UNSET",
+			"addressPrefix": "192.168.1.0/24",
+			"nextHopType": "None",
+			"nextHopIpAddress": "192.168.1.4"
+		},
+		"routes": "[if(empty(parameters('routes')), array(variables('defaultRoute')), parameters('routes'))]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/routeTables",
+			"apiVersion": "[variables('apiVersions').routeTables]",
+			"name": "[parameters('routeTableName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"disableBgpRoutePropagation": "[parameters('disableBgpRoutePropagation')]"
+			}
+		},
+		{
+			"type": "Microsoft.Network/routeTables/routes",
+			"apiVersion": "[variables('apiVersions').routeTables]",
+			"condition": "[not(empty(parameters('routes')))]",
+			"name": "[concat(parameters('routeTableName'), '/', variables('routes')[copyIndex()].name)]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/routeTables', parameters('routeTableName'))]"
+			],
+			"properties": {
+				"addressPrefix": "[variables('routes')[copyIndex()].addressPrefix]",
+				"nextHopType": "[variables('routes')[copyIndex()].nextHopType]",
+				"nextHopIpAddress": "[variables('routes')[copyIndex()].nextHopIpAddress]",
+				"hasBgpOverride": false
+			},
+			"copy": {
+				"name": "routesCopy",
+				"count": "[length(variables('routes'))]"
+			}
+		}
+	]
+}

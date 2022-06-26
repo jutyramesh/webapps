@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"subnetName": {
+			"value": "wh-int-infra-eastus2-vnet-01-sn05"
+		},
+		"virtualNetworkName": {
+			"value": "wh-int-infra-eastus2-vnet-01"
+		},
+		"addressPrefix": {
+			"value": "10.0.1.128/27"
+		},
+		"networkSecurityGroup": {
+			"value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/networkSecurityGroups/wh-int-infra-eastus2-vnet-01-sn05-nsg"
+		},
+		"serviceEndpoints": {
+			"value": []
+		}
+	},
+    "deploymentParameters": {
+		"dependencies": [
+			"nprod_management/wh-int-infra-eastus2-vnet-01-sn05-nsg.json"
+		],
+        "resourceGroup": "wh-int-infra-eastus2-vnet-01-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/virtual-network-subnet-template.json"
+    }
+}

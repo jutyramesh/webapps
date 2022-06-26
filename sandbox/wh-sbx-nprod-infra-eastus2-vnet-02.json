@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+                "Deployer": "Josh Hetland",
+                "DeployDate": "2022-06-10",
+                "Routable": "True"
+            }
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"virtualNetworkName": {
+			"value": "wh-sbx-nprod-infra-eastus2-vnet-02"
+		},
+		"addressSpaceAddressPrefixes": {
+			"value": [
+				"10.0.19.0/24"
+			]
+		}
+	},
+	"deploymentParameters": {
+		"force": 1,
+        "resourceGroup": "nprod-infra-adjoin-test-eastus2",
+        "subscription": "wh-nprod-sbox-01",
+        "templateFile": "templates/virtual-network-template.json"
+    }
+}

@@ -1,0 +1,135 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags."
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"azureFirewallName": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 56,
+			"metadata": {
+				"description": "The name of the Azure Firewall.",
+				"required": "yes"
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"allowedValues": [
+				"AZFW_VNet",
+				"AZFW_Hub"
+			],
+			"defaultValue": "AZFW_VNet",
+			"metadata": {
+				"description": "Name of an Azure Firewall SKU.",
+				"required": "no"
+			}
+		},
+		"skuTier": {
+			"type": "string",
+			"allowedValues": [
+				"Standard"
+			],
+			"defaultValue": "Standard",
+			"metadata": {
+				"description": "Tier of an Azure Firewall.",
+				"required": "no"
+			}
+		},
+		"threatIntelMode": {
+			"type": "string",
+			"allowedValues": [
+				"Alert",
+				"Deny"
+			],
+			"defaultValue": "Alert",
+			"metadata": {
+				"description": "The operation mode for Threat Intel.",
+				"required": "no"
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"azureFirewalls": "2020-11-01"
+		},
+		"publicIpName": "[concat(parameters('azureFirewallName'), '-pip-01')]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/publicIPAddresses",
+			"apiVersion": "[variables('apiVersions').azureFirewalls]",
+			"name": "[variables('publicIpName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"sku": {
+				"name": "Standard",
+				"tier": "Regional"
+			},
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ],
+			"properties": {
+				"publicIPAddressVersion": "IPv4",
+				"publicIPAllocationMethod": "Static"
+			}
+		},
+		{
+			"type": "Microsoft.Network/azureFirewalls",
+			"apiVersion": "[variables('apiVersions').azureFirewalls]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+			],
+			"name": "[parameters('azureFirewallName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ],
+			"properties": {
+				"sku": {
+					"name": "[parameters('skuName')]",
+					"tier": "[parameters('skuTier')]"
+				},
+				"threatIntelMode": "[parameters('threatIntelMode')]",
+				"additionalProperties": {},
+				"ipConfigurations": [
+					{
+						"name": "IpConf",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+							},
+							"subnet": {
+								"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'), 'AzureFirewallSubnet')]"
+							}
+						}
+					}
+				],
+				"networkRuleCollections": [],
+				"applicationRuleCollections": [],
+				"natRuleCollections": []
+			}
+		}
+	]
+}

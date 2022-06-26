@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNamePrefix": {
+            "value": "rwl-ilog"
+        },
+        "vmCount": {
+            "value": 1
+        },
+        "vmSize": {
+            "value": "Standard_B4ms"
+        },
+        "vmAdminUID": {
+            "value": "whadmin"
+        },
+        "vmAdminPWD": {
+            "value": "teasdaskfjh@#42315"
+        },
+        "vmEnableAcceleratedNetworking": {
+            "value": false
+        },
+        "vmSubnetID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn06"
+        },
+        "availabilitySetFaultDomains": {
+            "value": 3
+        },
+        "availabilitySetUpdateDomains": {
+            "value": 3
+        },
+        "vmImageReference": {
+            "value": {
+                "publisher": "MicrosoftWindowsServer",
+                "offer": "WindowsServer",
+                "sku": "2019-datacenter-gensecond",
+                "version": "latest"
+            }
+        },
+        "vmDisksAppSize": {
+            "value": 32
+        },
+        "vmDisksSharedQuantity": {
+            "value": 0
+        },
+        "vmDisksSharedSize": {
+            "value": 0
+        },
+        "resourceTypeSuffix": {
+            "value": true
+        },
+        "tags": {
+            "value": {
+                "deployer": "heng.yon"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "wh-int-infra-eastus2-vnet-01-monitoring-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/virtual-machine-avset-template.json"
+    }
+}

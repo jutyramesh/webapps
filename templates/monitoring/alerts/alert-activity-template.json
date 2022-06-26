@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "type": "string"
+        },
+        "resourceID": {
+            "type": "string"
+        },
+        "actionGroupID": {
+            "type": "string"
+        },
+        "allOf": {
+            "type": "array"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('alertName')]",
+            "location": "Global",
+            "properties": {
+                "scopes": [
+                    "[parameters('resourceID')]"
+                ],
+                "condition": {
+                    "allOf": "[parameters('allOf')]"
+                },
+                "actions": {
+                    "actionGroups": [
+                        {
+                            "actionGroupId": "[parameters('actionGroupID')]"
+                        }
+                    ]
+                },
+                "enabled": true
+            }
+        }
+    ]
+}

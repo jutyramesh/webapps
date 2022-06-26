@@ -1,0 +1,44 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus2"
+        },
+        "name": {
+            "value": "peering-wh-int-infra-eastus2-vnet-01-sn06-nsg-flow-logs"
+        },
+        "storageId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-monitoring-rg/providers/Microsoft.Storage/storageAccounts/infravnet01nsgsflowlogs"
+        },
+        "targetNSGResourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/networkSecurityGroups/wh-int-infra-eastus2-vnet-01-sn06-nsg"
+        },
+        "enableFlowLogs": {
+            "value": true
+        },
+        "version": {
+            "value": 2
+        },
+        "retentionPolicyDays": {
+            "value": 30
+        },
+        "retentionPolicyEnabled": {
+            "value": true
+        },
+        "networkWatcherFlowAnalyticsConfiguration": {
+            "value": {
+                "enabled": true,
+                "trafficAnalyticsInterval": 60,
+                "workspaceId": "442e08d2-2819-490e-bb9c-35d09f212547",
+                "workspaceRegion": "eastus2",
+                "workspaceResourceId": "/subscriptions/5eaff8ca-ddf3-48ed-8f57-3a3cc9e271ed/resourcegroups/wh-nprod-provisioning-eastus2-loganalytics-workspace-01-rg/providers/microsoft.operationalinsights/workspaces/wh-nprod-provisioning-eastus2-loganalytics-workspace-01"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "NetworkWatcherRG",
+        "templateFile": "templates/nsg/flow-logs/flow-log-template.json"
+    }
+}

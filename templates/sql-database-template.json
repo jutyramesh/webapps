@@ -1,0 +1,788 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.6.2.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location.",
+				"required": "yes"
+			}
+		},
+		"serverName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the server.",
+				"required": "yes"
+			}
+		},
+		"databaseName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the database.",
+				"required": "yes"
+			}
+		},
+		"databaseType": {
+			"type": "string",
+			"allowedValues": [
+				"Database",
+				"Synapse",
+				"DataWarehouse"
+			],
+			"metadata": {
+				"description": "Type of database to create: either Database or Synapse."
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of the SKU, typically, a letter + Number code, e.g. P3.",
+				"required": "yes"
+			}
+		},
+		"skuTier": {
+			"type": "string",
+			"allowedValues": [
+				"BusinessCritical",
+				"GeneralPurpose",
+				"Hyperscale"
+			],
+			"defaultValue": "GeneralPurpose",
+			"metadata": {
+				"description": "The tier or edition of the particular SKU, e.g. Basic, Premium.",
+				"required": "no"
+			}
+		},
+		"skuSize": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Size of the particular SKU",
+				"required": "no"
+			}
+		},
+		"skuFamily": {
+			"type": "string",
+			"defaultValue": "Gen5",
+			"metadata": {
+				"description": "If the service has different generations of hardware, for the same SKU, then that can be captured here.",
+				"required": "no"
+			}
+		},
+		"skuCapacity": {
+			"type": "int",
+			"defaultValue": 2,
+			"metadata": {
+				"description": "Capacity of the particular SKU.",
+				"required": "no"
+			}
+		},
+		"createMode": {
+			"type": "string",
+			"allowedValues": [
+				"Default",
+				"Secondary",
+				"OnlineSecondary"
+			],
+			"defaultValue": "Default",
+			"metadata": {
+				"description": "Specifies the mode of database creation.\r\n\r\nDefault: regular database creation.\r\n\r\nCopy: creates a database as a copy of an existing database. sourceDatabaseId must be specified as the resource ID of the source database.\r\n\r\nSecondary: creates a database as a secondary replica of an existing database. sourceDatabaseId must be specified as the resource ID of the existing primary database.\r\n\r\nPointInTimeRestore: Creates a database by restoring a point in time backup of an existing database. sourceDatabaseId must be specified as the resource ID of the existing database, and restorePointInTime must be specified.\r\n\r\nRecovery: Creates a database by restoring a geo-replicated backup. sourceDatabaseId must be specified as the recoverable database resource ID to restore.\r\n\r\nRestore: Creates a database by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the database's original resource ID, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sourceDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\r\n\r\nRestoreLongTermRetentionBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the recovery point resource ID.\r\n\r\nCopy, Secondary, and RestoreLongTermRetentionBackup are not supported for DataWarehouse edition.",
+				"required": "no"
+			}
+		},
+		"collation": {
+			"type": "string",
+			"allowedValues": [
+				"SQL_Latin1_General_CP1_CI_AS"
+			],
+			"defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+			"metadata": {
+				"description": "The collation of the database.",
+				"required": "no"
+			}
+		},
+		"maxSizeBytes": {
+			"type": "int",
+			"minValue": 0,
+			"maxValue": 4398046511104,
+			"defaultValue": 0,
+			"metadata": {
+				"description": "The max size of the database expressed in bytes. It defaults to 0, which sets the size to 32GB. You should use a value between 1073741824(1GB) and 4398046511104(4TB). This parameter does not apply to Synapse",
+				"required": "no"
+			}
+		},
+		"elasticPoolId": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the elastic pool containing this database.",
+				"required": "no"
+			}
+		},
+		"sourceDatabaseId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the source database associated with create operation of this database.",
+				"required": "no"
+			}
+		},
+		"restorePointInTime": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the point in time (ISO8601 format) of the source database that will be restored to create the new database.",
+				"required": "no"
+			}
+		},
+		"sourceDatabaseDeletionDate": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the time that the database was deleted.",
+				"required": "no"
+			}
+		},
+		"recoveryServicesRecoveryPointId": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the recovery point associated with create operation of this database.",
+				"required": "no"
+			}
+		},
+		"longTermRetentionBackupResourceId": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the long term retention backup associated with create operation of this database.",
+				"required": "no"
+			}
+		},
+		"recoverableDatabaseId": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the recoverable database associated with create operation of this database.",
+				"required": "no"
+			}
+		},
+		"restorableDroppedDatabaseId": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "The resource identifier of the restorable dropped database associated with create operation of this database.",
+				"required": "no"
+			}
+		},
+		"catalogCollation": {
+			"type": "string",
+			"allowedValues": [
+				"DATABASE_DEFAULT",
+				"SQL_Latin1_General_CP1_CI_AS"
+			],
+			"defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+			"metadata": {
+				"description": "Collation of the metadata catalog.",
+				"required": "no"
+			}
+		},
+		"zoneRedundant": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones.",
+				"required": "no"
+			}
+		},
+		"licenseType": {
+			"type": "string",
+			"allowedValues": [
+				"LicenseIncluded"
+			],
+			"defaultValue": "LicenseIncluded",
+			"metadata": {
+				"description": "The license type to apply for this database. `LicenseIncluded` if you need a license, or `BasePrice` if you have a license and are eligible for the Azure Hybrid Benefit.",
+				"required": "no"
+			}
+		},
+		"readScale": {
+			"type": "string",
+			"allowedValues": [
+				"Disabled"
+			],
+			"defaultValue": "Disabled",
+			"metadata": {
+				"description": "The state of read-only routing. If enabled, connections that have application intent set to readonly in their connection string may be routed to a readonly secondary replica in the same region.",
+				"required": "no"
+			}
+		},
+		"readReplicaCount": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "The number of readonly secondary replicas associated with the database.",
+				"required": "no"
+			}
+		},
+		"autoPauseDelay": {
+			"type": "int",
+			"allowedValues": [
+				-1
+			],
+			"defaultValue": -1,
+			"metadata": {
+				"description": "Time in minutes after which database is automatically paused. A value of -1 means that automatic pause is disabled",
+				"required": "no"
+			}
+		},
+		"storageAccountType": {
+			"type": "string",
+			"allowedValues": [
+				"GRS"
+			],
+			"defaultValue": "GRS",
+			"metadata": {
+				"description": "The storage account type used to store backups for this database. Currently the only supported option is GRS (GeoRedundantStorage).",
+				"required": "no"
+			}
+		},
+		"minCapacity": {
+			"type": "int",
+			"defaultValue": -1,
+			"metadata": {
+				"description": "Minimal capacity that database will always have allocated, if not paused",
+				"required": "no"
+			}
+		},
+		"transparentDataEncryptionName": {
+			"type": "string",
+			"allowedValues": [
+				"current"
+			],
+			"defaultValue": "current",
+			"metadata": {
+				"description": "The name of the transparent data encryption configuration.",
+				"required": "yes"
+			}
+		},
+		"transparentDataEncryptionStatus": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "The status of the database transparent data encryption.",
+				"required": "no"
+			}
+		},
+		"storageAccountId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A blob storage account id to store scan results.",
+				"required": "no"
+			}		
+		},
+		"enableAdvancedDataSecurity": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "ADS provides a set of advanced SQL security capabilities, including Data Discovery & Classification, SQL Vulnerability Assessment, and Advanced Threat Protection."
+			}
+		},
+		"storageAccountAccessKey": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the identifier key of the Threat Detection audit storage account.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the security alert policy.",
+				"required": "yes"
+			}
+		},
+		"securityAlertPolicyState": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Specifies the state of the policy, whether it is enabled or disabled or a policy has not been applied yet on the specific database.",
+				"required": "yes"
+			}
+		},
+		"securityAlertPolicyDisabledAlerts": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of alerts that are disabled. Allowed values are: Sql_Injection, Sql_Injection_Vulnerability, Access_Anomaly, Data_Exfiltration, Unsafe_Action",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyEmailAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of e-mail addresses to which the alert is sent.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyEmailAccountAdmins": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies that the alert is sent to the account administrators.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyStorageEndpoint": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the blob storage endpoint (e.g. https://MyAccount.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyStorageAccountAccessKey": {
+			"type": "string",
+			"allowedValues": [""],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Specifies the identifier key of the Threat Detection audit storage account.",
+				"required": "no"
+			}
+		},
+		"securityAlertPolicyRetentionDays": {
+			"type": "int",
+			"minValue": 60,
+			"defaultValue": 60,
+			"metadata": {
+				"description": "Specifies the number of days to keep in the Threat Detection audit logs.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the vulnerability assessment.",
+				"required": "yes"
+			}
+		},
+		"vulnerabilityAssessmentRecurringScansIsEnabled": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Recurring scans state.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentEmailAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Specifies an array of e-mail addresses to which the alert is sent.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentEmailSubscriptionAdmins": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies that the alert is sent to the account administrators.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentStorageContainerPath": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "A blob storage container path to hold the scan results (e.g. https://myStorage.blob.core.windows.net/VaScans/).",
+				"required": "yes"
+			}
+		},
+		"vulnerabilityAssessmentStorageContainerSasKey": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "A shared access signature (SAS Key) that has read and write access to the blob container specified in 'storageContainerPath' parameter. If 'storageAccountAccessKey' isn't specified, StorageContainerSasKey is required.",
+				"required": "no"
+			}
+		},
+		"vulnerabilityAssessmentStorageAccountAccessKey": {
+			"type": "string",
+			"defaultValue": "",
+			"allowedValues": [""],
+			"metadata": {
+				"description": "Specifies the identifier key of the Threat Detection audit storage account.",
+				"required": "no"
+			}
+		},
+		"auditingSettingName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The name of the blob auditing policy.",
+				"required": "yes"
+			}
+		},
+		"auditingSettingIsAzureMonitorTargetEnabled": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Specifies whether audit events are sent to Azure Monitor. \r\nIn order to send the events to Azure Monitor, specify 'state' as 'Enabled' and 'isAzureMonitorTargetEnabled' as true.\r\n\r\nWhen using REST API to configure auditing, Diagnostic Settings with 'SQLSecurityAuditEvents' diagnostic logs category on the database should be also created.\r\nNote that for server level audit you should use the 'master' database as {databaseName}.\r\n\r\nDiagnostic Settings URI format:\r\nPUT https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/providers/microsoft.insights/diagnosticSettings/{settingsName}?api-version=2017-05-01-preview\r\n\r\nFor more information, see [Diagnostic Settings REST API](https://go.microsoft.com/fwlink/?linkid=2033207)\r\nor [Diagnostic Settings PowerShell](https://go.microsoft.com/fwlink/?linkid=2033043)\r\n",
+				"required": "no"
+			}
+		},
+		"auditingSettingState": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled"
+			],
+			"defaultValue": "Enabled",
+			"metadata": {
+				"description": "Specifies the state of the policy. If state is Enabled, storageEndpoint or isAzureMonitorTargetEnabled are required.",
+				"required": "yes"
+			}
+		},
+		"backupShortTermRetentionPolicyName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The policy name. Should always be \"default\".",
+				"required": "yes"
+			}
+		},
+		"backupLongTermRetentionPolicyName": {
+			"type": "string",
+			"allowedValues": [
+				"default"
+			],
+			"defaultValue": "default",
+			"metadata": {
+				"description": "The policy name. Should always be Default.",
+				"required": "yes"
+			}
+		},
+		"applicationAccounts": {
+			"type": "array",
+			"metadata": {
+				"description": "The name of the service principal that will be used by the application to access the database.  The application accounts provided receive read/write access regardless of prod/non-prod.",
+				"subType": "string"
+			}
+		},
+		"distributionLists": {
+			"type": "array",
+			"metadata": {
+				"description": "A distribution list (DL) of human users that will need to access the database.  This parameter is for admins setting up the database in non-prod and will become owners.   Non-admin user accounts should be created outside of the pipeline.  In prod, this DL will be assigned read-only access to this database.",
+				"subType": "string"
+			}
+		},
+		"enableAlwaysEncrypted": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether or not to enable use of always encrypted on the database. Three keyvault resource ids are required."
+			}
+		},
+		"piiKeyvaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Keyvault resource ID used for PII encryption keys",
+				"subType": "resourceId"
+			}
+		},
+		"phiKeyvaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Keyvault resource ID used for PHI encryption keys",
+				"subType": "resourceId"
+			}
+		},
+		"govKeyvaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Keyvault resource ID used for Government ID encryption keys",
+				"subType": "resourceId"
+			}
+		}
+	},
+	"variables": {
+		"apiVersion": {
+			"database": "2019-06-01-preview",
+			"securityAlertPolicy": "2020-02-02-preview",
+			"securityAlertPolicy": "2017-03-01-preview",
+			"vulnerabilityAssessment": "2017-03-01-preview",
+			"transparentDataEncryption": "2014-04-01",
+			"auditingSetting": "2017-03-01-preview",
+			"backupShortTermRetentionPolicy": "2020-02-02-preview",
+			"backupLongTermRetentionPolicy": "2017-03-01-preview",
+			"keyvault": "2019-09-01",
+			"deployments": "2020-10-01"
+		},
+		"uniqueName": "[uniqueString(parameters('databaseName'))]",
+		"isDatabase": "[equals(parameters('databaseType'), 'Database')]",
+		"isSynapse": "[not(variables('isDatabase'))]",
+		"isReplica": "[equals(parameters('createMode'), 'OnlineSecondary')]",
+		"synapseSkuTier": "DataWarehouse",
+		"databaseKind": "[concat('v12.0,user,', if(variables('isDatabase'), 'vcore', toLower(variables('synapseSkuTier'))))]",
+		"isProd": "[equals(parameters('injectedValues').envType, 'Production')]",
+		"defaultDatabaseSkuName": "GP_Gen5",
+		"defaultSynapseSkuName": "DW100c",
+		"defaultSkuName": "[if(variables('isDatabase'), variables('defaultDatabaseSkuName'), variables('defaultSynapseSkuName'))]",
+		"skuName": "[if(not(empty(parameters('skuName'))), parameters('skuName'), variables('defaultSkuName'))]", 
+		"maxSizeBytes": "[if(variables('isDatabase'), parameters('maxSizeBytes'), 0)]",
+		"prodBackupLongTermRetentionPolicy": {
+			"weeklyRetention": "P1M",
+			"monthlyRetention": "P6m"
+		},
+		"nprodBackupLongTermRetentionPolicy": {
+			"weeklyRetention": "P2W",
+			"monthlyRetention": "P2m"
+		},
+		"prodBackupShortTermRetentionPolicy": 14,
+		"nprodBackupShortTermRetentionPolicy": 7,
+		"defaultEmailAddresses": [
+			"admin.noreply@boots.co.uk",
+			"admin.noreply@walgreens.co.uk"
+		],
+		"storageAccount": {
+			"subscriptionId": "[if(not(empty(parameters('storageAccountId'))), split(parameters('storageAccountId'), '/')[2], subscription().subscriptionId)]",
+			"resourceGroup": "[if(not(empty(parameters('storageAccountId'))), split(parameters('storageAccountId'), '/')[4], resourceGroup().name)]",
+			"name": "[if(not(empty(parameters('storageAccountId'))), split(parameters('storageAccountId'), '/')[8], '')]"
+		},
+		"storageAccountEndpoint": "[concat('https://', variables('storageAccount').name, '.blob.core.windows.net/')]",
+		"storageContainerPath": "[concat('https://', variables('storageAccount').name, '.blob.core.windows.net/vulnerability-assessments/')]",
+		"piiKeyvault": {
+			"subscriptionId": "[if(not(empty(parameters('piiKeyvaultId'))), split(parameters('piiKeyvaultId'), '/')[2], subscription().subscriptionId)]",
+			"resourceGroup": "[if(not(empty(parameters('piiKeyvaultId'))), split(parameters('piiKeyvaultId'), '/')[4], resourceGroup().name)]",
+			"name": "[if(not(empty(parameters('piiKeyvaultId'))), split(parameters('piiKeyvaultId'), '/')[8], '')]"
+		},
+		"phiKeyvault": {
+			"subscriptionId": "[if(not(empty(parameters('phiKeyvaultId'))), split(parameters('phiKeyvaultId'), '/')[2], subscription().subscriptionId)]",
+			"resourceGroup": "[if(not(empty(parameters('phiKeyvaultId'))), split(parameters('phiKeyvaultId'), '/')[4], resourceGroup().name)]",
+			"name": "[if(not(empty(parameters('phiKeyvaultId'))), split(parameters('phiKeyvaultId'), '/')[8], '')]"
+		},
+		"govKeyvault": {
+			"subscriptionId": "[if(not(empty(parameters('govKeyvaultId'))), split(parameters('govKeyvaultId'), '/')[2], subscription().subscriptionId)]",
+			"resourceGroup": "[if(not(empty(parameters('govKeyvaultId'))), split(parameters('govKeyvaultId'), '/')[4], resourceGroup().name)]",
+			"name": "[if(not(empty(parameters('govKeyvaultId'))), split(parameters('govKeyvaultId'), '/')[8], '')]"
+		},
+		"accessPolicies": [
+			{
+				"tenantId": "92cb778e-8ba7-4f34-a011-4ba6e7366996",
+				"objectId": "66adf39e-a329-4594-acd0-cbc11d71593b",
+				"permissions": {
+					"keys": ["get", "create", "wrapKey", "unwrapKey", "sign", "verify", "list", "encrypt", "decrypt"]
+				}
+			},
+			{
+				"tenantId": "92cb778e-8ba7-4f34-a011-4ba6e7366996",
+				"objectId": "e7210bd5-5d0c-4b2a-a8e9-86f8ebbbab3d",
+				"permissions": {
+					"keys": ["get", "create", "wrapKey", "unwrapKey", "sign", "verify", "list", "encrypt", "decrypt"]
+				}
+			}
+        ],
+		"pipelineVirtualNetworks": [
+			{
+				"id": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/prod-mgmt-hub-vnet-eastus2-01/providers/Microsoft.Network/virtualNetworks/prod-int-phub-eastus2-vnet-01/subnets/prod-int-phub-eastus2-vnet-01-sn01"
+			},
+			{
+				"id": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/prod-mgmt-hub-vnet-centralus-01/providers/Microsoft.Network/virtualNetworks/prod-int-phub-centralus-vnet-01/subnets/prod-int-phub-centralus-vnet-01-sn01"
+			},
+			{
+				"id": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/nprod-mgmt-hub-vnet-eastus2-01/providers/Microsoft.Network/virtualNetworks/nprod-int-nhub-eastus2-vnet-01/subnets/nprod-int-nhub-eastus2-vnet-01-sn01"
+			},
+			{
+				"id": "/subscriptions/5f82d5c3-ea71-45f3-826a-4dbbcf6bf5e0/resourceGroups/nprod-mgmt-hub-vnet-centralus-01/providers/Microsoft.Network/virtualNetworks/nprod-int-nhub-centralus-vnet-01/subnets/nprod-int-nhub-centralus-vnet-01-sn01"
+			}
+		]
+	},
+	"resources": [
+        {
+            "type": "Microsoft.Sql/servers/securityAlertPolicies",
+			"apiVersion": "[variables('apiVersion').securityAlertPolicy]",
+			"condition": "[parameters('enableAdvancedDataSecurity')]",
+			"dependsOn": [],
+			"name": "[concat(parameters('serverName'), '/', parameters('securityAlertPolicyName'))]",
+            "properties": {
+                "state": "[parameters('securityAlertPolicyState')]"
+            }
+        },
+		{
+			"type": "Microsoft.Sql/servers/databases",
+			"apiVersion": "[variables('apiVersion').database]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'))]",
+			"location": "[parameters('location')]",
+			"kind": "[variables('databaseKind')]",
+			"sku": {
+				"name": "[variables('skuName')]",
+				"tier": "[if(variables('isDatabase'), parameters('skuTier'), variables('synapseSkuTier'))]",
+				"size": "[parameters('skuSize')]",
+				"family": "[if(variables('isDatabase'), parameters('skuFamily'), json('null'))]",
+				"capacity": "[if(variables('isDatabase'), parameters('skuCapacity'), json('null'))]"
+			},
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"createMode": "[parameters('createMode')]",
+				"collation": "[parameters('collation')]",
+				"maxSizeBytes": "[variables('maxSizeBytes')]",
+				"elasticPoolId": "[if(empty(parameters('elasticPoolId')), json('null'), parameters('elasticPoolId'))]",
+				"sourceDatabaseId": "[if(empty(parameters('sourceDatabaseId')), json('null'), parameters('sourceDatabaseId'))]",
+				"restorePointInTime": "[if(empty(parameters('restorePointInTime')), json('null'), parameters('restorePointInTime'))]",
+				"sourceDatabaseDeletionDate": "[if(empty(parameters('sourceDatabaseDeletionDate')), json('null'), parameters('sourceDatabaseDeletionDate'))]",
+				"recoveryServicesRecoveryPointId": "[if(empty(parameters('recoveryServicesRecoveryPointId')), json('null'), parameters('recoveryServicesRecoveryPointId'))]",
+				"longTermRetentionBackupResourceId": "[if(empty(parameters('longTermRetentionBackupResourceId')), json('null'), parameters('longTermRetentionBackupResourceId'))]",
+				"recoverableDatabaseId": "[if(empty(parameters('recoverableDatabaseId')), json('null'), parameters('recoverableDatabaseId'))]",
+				"restorableDroppedDatabaseId": "[if(empty(parameters('restorableDroppedDatabaseId')), json('null'), parameters('restorableDroppedDatabaseId'))]",
+				"catalogCollation": "[parameters('catalogCollation')]",
+				"zoneRedundant": "[parameters('zoneRedundant')]",
+				"licenseType": "[parameters('licenseType')]",
+				"readScale": "[parameters('readScale')]",
+				"readReplicaCount": "[parameters('readReplicaCount')]",
+				"autoPauseDelay": "[parameters('autoPauseDelay')]",
+				"storageAccountType": "[parameters('storageAccountType')]",
+				"minCapacity": "[if(greater(parameters('minCapacity'), -1), parameters('minCapacity'), json('null'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+			"apiVersion": "[variables('apiVersion').transparentDataEncryption]",
+			"condition": "[not(variables('isReplica'))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'), parameters('databaseName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'), '/', parameters('transparentDataEncryptionName'))]",
+			"properties": {
+				"status": "[parameters('transparentDataEncryptionStatus')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+			"apiVersion": "[variables('apiVersion').securityAlertPolicy]",
+			"condition": "[parameters('enableAdvancedDataSecurity')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'), parameters('databaseName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'), '/', parameters('securityAlertPolicyName'))]",
+			"properties": {
+				"state": "[parameters('securityAlertPolicyState')]",
+				"disabledAlerts": "[parameters('securityAlertPolicyDisabledAlerts')]",
+				"emailAddresses": "[parameters('securityAlertPolicyEmailAddresses')]",
+				"emailAccountAdmins": "[parameters('securityAlertPolicyEmailAccountAdmins')]",
+				"storageEndpoint": "[if(not(empty(parameters('storageAccountId'))), variables('storageAccountEndpoint'), json('null'))]",
+				"storageAccountAccessKey": "[if(not(empty(parameters('storageAccountAccessKey'))), parameters('storageAccountAccessKey'), json('null'))]",
+				"retentionDays": "[parameters('securityAlertPolicyRetentionDays')]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+			"apiVersion": "[variables('apiVersion').vulnerabilityAssessment]",
+			"condition": "[parameters('enableAdvancedDataSecurity')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'), parameters('databaseName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'), '/', parameters('vulnerabilityAssessmentName'))]",
+			"properties": {
+				"storageContainerPath": "[if(not(empty(parameters('storageAccountId'))), variables('storageContainerPath'), json('null'))]",
+				"storageContainerSasKey": "[json('null')]",
+				"storageAccountAccessKey": "[if(not(empty(parameters('storageAccountAccessKey'))), parameters('storageAccountAccessKey'), json('null'))]",
+				"recurringScans": {
+					"isEnabled": "[parameters('vulnerabilityAssessmentRecurringScansIsEnabled')]",
+					"emailSubscriptionAdmins": "[parameters('vulnerabilityAssessmentEmailSubscriptionAdmins')]",
+					"emails": "[parameters('vulnerabilityAssessmentEmailAddresses')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
+			"apiVersion": "[variables('apiVersion').backupShortTermRetentionPolicy]",
+			"condition": "[variables('isDatabase')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'), parameters('databaseName'))]",
+				"[resourceId('Microsoft.Sql/servers/databases/transparentDataEncryption', parameters('serverName'), parameters('databaseName'), parameters('transparentDataEncryptionName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'), '/', parameters('backupShortTermRetentionPolicyName'))]",
+			"properties": {
+				"retentionDays": "[if(variables('isProd'), variables('prodBackupShortTermRetentionPolicy'), variables('nprodBackupShortTermRetentionPolicy'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+			"apiVersion": "[variables('apiVersion').backupLongTermRetentionPolicy]",
+			"condition": "[variables('isDatabase')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'), parameters('databaseName'))]",
+				"[resourceId('Microsoft.Sql/servers/databases/transparentDataEncryption', parameters('serverName'), parameters('databaseName'), parameters('transparentDataEncryptionName'))]"
+			],
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'), '/', parameters('backupLongTermRetentionPolicyName'))]",
+			"properties": "[if(variables('isProd'), variables('prodBackupLongTermRetentionPolicy'), variables('nprodBackupLongTermRetentionPolicy'))]"
+		}
+	]
+}

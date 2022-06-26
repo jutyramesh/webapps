@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptions": {
+      "value": [
+        "62cc7515-a607-4af3-9541-ca300c09d7b3",
+        "f3bc937e-4c44-49db-bbe4-73eeabd144e5",
+        "5eaff8ca-ddf3-48ed-8f57-3a3cc9e271ed",
+        "c945a18b-dab8-4ac5-a8bd-8112afef0738",
+        "22be09a9-d858-4ffa-a5a8-3172283218d4",
+        "e18622f0-1586-4772-8593-2791dd7d1c5f",
+        "5d9206aa-c786-4f9a-b9ed-627ac9d6dc6f",
+        "904fc405-ce86-412b-aa1c-1c689eb7f38e"
+      ]
+    },
+    "workspaceName": {
+      "value": "wh-nprod-globplat-seclaws-eastus2-01"
+    },
+    "location": {
+      "value": "East US2"
+    }
+  },
+  "deploymentParameters": {
+    "resourceGroup": "wh-nprod-globplat-security-rg-eastus2-01",
+    "subscription": "wh-nprod-management-01",
+    "templateFile": ".\\templates\\log-analytics-subscriptions-datasource-template.json"
+  }
+}

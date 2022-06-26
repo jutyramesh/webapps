@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "value": "nprod-infra-dns-agents-acg-02"
+    },
+    "containerName": {
+      "value": "nprod-infra-dns-agents-aci-02"
+    },
+    "image": {
+      "value": "nprodinfraprovisioningagentsacr01.azurecr.io/ccp-dns-agent:20220617.2"
+    },
+    "identity": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-dns-agents-eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/nprod-infra-dns-agents-id-01"
+    },
+    "subnetResourceId": {
+      "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn01"
+    },
+    "ports": {
+      "value": [
+        {
+          "port": "53",
+          "protocol": "UDP"
+        },
+        {
+          "port": "953",
+          "protocol": "TCP"
+        }
+      ]
+    }
+  },
+  "deploymentParameters": {
+    "resourceGroup": "nprod-infra-dns-agents-eastus2",
+    "subscription": "wh-nprod-management-01",
+    "templateFile": "templates/acg-template.json"
+  }
+}

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-when-storage-account-nprodinfrastorage01-availability-less-than-50-percentage"
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Storage/storageAccounts/nprodinfrastorage01"
+        },
+        "metricName": {
+            "value": "Availability"
+        },
+        "threshold": {
+            "value": 50
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actiongroups/WH-CCP-NPROD"
+        },
+        "evaluationfrequency": {
+            "value": "PT15M"
+        },
+        "windowsize": {
+            "value": "PT15M"
+        },
+        "timeAggregation": {
+            "value": "Average"
+        },
+        "alertseverity": {
+            "value": 2
+        },
+        "operator": {
+            "value": "LessThan"
+        }
+    },
+    "deploymentparameters": {
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+    }
+}

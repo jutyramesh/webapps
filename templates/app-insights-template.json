@@ -1,0 +1,579 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.2.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object"
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location",
+				"required": "yes"
+			}
+		},
+		"componentName": {
+			"type": "string",
+			"metadata": {
+				"required": "yes",
+				"subType": "regex",
+				"pattern": "^[a-zA-Z][a-zA-Z0-9-]*$",
+				"description": "The name of the Application Insights component resource."
+			}
+		},
+		"kind": {
+			"type": "string",
+			"defaultValue": "web",
+			"metadata": {
+				"description": "The kind of application that this component refers to, used to customize UI. This value is a freeform string, values should typically be one of the following: web, ios, other, store, java, phone.",
+				"required": "yes"
+			}
+		},
+		"Application_Type": {
+			"type": "string",
+			"allowedValues": [
+				"web",
+				"other"
+			],
+			"defaultValue": "web",
+			"metadata": {
+				"description": "Type of application being monitored.",
+				"required": "yes"
+			}
+		},
+		"Flow_Type": {
+			"type": "string",
+			"allowedValues": [
+				"Bluefield"
+			],
+			"defaultValue": "Bluefield",
+			"metadata": {
+				"description": "Used by the Application Insights system to determine what kind of flow this component was created by. This is to be set to 'Bluefield' when creating/updating a component via the REST API.",
+				"required": "no"
+			}
+		},
+		"Request_Source": {
+			"type": "string",
+			"defaultValue": "rest",
+			"metadata": {
+				"description": "Describes what tool created this Application Insights component. Customers using this API should set this to the default 'rest'.",
+				"required": "no"
+			}
+		},
+		"HockeyAppId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The unique application ID created when a new application is added to HockeyApp, used for communications with HockeyApp.",
+				"required": "no"
+			}
+		},
+		"SamplingPercentage": {
+			"type": "int",
+			"defaultValue": -1,
+			"metadata": {
+				"description": "Percentage of the data produced by the application being monitored that is being sampled for Application Insights telemetry.",
+				"required": "no"
+			}
+		},
+		"RetentionInDays": {
+			"type": "int",
+			"defaultValue": 90,
+			"metadata": {
+				"description": "Retention period in days.",
+				"required": "no"
+			}
+		},
+		"DisableIpMasking": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "Disable IP masking.",
+				"required": "no"
+			}
+		},
+		"ImmediatePurgeDataOn30Days": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Purge data immediately after 30 days.",
+				"required": "no"
+			}
+		},
+		"IngestionMode": {
+			"type": "string",
+			"allowedValues": [
+				"ApplicationInsights",
+				"ApplicationInsightsWithDiagnosticSettings",
+				"LogAnalytics"
+			],
+			"defaultValue": "ApplicationInsights",
+			"metadata": {
+				"description": "Indicates the flow of the ingestion.",
+				"required": "no"
+			}
+		},
+		"DisableLocalAuth": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Disable Non-AAD based Auth.",
+				"required": "no"
+			}
+		},
+		"ForceCustomerStorageForProfiler": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Force users to create their own storage account for profiler and debugger.",
+				"required": "no"
+			}
+		},
+		"WorkspaceResourceId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource Id of the log analytics workspace which the data will be ingested to. This property is required to create an application with this API version. Applications from older versions will not have this property.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"publicNetworkAccessForIngestion": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled",
+				"Disabled"
+			],
+			"defaultValue": "Disabled",
+			"metadata": {
+				"description": "The network access type for operating on the Application Insights Component. By default it is Enabled",
+				"required": "no"
+			}
+		},
+		"publicNetworkAccessForQuery": {
+			"type": "string",
+			"allowedValues": [
+				"Enabled",
+				"Disabled"
+			],
+			"defaultValue": "Disabled",
+			"metadata": {
+				"description": "The network access type for operating on the Application Insights Component. By default it is Enabled",
+				"required": "no"
+			}
+		},
+		"ProactiveDetectionConfigs": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"subType": "object",
+				"subTypeDefinition": {
+					"proactiveDetectionConfigName": {
+						"type": "string",
+						"metadata": {
+							"description": "Azure resource name",
+							"required": "yes"
+						}
+					},
+					"Enabled": {
+						"type": "bool",
+						"metadata": {
+							"description": "A flag that indicates whether this rule is enabled by the user",
+							"required": "no"
+						}
+					},
+					"SendEmailsToSubscriptionOwners": {
+						"type": "bool",
+						"metadata": {
+							"description": "A flag that indicated whether notifications on this rule should be sent to subscription owners",
+							"required": "no"
+						}
+					},
+					"CustomEmails": {
+						"type": "array",
+						"metadata": {
+							"description": "Custom email addresses for this rule notifications",
+							"required": "no"
+						}
+					},
+					"RuleDefinitions": {
+						"type": "object",
+						"metadata": {
+							"description": "Rule definitions attached to the configuration",
+							"required": "no",
+							"subTypeDefinition": {
+								"Name": {
+									"type": "string",
+									"metadata": {
+										"description": "The rule name",
+										"required": "no"
+									}
+								},
+								"DisplayName": {
+									"type": "string",
+									"metadata": {
+										"description": "The rule name as it is displayed in UI",
+										"required": "no"
+									}
+								},
+								"Description": {
+									"type": "string",
+									"metadata": {
+										"description": "The rule description",
+										"required": "no"
+									}
+								},
+								"HelpUrl": {
+									"type": "string",
+									"metadata": {
+										"description": "URL which displays additional info about the proactive detection rule",
+										"required": "no"
+									}
+								},
+								"IsHidden": {
+									"type": "bool",
+									"metadata": {
+										"description": "A flag indicating whether the rule is hidden (from the UI)",
+										"required": "no"
+									}
+								},
+								"IsEnabledByDefault": {
+									"type": "bool",
+									"metadata": {
+										"description": "A flag indicating whether the rule is enabled by default",
+										"required": "no"
+									}
+								},
+								"IsInPreview": {
+									"type": "bool",
+									"metadata": {
+										"description": "A flag indicating whether the rule is in preview",
+										"required": "no"
+									}
+								},
+								"SupportsEmailNotifications": {
+									"type": "bool",
+									"metadata": {
+										"description": "A flag indicating whether email notifications are supported for detections for this rule",
+										"required": "no"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Application Insights Component Contributor",
+							"Application Insights Snapshot Debugger",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		},
+		"documentType": {
+			"type": "array",
+			"defaultValue": [
+				"Request",
+				"Exception",
+				"Trace",
+				"Metric",
+				"Page Load",
+				"Page View",
+				"Dependency",
+				"Availability",
+				"Performance Counter"
+			],
+			"allowedValues": [
+				"Request",
+				"Exception",
+				"Trace",
+				"Metric",
+				"Page Load",
+				"Page View",
+				"Dependency",
+				"Availability",
+				"Performance Counter"
+			],
+			"metadata": {
+				"description": "Document types that need exported.",
+				"subType": "string"
+			}
+		},
+		"storageAccountId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Destination Storage Account Id.",
+				"subType": "string"
+			}
+		},
+		"storageSASUri": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Destination Storage SAS Uri",
+				"subType": "string"
+			}
+		},
+		"keyVaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource ID of pre-existing Keyvault name to be used to store instrumentation key",
+				"subType": "resourceId"
+			}
+		},
+		"keyVaultName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Name of KeyVault to store instrumentation key. DEPRECATED: Use keyVaultId"
+			}
+		},
+		"keyVaultResourceGroup": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource Group of KeyVault to store instrumentation key. DEPRECATED: Use keyVaultId"
+			}
+		},
+		"keyVaultSubscriptionId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Subscription of KeyVault to store instrumentation key. DEPRECATED: Use keyVaultId"
+			}
+		},
+		"priceCode": {
+			"type": "string",
+			"defaultValue": "Basic",
+			"allowedValues": [
+				"Basic",
+                "Application Insights Enterprise"
+			],
+			"metadata": {
+				"description": "Pricing plan: Basic = Per GB, Enterprise plan = Per Node (legacy Enterprise plan)",
+				"required": "no"
+			}
+		},
+		"dailyQuota": {
+			"type": "int",
+			"defaultValue": 100,
+			"minValue": 1,
+			"metadata": {
+				"description": "Enter daily quota in GB.",
+				"required": "no"
+			}
+		},
+		"dailyQuotaResetTime": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Enter daily quota reset hour in UTC (0 to 23). Values outside the range will get a random reset hour.",
+				"required": "no"
+			}
+		},
+		"warningThreshold": {
+			"type": "int",
+			"defaultValue": 90,
+			"minValue": 1,
+			"maxValue": 100,
+			"metadata": {
+				"description": "Enter the % value of daily quota after which warning mail to be sent. ",
+				"required": "no"
+			}
+		}
+	},
+	"variables": {
+		"componentApiVersion": "2020-02-02",
+		"deploymentsApiVersion": "2017-05-10",
+		"keyvaultApiVersion": "2019-09-01",
+		"roleAssignmentsApiVersion": "2019-04-01-preview",
+		"billingplanApiVersion": "2015-05-01",
+		"uniqueName": "[uniqueString(parameters('componentName'))]",
+		"defaultProactiveDetectionConfigs": {
+			"proactiveDetectionConfigName": "DEFAULT"
+		},
+		"ProactiveDetectionConfigs": "[if(empty(parameters('ProactiveDetectionConfigs')), array(variables('defaultProactiveDetectionConfigs')), parameters('ProactiveDetectionConfigs'))]",
+		"keyVault": {
+			"subscriptionId": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[2], parameters('keyVaultSubscriptionId'))]",
+			"resourceGroup": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[4], parameters('keyVaultResourceGroup'))]",
+			"name": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[8], parameters('keyVaultName'))]"
+		},
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Application Insights Component Contributor": "ae349356-3a1b-4a5e-921d-050484c6347e",
+		"Application Insights Snapshot Debugger": "08954f03-6346-4c2e-81c0-ec3a5cfae23b",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+		"pricePlan": "[parameters('priceCode')]",
+		"billingplan": "[concat(parameters('componentName'),'/', variables('pricePlan'))]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Insights/components",
+			"apiVersion": "[variables('componentApiVersion')]",
+			"dependsOn": [],
+			"name": "[parameters('componentName')]",
+			"location": "[parameters('location')]",
+			"kind": "[parameters('kind')]",
+			"properties": {
+				"Application_Type": "[parameters('Application_Type')]",
+				"Flow_Type": "[parameters('Flow_Type')]",
+				"Request_Source": "[parameters('Request_Source')]",
+				"HockeyAppId": "[if(not(empty(parameters('HockeyAppId'))), parameters('HockeyAppId'), json('null'))]",
+				"SamplingPercentage": "[if(equals(parameters('SamplingPercentage'), -1), json('null'), parameters('SamplingPercentage'))]",
+				"DisableIpMasking": "[parameters('DisableIpMasking')]",
+				"WorkspaceResourceId": "[if(not(empty(parameters('WorkspaceResourceId'))), parameters('WorkspaceResourceId'), json('null'))]",
+				"publicNetworkAccessForIngestion": "[parameters('publicNetworkAccessForIngestion')]",
+				"publicNetworkAccessForQuery": "[parameters('publicNetworkAccessForQuery')]",
+				"IngestionMode": "[parameters('IngestionMode')]",
+				"DisableLocalAuth": "[parameters('DisableLocalAuth')]",
+				"ForceCustomerStorageForProfiler": "[parameters('ForceCustomerStorageForProfiler')]",
+				"RetentionInDays": "[parameters('RetentionInDays')]"
+			}
+		},
+		{
+			"type": "Microsoft.Insights/components/ProactiveDetectionConfigs",
+			"apiVersion": "[variables('componentApiVersion')]",
+			"condition": "[not(empty(parameters('ProactiveDetectionConfigs')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Insights/components', parameters('componentName'))]"
+			],
+			"name": "[concat(parameters('componentName'), '/', variables('ProactiveDetectionConfigs')[copyIndex()].proactiveDetectionConfigName)]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"Name": "[variables('ProactiveDetectionConfigs')[copyIndex()].proactiveDetectionConfigName]",
+				"Enabled": "[if(contains(variables('ProactiveDetectionConfigs')[copyIndex()], 'Enabled'), variables('ProactiveDetectionConfigs')[copyIndex()].Enabled, json('null'))]",
+				"SendEmailsToSubscriptionOwners": "[if(contains(variables('ProactiveDetectionConfigs')[copyIndex()], 'SendEmailsToSubscriptionOwners'), variables('ProactiveDetectionConfigs')[copyIndex()].SendEmailsToSubscriptionOwners, json('null'))]",
+				"CustomEmails": "[if(contains(variables('ProactiveDetectionConfigs')[copyIndex()], 'CustomEmails'), variables('ProactiveDetectionConfigs')[copyIndex()].CustomEmails, json('null'))]",
+				"RuleDefinitions": "[if(contains(variables('ProactiveDetectionConfigs')[copyIndex()], 'RuleDefinitions'), variables('ProactiveDetectionConfigs')[copyIndex()].RuleDefinitions, json('null'))]"
+			},
+			"copy": {
+				"name": "ProactiveDetectionConfigsCopy",
+				"count": "[length(variables('ProactiveDetectionConfigs'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"name": "instrumentKey",
+			"apiVersion": "[variables('deploymentsApiVersion')]",
+			"resourceGroup": "[variables('keyVault').resourceGroup]",
+			"subscriptionId": "[variables('keyVault').subscriptionId]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Insights/components/', parameters('componentName'))]"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"template": {
+					"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+					"contentVersion": "1.0.0.0",
+					"parameters": {},
+					"variables": {},
+					"resources": [
+						{
+							"type": "Microsoft.KeyVault/vaults/secrets",
+							"name": "[concat(variables('keyVault').name, '/', parameters('componentName'))]",
+							"apiVersion": "[variables('keyvaultApiVersion')]",
+							"properties": {
+								"value": "[reference(resourceId('Microsoft.Insights/components/', parameters('componentName')), variables('componentApiVersion'), 'Full').properties.InstrumentationKey]"
+							}
+						},
+						{
+							"type": "Microsoft.KeyVault/vaults/secrets",
+							"name": "[concat(variables('keyVault').name, '/', parameters('componentName'), '-key')]",
+							"apiVersion": "[variables('keyvaultApiVersion')]",
+							"properties": {
+								"value": "[reference(resourceId('Microsoft.Insights/components/', parameters('componentName')), variables('componentApiVersion'), 'Full').properties.InstrumentationKey]"
+							}
+						},
+						{
+							"type": "Microsoft.KeyVault/vaults/secrets",
+							"name": "[concat(variables('keyVault').name, '/', parameters('componentName'), '-cxn')]",
+							"apiVersion": "[variables('keyvaultApiVersion')]",
+							"properties": {
+								"value": "[reference(resourceId('Microsoft.Insights/components/', parameters('componentName')), variables('componentApiVersion'), 'Full').properties.ConnectionString]"
+							}
+						}
+					]
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Insights/components/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Insights/components', parameters('componentName'))]"
+			],
+			"name": "[concat(parameters('componentName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		},
+		{
+			"name": "[variables('billingplan')]",
+			"type": "microsoft.insights/components/CurrentBillingFeatures",
+			"location": "[parameters('location')]",
+			"apiVersion": "[variables('billingplanApiVersion')]",
+			"condition":"[not(empty(parameters('priceCode')))]",
+			"dependsOn": [
+				"[resourceId('microsoft.insights/components', parameters('componentName'))]"
+			],
+			"properties": {
+				"CurrentBillingFeatures": "[variables('pricePlan')]",
+				"DataVolumeCap": {
+					"Cap": "[parameters('dailyQuota')]",
+					"WarningThreshold": "[parameters('warningThreshold')]",
+					"ResetTime": "[parameters('dailyQuotaResetTime')]"
+				}
+			}
+		}
+	]
+}

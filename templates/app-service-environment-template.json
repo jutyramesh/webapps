@@ -1,0 +1,439 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.2.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource Location.",
+				"required": "yes"
+			}
+		},
+		"hostingEnvironmentName": {
+			"type": "string",
+			"minLength": 24,
+			"maxLength": 41,
+			"metadata": {
+				"description": "Name of the App Service Environment.",
+				"required": "yes"
+			}
+		},
+		"kind": {
+			"type": "string",
+			"allowedValues": [
+				"ASEV2",
+				"ASEV3"
+			],
+			"defaultValue": "ASEV2",
+			"metadata": {
+				"description": "Kind of resource.",
+				"required": "no"
+			}
+		},
+		"multiSize": {
+			"type": "string",
+			"allowedValues": [
+				"Small",
+				"Medium",
+				"Large",
+				"ExtraLarge"
+			],
+			"defaultValue": "Small",
+			"metadata": {
+				"description": "Front-end VM size, e.g. \"Medium\", \"Large\".",
+				"required": "no"
+			}
+		},
+		"multiRoleCount": {
+			"type": "int",
+			"minValue": 2,
+			"defaultValue": 2,
+			"metadata": {
+				"description": "Number of front-end instances.",
+				"required": "no"
+			}
+		},
+		"frontEndScaleFactor": {
+			"type": "int",
+			"minValue": 5,
+			"maxValue": 15,
+			"defaultValue": 5,
+			"metadata": {
+				"description": "Scale factor for front-ends.",
+				"required": "no"
+			}
+		},
+		"hasLinuxWorkers": {
+			"type": "bool",
+			"metadata": {
+				"description": "Flag that displays whether an ASE has linux workers or not",
+				"required": "no"
+			}
+		},
+		"dnsSuffix": {
+			"type": "string",
+			"minLength": 0,
+			"maxLength": 253,
+			"defaultValue": "",
+			"metadata": {
+				"description": "DNS suffix of the App Service Environment.",
+				"required": "no"
+			}
+		},
+		"clusterSettings": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Custom settings for changing the behavior of the App Service Environment.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Pair name.",
+							"required": "no"
+						}
+					},
+					"value": {
+						"type": "string",
+						"metadata": {
+							"description": "Pair value.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"workerPools": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Description of worker pools with worker size IDs, VM sizes, and number of workers in each pool.",
+				"required": "yes",
+				"subType": "object",
+				"subTypeDefinition": {
+					"workerSizeId": {
+						"type": "int",
+						"metadata": {
+							"description": "Worker size ID for referencing this worker pool.",
+							"required": "no"
+						}
+					},
+					"computeMode": {
+						"type": "string",
+						"allowedValues": [
+							"Shared",
+							"Dedicated",
+							"Dynamic"
+						],
+						"metadata": {
+							"description": "Shared or dedicated app hosting.",
+							"required": "no"
+						}
+					},
+					"workerCount": {
+						"type": "int",
+						"minValue": 0,
+						"metadata": {
+							"description": "Number of instances in the worker pool.",
+							"required": "no"
+						}
+					},
+					"workerSize": {
+						"type": "string",
+						"allowedValues": [
+							"Small",
+							"Medium",
+							"Large",
+							"ExtraLarge"
+						],
+						"metadata": {
+							"description": "VM size of the worker pool instances.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"ipsslAddressCount": {
+			"type": "int",
+			"minValue": 0,
+			"maxValue": 100,
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Number of IP SSL addresses reserved for the App Service Environment.",
+				"required": "no"
+			}
+		},
+		"userWhitelistedIpRanges": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "User added ip ranges to whitelist on ASE db",
+				"required": "no"
+			}
+		},
+		"subnetId": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet resource ID for the managed instance.",
+				"required": "no"
+			}
+		},
+		"networkAccessControlList": {
+			"type": "array",
+			"metadata": {
+				"description": "Access control list for controlling traffic to the App Service Environment.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"action": {
+						"type": "string",
+						"allowedValues": [
+							"Permit",
+							"Deny"
+						],
+						"defaultValue": "Deny",
+						"metadata": {
+							"description": "Action object.",
+							"required": "no"
+						}
+					},
+					"remoteSubnet": {
+						"type": "string",
+						"metadata": {
+							"description": "Remote subnet.",
+							"required": "no"
+						}
+					},
+					"description": {
+						"type": "string",
+						"metadata": {
+							"description": "Description of network access control entry.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"internalLoadBalancingMode": {
+			"type": "string",
+			"allowedValues": [
+				"Web",
+				"Publishing",
+				"Web,Publishing"
+			],
+			"defaultValue": "Web",
+			"metadata": {
+				"description": "Specifies which endpoints to serve internally in the Virtual Network for the App Service Environment.",
+				"required": "no"
+			}
+		},
+		"dynamicCacheEnabled": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "True/false indicating whether the App Service Environment is suspended. The environment can be suspended e.g. when the management endpoint is no longer available\n(most likely because NSG blocked the incoming traffic).",
+				"required": "no"
+			}
+		},
+		"suspended": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if the App Service Environment is suspended; otherwise, <code>false</code>. The environment can be suspended, e.g. when the management endpoint is no longer available\n (most likely because NSG blocked the incoming traffic).",
+				"required": "no"
+			}
+		},
+		"sslCertKeyVaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Key Vault ID for ILB App Service Environment default SSL certificate",
+				"required": "no"
+			}
+		},
+		"sslCertKeyVaultSecretName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Key Vault Secret Name for ILB App Service Environment default SSL certificate",
+				"required": "no"
+			}
+		},
+		"apiManagementAccountId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "API Management Account associated with the App Service Environment.",
+				"required": "no"
+			}
+		},
+		"zones": {
+			"type": "array",
+			"defaultValue": [],
+			"allowedValues": ["1", "2", "3"],
+			"metadata": {
+				"description": "A list of availability zones denoting where the resource needs to come from."
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"subType": "object",
+				"description": "A list of role assignments mapped to identities",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						},
+						"type": "string",
+						"allowedValues": [
+							"Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						]
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"hostingEnvironmentApiVersion": "2021-02-01",
+		"roleAssignmentsApiVersion": "2019-04-01-preview",
+		"uniqueName": "[uniqueString(parameters('hostingEnvironmentName'))]",
+		"isV3": "[equals(parameters('kind'), 'ASEV3')]",
+		"copy": [{
+				"name": "workerPools",
+				"count": "[length(parameters('workerPools'))]",
+				"input": {
+					"computeMode": "[if(contains(parameters('workerPools')[copyIndex('workerPools')], 'computeMode'), parameters('workerPools')[copyIndex('workerPools')].computeMode, json('null'))]",
+					"workerSizeId": "[if(contains(parameters('workerPools')[copyIndex('workerPools')], 'workerSizeId'), parameters('workerPools')[copyIndex('workerPools')].workerSizeId, json('null'))]",
+					"workerCount": "[if(contains(parameters('workerPools')[copyIndex('workerPools')], 'workerCount'), parameters('workerPools')[copyIndex('workerPools')].workerCount, json('null'))]",
+					"workerSize": "[if(contains(parameters('workerPools')[copyIndex('workerPools')], 'workerSize'), parameters('workerPools')[copyIndex('workerPools')].workerSize, json('null'))]"
+				}
+			},
+			{
+				"name": "clusterSettings",
+				"count": "[length(parameters('clusterSettings'))]",
+				"input": {
+					"name": "[if(contains(parameters('clusterSettings')[copyIndex('clusterSettings')], 'name'), parameters('clusterSettings')[copyIndex('clusterSettings')].name, json('null'))]",
+					"value": "[if(contains(parameters('clusterSettings')[copyIndex('clusterSettings')], 'value'), parameters('clusterSettings')[copyIndex('clusterSettings')].value, json('null'))]"
+				}
+			},
+			{
+				"name": "networkAccessControlList",
+				"count": "[length(parameters('networkAccessControlList'))]",
+				"input": {
+					"action": "[if(contains(parameters('networkAccessControlList')[copyIndex('networkAccessControlList')], 'action'), parameters('networkAccessControlList')[copyIndex('networkAccessControlList')].action, 'Deny')]",
+					"remoteSubnet": "[if(contains(parameters('networkAccessControlList')[copyIndex('networkAccessControlList')], 'remoteSubnet'), parameters('networkAccessControlList')[copyIndex('networkAccessControlList')].remoteSubnet, json('null'))]",
+					"description": "[if(contains(parameters('networkAccessControlList')[copyIndex('networkAccessControlList')], 'description'), parameters('networkAccessControlList')[copyIndex('networkAccessControlList')].description, json('null'))]",
+					"order": "[int(copyIndex('networkAccessControlList'))]"
+				}
+			}
+		],
+		"subnetIdParts": "[split(parameters('subnetId'), '/')]",
+		"subnet": {
+			"virtualNetworkId": "[resourceId(variables('subnetIdParts')[2], variables('subnetIdParts')[4], 'Microsoft.Network/virtualNetworks', variables('subnetIdParts')[8])]",
+			"subscriptionId": "[variables('subnetIdParts')[2]]",
+			"resourceGroup": "[variables('subnetIdParts')[4]]",
+			"virtualNetwork": "[variables('subnetIdParts')[8]]",
+			"name": "[variables('subnetIdParts')[10]]"
+		},
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Contributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [{
+			"type": "Microsoft.Web/hostingEnvironments",
+			"apiVersion": "[variables('hostingEnvironmentApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('hostingEnvironmentName')]",
+			"location": "[parameters('location')]",
+			"kind": "[parameters('kind')]",
+			"tags": "[parameters('tags')]",
+			"zones": "[if(not(empty(parameters('zones'))), parameters('zones'), json('null'))]",
+			"properties": {
+				"name": "[parameters('hostingEnvironmentName')]",
+				"location": "[parameters('location')]",
+				"multiSize": "[if(not(variables('isV3')), parameters('multiSize'), json('null'))]",
+				"multiRoleCount": "[parameters('multiRoleCount')]",
+				"hasLinuxWorkers": "[parameters('hasLinuxWorkers')]",
+				"suspended": "[parameters('suspended')]",
+				"dnsSuffix": "[parameters('dnsSuffix')]",
+				"workerPools": "[variables('workerPools')]",
+				"ipsslAddressCount": "[parameters('ipsslAddressCount')]",
+				"internalLoadBalancingMode": "[parameters('internalLoadBalancingMode')]",
+				"dynamicCacheEnabled": "[if(not(variables('isV3')),parameters('dynamicCacheEnabled'),json('null'))]",
+				"frontEndScaleFactor": "[if(not(variables('isV3')),parameters('frontEndScaleFactor'),json('null'))]",
+				"clusterSettings": "[variables('clusterSettings')]",
+				"userWhitelistedIpRanges": "[if(not(variables('isV3')),parameters('userWhitelistedIpRanges'),json('null'))]",
+				"networkAccessControlList": "[if(not(variables('isV3')),variables('networkAccessControlList'),json('null'))]",
+				"vnetResourceGroupName": "[variables('subnet').resourceGroup]",
+				"vnetName": "[variables('subnet').virtualNetwork]",
+				"vnetSubnetName": "[variables('subnet').name]",
+				"virtualNetwork": {
+					"subnet": "[variables('subnet').name]",
+					"id": "[parameters('subnetId')]"
+				},
+				"sslCertKeyVaultId": "[if(not(empty(parameters('sslCertKeyVaultId'))), parameters('sslCertKeyVaultId'), json('null'))]",
+				"sslCertKeyVaultSecretName": "[if(not(empty(parameters('sslCertKeyVaultSecretName'))), parameters('sslCertKeyVaultSecretName'), json('null'))]",
+				"apiManagementAccountId": "[parameters('apiManagementAccountId')]"
+			}
+		},
+		{
+			"type": "Microsoft.Web/hostingEnvironments/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/hostingEnvironments', parameters('hostingEnvironmentName'))]"
+			],
+			"name": "[concat(parameters('hostingEnvironmentName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

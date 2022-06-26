@@ -1,0 +1,39 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+			"value": {
+                "Deployer": "Nick Barber",
+                "CostCenter": "Healthcare Development 5004",
+                "CostCode": "1000609920",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverfarmName": {
+            "value": "ccp-patching-np-l-asp-01"
+        },
+        "isLinux": {
+            "value": true
+        },
+        "skuName": {
+            "value": "I2V2"
+        },
+        "kind": {
+            "value": "app"
+        },
+		"hostingEnvironmentProfileId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/hostingEnvironments/rpu-nprod-infra-svcs-eastus2-ase-01"
+		}
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "templateFile": "templates/app-service-plan-template.json"
+    }
+}

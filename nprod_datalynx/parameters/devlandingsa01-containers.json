@@ -1,0 +1,74 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.1.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "storageAccountName": {
+            "value": "devlandingsa01"
+        },
+        "containers": {
+            "value": [
+			   {
+                    "containerName": "archive"
+               },
+			   {
+                    "containerName": "landing"
+               },
+			   {
+                    "containerName": "quarantine"
+               },
+			   {
+                    "containerName": "raw"
+               },
+			   {
+                    "containerName": "rawhopper"
+               }
+			]
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "Storage Blob Data Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967",
+                    "containerName": "archive"
+                },
+				{
+                    "roleDefinitionName": "Storage Blob Data Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967",
+                    "containerName": "landing"
+                },
+				{
+                    "roleDefinitionName": "Storage Blob Data Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967",
+                    "containerName": "quarantine"
+                },
+				{
+                    "roleDefinitionName": "Storage Blob Data Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967",
+                    "containerName": "raw"
+                },
+				{
+                    "roleDefinitionName": "Storage Blob Data Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967",
+                    "containerName": "rawhopper"
+                },
+				]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-datalake-paas-eastus2",
+        "subscription": "wh-nprod-datalake-01",
+        "templateFile": "templates/storage-container-template.json"
+    }
+}

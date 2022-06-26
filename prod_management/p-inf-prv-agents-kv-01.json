@@ -1,0 +1,47 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "3.1.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "vaultName": {
+            "value": "p-inf-prv-agents-kv-01"
+        },
+        "tenantId": {
+            "value": "43d2f056-2a0f-4a87-a552-1bbcec447cd1"
+        },
+        "enableRbacAuthorization": {
+            "value": true
+        },
+        "allowedVirtualNetworks": {
+            "value": [
+                "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-networking-infra-eastus2/providers/Microsoft.Network/virtualNetworks/wh-mgmt-prod-int-infra-eastus2-vnet-01/subnets/wh-mgmt-prod-int-infra-eastus2-vnet-01-sn01",
+                "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-networking-infra-eastus2/providers/Microsoft.Network/virtualNetworks/wh-mgmt-prod-int-infra-eastus2-vnet-01/subnets/wh-mgmt-prod-int-infra-eastus2-vnet-01-sn02"
+            ]
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "Key Vault Secrets User",
+                    "principalId": "74942ba3-129a-4d1d-9321-f13a020dc6fc"
+                }
+            ]
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Production"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "prod-infra-provisioning-agents-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/keyvault-template.json"
+    }
+}

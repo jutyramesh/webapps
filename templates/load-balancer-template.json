@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "loadBalancerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Load Balancer Name"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "metadata": {
+                "description": "tags"
+            }
+        },
+        "subnetID": {
+            "type": "string",
+            "metadata": {
+                "description": "Fully qualified subnet resource ID in the following format /subscriptions/[SubID]/resourceGroups/[RGName]/providers/Microsoft.Network/virtualNetworks/[VNetName]/subnets/[SubnetName]"
+            }
+        },
+        "backendAddressPoolsConfig": {
+            "type": "array",
+            "metadata": {
+                "description": "backend address pools properties"
+            }
+        },
+        "inboundNATRulesConfig": {
+            "type": "array",
+            "metadata": {
+                "description": "NAT rules properties "
+            }
+        },
+        "probesConfig": {
+            "type": "array",
+            "metadata": {
+                "description": "probes properties"
+            }
+        },
+        "loadBalancerRulesConfig": {
+            "type": "array",
+            "metadata": {
+                "description": "load balancer rules properties"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[parameters('loadBalancerName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "apiVersion": "2021-05-01",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "subnet": {
+                                "id": "[parameters('subnetID')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": "[parameters('backendAddressPoolsConfig')]" ,
+                "inboundNatRules": "[parameters('inboundNATRulesConfig')]",
+                "probes": "[parameters('probesConfig')]",
+                "loadBalancingRules": "[parameters('loadBalancerRulesConfig')]"
+            }
+        }
+    ],
+    "outputs": {
+        "deploymentStatus": {
+            "type": "string",
+            "value": "Deployment Successful"
+        }
+    }
+}

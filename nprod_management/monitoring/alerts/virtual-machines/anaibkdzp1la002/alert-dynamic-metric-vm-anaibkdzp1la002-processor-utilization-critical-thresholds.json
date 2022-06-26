@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-vm-anaibkdzp1la002-processor-utilization-critical-thresholds" 
+        },
+        "alertDescription": {
+            "value": "Whenever the average average_% processor time is greater than dynamic threshold"
+        },
+        "alertSeverity": {
+            "value": 2
+        },
+        "isEnabled": {
+            "value": true
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-backup-rg/providers/Microsoft.Compute/virtualMachines/anaibkdzp1la002"
+        },
+        "metricName": {
+            "value": "CPU Credits Consumed" 
+        },
+        "metricNamespace": {
+            "value": "microsoft.compute/virtualmachines" 
+        },
+        "targetResourceType": {
+            "value": ""
+        },
+        "operator": {
+            "value": "GreaterThan"
+        },
+        "threshold": {
+            "value": 0 
+        },
+        "timeAggregation": {
+            "value": "Average" 
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "evaluationFrequency": {
+            "value": "PT15M"
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actionGroups/WH-CCP-NPROD"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "wh-int-infra-eastus2-backup-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/monitoring/alerts/alert-dynamic-metric-template.json"
+    }
+}

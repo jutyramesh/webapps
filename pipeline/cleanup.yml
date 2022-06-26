@@ -1,0 +1,33 @@
+#
+# Azure State Repository - Subscription Cleanup
+#
+# This will run each time the main branch is updated
+# as well as daily at midnight UTC
+#
+trigger:
+- main
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily Scan
+  branches:
+    include:
+    - main
+  always: true
+
+jobs:
+
+#
+# Sandbox
+#
+- job: SandboxCleanup
+  pool: wh-np-ccp-agents
+  steps:
+
+  - task: AzureCLI@2
+    displayName: Sandbox Subscription Cleanup
+    inputs:
+      azureSubscription: wh-np-ccp-connection
+      scriptType: pscore
+      scriptPath: pipeline/Clean-Subscription.ps1
+      arguments: -SubscriptionName "not-a-real-subscription"

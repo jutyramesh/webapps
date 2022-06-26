@@ -1,0 +1,22 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "managedIdentityName": {
+            "value": "prod-infra-provisioning-agents-id-01"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "prod-infra-provisioning-agents-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/user-assigned-managed-identity-template.json"
+    }
+}

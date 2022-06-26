@@ -1,0 +1,95 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "componentName": {
+            "value": "dev-datalynx-ingest-ais-01"
+        },
+        "kind": {
+            "value": "other"
+        },
+        "Application_Type": {
+            "value": "other"
+        },
+        "Request_Source": {
+            "value": "rest"
+        },
+        "HockeyAppId": {
+            "value": ""
+        },
+        "SamplingPercentage": {
+            "value": -1
+        },
+        "RetentionInDays": {
+            "value": 90
+        },
+        "ImmediatePurgeDataOn30Days": {
+            "value": true
+        },
+        "publicNetworkAccessForIngestion": {
+            "value": "Disabled"
+        },
+        "publicNetworkAccessForQuery": {
+            "value": "Disabled"
+        },
+        "ProactiveDetectionConfigs": {
+            "value": []
+        },
+        "roleAssignments": {
+            "value": [
+			    			    {
+                    "roleDefinitionName": "Application Insights Snapshot Debugger",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                },			    {
+                    "roleDefinitionName": "Reader",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                }
+			]
+        },
+        "documentType": {
+            "value": [
+                "Request",
+                "Exception",
+                "Trace",
+                "Metric",
+                "Page Load",
+                "Page View",
+                "Dependency",
+                "Availability",
+                "Performance Counter"
+            ]
+        },
+        "storageAccountId": {
+            "value": ""
+        },
+        "storageSASUri": {
+            "value": ""
+        },
+        "keyVaultName": {
+            "value": "dev-ingestion-kv-01"
+        },
+        "keyVaultResourceGroup": {
+            "value": "dev-datalynx-dataeng-paas-eastus2"
+        },
+        "keyVaultSubscriptionId": {
+            "value": "74711008-33b9-4784-b1ea-76aab1287167"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/app-insights-template.json"
+    }
+}

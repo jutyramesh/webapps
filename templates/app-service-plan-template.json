@@ -1,0 +1,428 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.0.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource Location.",
+				"required": "yes"
+			}
+		},
+		"serverfarmName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the App Service plan.",
+				"required": "yes"
+			}
+		},
+		"hostingEnvironmentProfileId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource ID of the App Service Environment.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"isLinux": {
+			"type": "bool",
+			"metadata": {
+				"description": "Whether or not this serverfarm should be Linux or Windows."
+			}
+		},
+		"skuCapacity": {
+			"type": "int",
+            "minValue": 0,
+            "maxValue": 100,
+            "defaultValue": 1,
+			"metadata": {
+				"description": "Current number of instances assigned to the resource.",
+				"required": "no"
+			}
+		},
+		"skuName": {
+			"type": "string",
+            "allowedValues": [
+				"S1",
+				"S2",
+				"S3",
+				"P1",
+				"P2",
+				"P3",
+				"P1V2",
+				"P2V2",
+				"P3V2",
+				"P1V3",
+				"P2V3",
+				"P3V3",
+				"I1",
+				"I2",
+				"I3",
+				"I1V2",
+				"I2V2",
+				"I3V2",
+				"EP1",
+				"EP2",
+				"EP3"
+			],
+			"metadata": {
+				"description": "Name of the resource SKU.",
+				"required": "no"
+			}
+		},
+		"skuTier": {
+			"type": "string",
+            "allowedValues": [
+				""
+            ],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Service tier of the resource SKU.",
+				"required": "no"
+			}
+		},
+		"skuFamily": {
+			"type": "string",
+			"allowedValues": [
+				""
+			],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Family code of the resource SKU.",
+				"required": "no"
+			}
+		},
+		"skuLocations": {
+			"type": "array",
+			"allowedValues": [],
+			"defaultValue": [],
+			"metadata": {
+				"description": "Locations of the SKU.",
+				"required": "no"
+			}
+		},
+		"skuCapabilities": {
+			"type": "array",
+			"allowedValues": [],
+			"defaultValue": [],
+			"metadata": {
+				"description": "Capabilities of the SKU, e.g., is traffic manager enabled?",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Name of the SKU capability.",
+							"required": "no"
+						}
+					},
+					"value": {
+						"type": "string",
+						"metadata": {
+							"description": "Value of the SKU capability.",
+							"required": "no"
+						}
+					},
+					"reason": {
+						"type": "string",
+						"metadata": {
+							"description": "Reason of the SKU capability.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"skuSkuCapacityDefault": {
+			"type": "int",
+			"allowedValues": [
+				0
+			],
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Default number of workers for this App Service plan SKU.",
+				"required": "no"
+			}
+		},
+		"skuSkuCapacityMinimum": {
+			"type": "int",
+			"allowedValues": [
+				0
+			],
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Minimum number of workers for this App Service plan SKU.",
+				"required": "no"
+			}
+		},
+		"skuSkuCapacityMaximum": {
+			"type": "int",
+			"allowedValues": [
+				0
+			],
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum number of workers for this App Service plan SKU.",
+				"required": "no"
+			}
+		},
+		"skuSkuCapacityScaleType": {
+			"type": "string",
+			"allowedValues": [
+				""
+			],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Available scale configurations for an App Service plan.",
+				"required": "no"
+			}
+		},
+		"skuSize": {
+			"type": "string",
+			"allowedValues": [
+				""
+			],
+			"defaultValue": "",
+			"metadata": {
+				"description": "Size specifier of the resource SKU.",
+				"required": "no"
+			}
+		},
+		"kind": {
+			"type": "string",
+			"allowedValues": [
+				"app",
+				"function"
+			],
+			"metadata": {
+				"description": "Kind of resource.",
+				"required": "no"
+			}
+		},
+		"perSiteScaling": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "If <code>true</code>, apps assigned to this App Service plan can be scaled independently.\nIf <code>false</code>, apps assigned to this App Service plan will scale to all instances of the plan.",
+				"required": "no"
+			}
+		},
+		"workerTierName": {
+			"type": "string",
+            "defaultValue": "",
+			"metadata": {
+				"description": "Target worker tier assigned to the App Service plan.",
+				"required": "no"
+			}
+		},
+		"targetWorkerSizeId": {
+			"type": "int",
+			"defaultValue": -1,
+			"metadata": {
+				"description": "Scaling worker size ID.",
+				"required": "no"
+			}
+		},
+		"targetWorkerCount": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Scaling worker count.",
+				"required": "no"
+			}
+		},
+		"maximumElasticWorkerCount": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum number of total workers allowed for this ElasticScaleEnabled App Service Plan",
+				"required": "no"
+			}
+		},
+		"freeOfferExpirationTime": {
+			"type": "string",
+            "defaultValue": "",
+			"metadata": {
+				"description": "The time when the server farm free offer expires.",
+				"required": "no"
+			}
+		},
+		"isXenon": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "Obsolete: If Hyper-V container app service plan <code>true</code>, <code>false</code> otherwise.",
+				"required": "no"
+			}
+		},
+		"hyperV": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "If Hyper-V container app service plan <code>true</code>, <code>false</code> otherwise.",
+				"required": "no"
+			}
+		},
+		"isSpot": {
+			"type": "bool",
+            "defaultValue": false,
+			"metadata": {
+				"description": "If <code>true</code>, this App Service Plan owns spot instances.",
+				"required": "no"
+			}
+		},
+		"spotExpirationTime": {
+			"type": "string",
+            "defaultValue": "",
+			"metadata": {
+				"description": "The time when the server farm expires. Valid only if it is a spot server farm.",
+				"required": "no"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						},
+						"type": "string",
+						"allowedValues": [
+							"Web Plan Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						]
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					}
+				},
+				"subType": "object",
+				"description": "A list of role assignments mapped to identities"
+			}
+		}
+	},
+	"variables": {
+		"serverfarmApiVersion": "2020-06-01",
+		"uniqueName": "[uniqueString(parameters('serverfarmName'))]",
+		"copy": [
+			{
+				"name": "skuCapabilities",
+				"count": "[length(parameters('skuCapabilities'))]",
+				"input": {
+					"reason": "[parameters('skuCapabilities')[copyIndex('skuCapabilities')].reason]",
+					"serverfarmName": "[parameters('skuCapabilities')[copyIndex('skuCapabilities')].serverfarmName]",
+					"value": "[parameters('skuCapabilities')[copyIndex('skuCapabilities')].value]"
+				}
+			}
+		],
+		"isFunction": "[equals(parameters('kind'), 'function')]",
+		"kind": "[concat(if(variables('isFunction'), 'elastic', parameters('kind')), if(and(parameters('isLinux'), not(variables('isFunction'))), ',linux', ''))]",
+		"hostingEnvironmentProfile": {
+			"id": "[parameters('hostingEnvironmentProfileId')]"
+		},
+		"skuCapacity": {
+			"default": "[parameters('skuSkuCapacityDefault')]",
+			"minimum": "[parameters('skuSkuCapacityMinimum')]",
+			"maximum": "[parameters('skuSkuCapacityMaximum')]",
+			"scaleType": "[parameters('skuSkuCapacityScaleType')]"
+		},
+		"skuTiers": {
+			"S": "Standard",
+			"P": "Premium",
+			"E": "ElasticPremium",
+			"I": "Isolated"
+		},
+		"skuTier": "[concat(variables('skuTiers')[first(parameters('skuName'))], if(contains(parameters('skuName'), 'V2'), 'V2', ''))]",
+		"reserved": "[parameters('isLinux')]",
+		"roleAssignmentsApiVersion": "2019-04-01-preview",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+        "Web Plan Contributor": "2cc479cb-7b4d-49a8-b449-8c00fd0f0a4b",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Web/serverfarms",
+			"apiVersion": "[variables('serverfarmApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('serverfarmName')]",
+			"tags": "[parameters('tags')]",
+			"location": "[parameters('location')]",
+			"kind": "[variables('kind')]",
+			"sku": {
+				"name": "[parameters('skuName')]",
+				"tier": "[variables('skuTier')]",
+				"capacity": "[parameters('skuCapacity')]",
+				"size": "[parameters('skuSize')]",
+				"family": "[parameters('skuFamily')]"
+			},
+			"properties": {
+				"hostingEnvironmentProfile": "[if(not(empty(parameters('hostingEnvironmentProfileId'))), variables('hostingEnvironmentProfile'), json('null'))]",
+				"maximumElasticWorkerCount": "[if(variables('isFunction'), parameters('maximumElasticWorkerCount'), json('null'))]",
+				"reserved": "[variables('reserved')]",
+				"isXenon": "[parameters('isXenon')]",
+				"hyperV": "[parameters('hyperV')]",
+				"perSiteScaling": "[parameters('perSiteScaling')]",
+				"workerTierName": "[parameters('workerTierName')]",
+				"targetWorkerCount": "[parameters('targetWorkerCount')]",
+				"targetWorkerSizeId": "[if(not(equals(parameters('targetWorkerSizeId'), -1)), parameters('targetWorkerSizeId'), json('null'))]",
+				"freeOfferExpirationTime": "[parameters('freeOfferExpirationTime')]",
+				"isSpot": "[parameters('isSpot')]",
+				"spotExpirationTime": "[parameters('spotExpirationTime')]"
+			}
+		},
+		{
+			"type": "Microsoft.Web/serverfarms/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/serverfarms', parameters('serverfarmName'))]"
+			],
+			"name": "[concat(parameters('serverfarmName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

@@ -1,0 +1,49 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+				"LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+            
+        },
+        "workspaceName": {
+            "value": "dev-datalynx-dataeng-curate-eastus2-adb-01"
+            
+        },
+        "customPrivateSubnetId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet01-eastus2/providers/Microsoft.Network/virtualNetworks/wh-datalynx-nprod-int-general-eastus2-vnet-01/subnets/wh-datalynx-nprod-int-general-eastus2-vnet-01-dataeng01"
+            
+        },
+        "customPublicSubnetId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet01-eastus2/providers/Microsoft.Network/virtualNetworks/wh-datalynx-nprod-int-general-eastus2-vnet-01/subnets/wh-datalynx-nprod-int-general-eastus2-vnet-01-dataeng02"
+            
+        },
+        "keyvaultResourceId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-paas-eastus2/providers/Microsoft.KeyVault/vaults/dev-ingestion-kv-01"
+            
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "Reader",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                }				
+			]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/databricks-template-custom.json"
+        
+    }
+}

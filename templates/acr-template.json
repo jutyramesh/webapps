@@ -1,0 +1,315 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "2.0.0.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "The tags of the resource.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "The location of the resource. This cannot be changed after the resource is created.",
+				"required": "yes"
+			}
+		},
+		"registryName": {
+			"type": "string",
+			"minLength": 5,
+			"maxLength": 50,
+			"metadata": {
+				"description": "The name of the container registry.",
+				"required": "yes",
+				"subType": "regex",
+				"pattern": "^[a-zA-Z0-9]*$"
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"defaultValue": "Premium",
+			"allowedValues": [
+				"Premium"
+			],
+			"metadata": {
+				"description": "The SKU name of the container registry. Required for registry creation.",
+				"required": "yes"
+			}
+		},
+		"adminUserEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"allowedValues": [false],
+			"metadata": {
+				"description": "The value that indicates whether the admin user is enabled.",
+				"required": "no"
+			}
+		},
+		"networkRuleSetDefaultAction": {
+			"type": "string",
+			"defaultValue": "Deny",
+			"allowedValues": [
+				"Deny"
+			],
+			"metadata": {
+				"description": "The default action of allow or deny when no other rules match.",
+				"required": "yes"
+			}
+		},
+		"allowedVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of Resource ID of a subnet, for example: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"allowedIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of IP or IP range in CIDR format. Only IPV4 address is allowed.",
+				"required": "no",
+				"subType": "ipv4"
+			}
+		},
+		"quarantinePolicyStatus": {
+			"type": "string",
+			"defaultValue": "disabled",
+			"allowedValues": [
+				"enabled",
+				"disabled"
+			],
+			"metadata": {
+				"description": "The value that indicates whether the policy is enabled or not.",
+				"required": "no"
+			}
+		},
+		"trustPolicyType": {
+			"type": "string",
+			"defaultValue": "Notary",
+			"allowedValues": [
+				"Notary"
+			],
+			"metadata": {
+				"description": "The type of trust policy.",
+				"required": "no"
+			}
+		},
+		"trustPolicyStatus": {
+			"type": "string",
+			"defaultValue": "enabled",
+			"allowedValues": [
+				"enabled"
+			],
+			"metadata": {
+				"description": "The value that indicates whether the policy is enabled or not.",
+				"required": "no"
+			}
+		},
+		"retentionPolicyDays": {
+			"type": "int",
+			"minValue": 1,
+			"maxValue": 180,
+			"defaultValue": 180,
+			"metadata": {
+				"description": "The number of days to retain an untagged manifest after which it gets purged.",
+				"required": "no"
+			}
+		},
+		"retentionPolicyStatus": {
+			"type": "string",
+			"defaultValue": "enabled",
+			"allowedValues": [
+				"enabled"
+			],
+			"metadata": {
+				"description": "The value that indicates whether the policy is enabled or not.",
+				"required": "no"
+			}
+		},
+		"replicationLocations": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of locations for replication. This cannot be changed after the resource is created.",				
+				"subType": "string"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"AcrDelete",
+							"AcrImageSigner",
+							"AcrPull",
+							"AcrPush",
+							"AcrQuarantineReader",
+							"AcrQuarantineWriter",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Object ID of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"registrieApiVersion": "2019-05-01",
+		"roleAssignmentsApiVersion": "2018-09-01-preview",
+		"uniqueName": "[uniqueString(parameters('registryName'))]",
+		"isProd": "[equals(parameters('injectedValues').envType, 'Production')]",
+		"datacenterIpAddresses": [
+			"63.73.199.0/24",
+			"63.239.17.0/24",
+			"204.15.116.0/22",
+			"209.65.11.0/24"
+		],
+		"prodIpAddresses": [
+			"40.67.188.50",
+			"52.177.84.230",
+			"52.155.224.242",
+			"51.105.163.210",
+			"20.36.252.188"
+		],
+		"nonProdIpAddresses": [
+			"52.230.220.128",
+			"40.65.233.76",
+			"52.155.224.148",
+			"51.105.144.11"
+		],
+		"allowedIpAddresses": "[union(parameters('allowedIpAddresses'), variables('datacenterIpAddresses'), if(variables('isProd'), variables('prodIpAddresses'), variables('nonProdIpAddresses')))]",
+		"copy": [
+			{
+				"name": "networkRuleSetVirtualNetworkRules",
+				"count": "[length(parameters('allowedVirtualNetworks'))]",
+				"input": {
+					"action": "Allow",
+					"id": "[parameters('allowedVirtualNetworks')[copyIndex('networkRuleSetVirtualNetworkRules')]]"
+				}
+			},
+			{
+				"name": "networkRuleSetIpRules",
+				"count": "[length(variables('allowedIpAddresses'))]",
+				"input": {
+					"action": "Allow",
+					"value": "[variables('allowedIpAddresses')[copyIndex('networkRuleSetIpRules')]]"
+				}
+			}
+		],
+		"replicationLocations": "[if(empty(parameters('replicationLocations')), array(parameters('location')), parameters('replicationLocations'))]",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"AcrDelete": "c2f4ef07-c644-48eb-af81-4b1b4947fb11",
+		"AcrImageSigner": "6cef56e8-d556-48e5-a04f-b8e64114680f",
+		"AcrPull": "7f951dda-4ed3-4680-a7ca-43fe172d538d",
+		"AcrPush": "8311e382-0749-4cb8-b61a-304f252e45ec",
+		"AcrQuarantineReader": "cdda3590-29a3-44f6-95f2-9f980659eb04",
+		"AcrQuarantineWriter": "c8d4ff99-41c3-41a8-9f60-21dfdad59608",
+		"WBA - LEAP - Resource Deletion":  "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.ContainerRegistry/registries",
+			"apiVersion": "[variables('registrieApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('registryName')]",
+			"tags": "[parameters('tags')]",
+			"location": "[parameters('location')]",
+			"sku": {
+				"name": "[parameters('skuName')]"
+			},
+			"properties": {
+				"adminUserEnabled": "[parameters('adminUserEnabled')]",
+				"storageAccount": null,
+				"networkRuleSet": {
+					"defaultAction": "[parameters('networkRuleSetDefaultAction')]",
+					"virtualNetworkRules": "[variables('networkRuleSetVirtualNetworkRules')]",
+					"ipRules": "[variables('networkRuleSetIpRules')]"
+				},
+				"policies": {
+					"quarantinePolicy": {
+						"status": "[parameters('quarantinePolicyStatus')]"
+					},
+					"trustPolicy": {
+						"type": "[parameters('trustPolicyType')]",
+						"status": "[parameters('trustPolicyStatus')]"
+					},
+					"retentionPolicy": {
+						"days": "[parameters('retentionPolicyDays')]",
+						"status": "[parameters('retentionPolicyStatus')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.ContainerRegistry/registries/replications",
+			"apiVersion": "[variables('registrieApiVersion')]",
+			"condition": "[not(empty(parameters('replicationLocations')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.ContainerRegistry/registries', parameters('registryName'))]"
+			],
+			"name": "[concat(parameters('registryName'), '/', replace(variables('replicationLocations')[copyIndex()], ' ', ''))]",
+			"location": "[replace(variables('replicationLocations')[copyIndex()], ' ', '')]",
+			"tags": "[parameters('tags')]",
+			"properties": {},
+			"copy": {
+				"name": "replicationsCopy",
+				"count": "[length(variables('replicationLocations'))]"
+			}
+		},
+		{
+			"type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.ContainerRegistry/registries', parameters('registryName'))]"
+			],
+			"name": "[concat(parameters('registryName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

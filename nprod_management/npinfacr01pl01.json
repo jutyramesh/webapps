@@ -1,0 +1,36 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "poolName": {
+            "value": "npinfacr01pl01"
+        },
+        "poolCount": {
+            "value": 3
+        },
+        "poolTier": {
+            "value": "S2"
+        },
+        "poolOS": {
+            "value": "Linux"
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "registryName": {
+            "value": "nprodinfraprovisioningagentsacr01"
+        },
+        "poolSubnetId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn03"
+        } 
+    },
+    "deploymentParameters": {
+        "dependencies": [
+            "nprod_management/nprodinfraprovisioningagentsacr01.json",
+            "nprod_management/wh-int-infra-eastus2-vnet-01-sn03.json"
+        ],
+        "resourceGroup": "nprod-infra-provisioning-agents-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/acr-agentpool-template.json"
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+				"LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"virtualNetworkName": {
+			"value": "wh-datalynx-nprod-int-general-eastus2-vnet-02"
+		},
+		"addressSpaceAddressPrefixes": {
+			"value": [
+				"10.255.4.0/23"
+			]
+		}
+	},
+	"deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-vnet02-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/virtual-network-template.json"
+    }
+}

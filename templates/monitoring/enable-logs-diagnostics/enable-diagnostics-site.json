@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+         "appServiceName": {
+            "type": "String",
+            "metadata": { 
+                "descrition": "Name of the webApp NOT the appservice plan " 
+                }
+        },
+        "settingName": {
+            "type": "String",
+            "metadata": { 
+                "descrition": "Name of diagnostic setting"
+             }
+        },
+        "logAnalyticResourceID": {
+            "type": "String",
+            "metadata": {
+                "descrition": "logAnalyticResourceID for log analytics workspace" 
+                }
+        },
+        "logTypes": {
+            "type": "Array",
+            "metadata": {
+                "description": "enable alert log types"
+            }
+        },
+        "metricTypes": {
+            "type": "Array",
+            "metadata": {
+                "description": "enable metric log types"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(parameters('appservicename'),'/Microsoft.Insights/', parameters('settingName'))]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "workspaceId": "[parameters('logAnalyticResourceID')]",
+                "logs": "[parameters('logTypes')]",
+                "metrics": "[parameters('metricTypes')]"
+            }
+        }
+    ]
+}

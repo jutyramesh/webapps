@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "poolName": {
+            "type": "string",
+            "maxLength": 20,
+            "metadata": {
+                "description": "limited to 20 characters"
+            }
+        },
+        "poolCount": {
+            "type": "int",
+            "defaultValue": 1
+        },
+        "poolTier": {
+            "type": "string",
+            "defaultValue": "S1",
+            "allowedValues": [
+                "S1",
+                "S2",
+                "S3",
+                "I6"
+            ]
+        },
+        "poolOS": {
+            "type": "string",
+            "defaultValue": "Linux",
+            "allowedValues": [
+                "Linux"
+            ]
+        },
+        "location": {
+            "type": "string"
+        },
+        "registryName": {
+            "type": "string"
+        },
+        "poolSubnetId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "for injecting the agent pool into a subnet, make sure to view the details on outbound allowance requirements and service endpoint to ACRs it will interact with"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerRegistry/registries/agentPools",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[concat(parameters('registryName'), '/', parameters('poolName'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "count": "[parameters('poolCount')]",
+                "tier": "[parameters('poolTier')]",
+                "os": "[parameters('poolOS')]",
+                "virtualNetworkSubnetResourceId": "[parameters('poolSubnetId')]"
+            }
+        }
+    ],
+    "outputs": {
+        "poolName": {
+            "type": "string",
+            "value": "[parameters('poolName')]",
+            "metadata": {
+                "description": "The name of the pool."
+            }
+        }
+    }
+}

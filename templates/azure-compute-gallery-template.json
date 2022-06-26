@@ -1,0 +1,115 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "yes"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location",
+				"required": "yes"
+			}
+		},
+		"galleryName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the Shared Image Gallery. The allowed characters are alphabets and numbers with dots and periods allowed in the middle. The maximum length is 80 characters.",
+				"required": "yes"
+			}
+		},
+		"description": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The description of this Shared Image Gallery resource. This property is updatable.",
+				"required": "no"
+			}
+		},
+		"roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"subType": "object",
+				"description": "A list of role assignments mapped to identities",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"metadata": {
+							"required": "no",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						},
+						"type": "string",
+						"allowedValues": [
+							"Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						]
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"gallerieApiVersion": "2019-12-01",
+		"roleAssignmentsApiVersion": "2019-04-01-preview",
+		"uniqueName": "[uniqueString(parameters('galleryName'))]",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"Contributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+		"WBA - LEAP - Resource Deletion": "0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+		"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Compute/galleries",
+			"apiVersion": "[variables('gallerieApiVersion')]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('galleryName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"description": "[parameters('description')]"
+			}
+		},
+		{
+			"type": "Microsoft.Compute/galleries/providers/roleAssignments",
+			"apiVersion": "[variables('roleAssignmentsApiVersion')]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Compute/galleries', parameters('galleryName'))]"
+			],
+			"name": "[concat(parameters('galleryName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roleAssignments')[copyIndex()].roleDefinitionName , variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables(variables('roleAssignments')[copyIndex()].roleDefinitionName))]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

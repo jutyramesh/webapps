@@ -1,0 +1,45 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverfarmName": {
+            "value": "datalynx-ingest-dev-w-asp-01"
+        },
+        "isLinux": {
+            "value": false
+        },
+        "skuName": {
+            "value": "P1V2"
+        },
+        "kind": {
+            "value": "app"
+        },
+        "perSiteScaling": {
+            "value": true
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "Reader",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                }]
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/app-service-plan-template.json"
+    }
+}

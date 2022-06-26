@@ -1,0 +1,2509 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"value": "eastus2"
+		},
+		"firewallPolicyName": {
+			"value": "AzureFirewall_wh-int-nvhub-eastus2-vhub-01-Standard"
+		},
+		"applicationRules": {
+			"value": [
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "ApplicationRule",
+							"name": "WVD",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [
+								"WindowsVirtualDesktop"
+							],
+							"webCategories": [],
+							"targetFqdns": [],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "MS Sites",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"go.microsoft.com",
+								"*.azureedge.net",
+								"rhui-1.microsoft.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "Powershell",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"www.powershellgallery.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "Centos",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"olcentgbl.trafficmanager.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "AKS-SSL Targets",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.hcp.eastus2.azmk8s.io",
+								"*.hcp.centralus.azmk8s.io",
+								"*.hcp.northeurope.azmk8s.io",
+								"*.hcp.westeurope.azmk8s.io",
+								"*.tun.eastus2.azmk8s.io",
+								"*.tun.centralus.azmk8s.io",
+								"*.tun.northeurope.azmk8s.io",
+								"*.tun.westeurope.azmk8s.io",
+								"aksrepos.azurecr.io",
+								"*.blob.core.windows.net",
+								"mcr.microsoft.com",
+								"*.cdn.mscr.io",
+								"management.azure.com",
+								"login.microsoftonline.com",
+								"packages.microsoft.com",
+								"acs-mirror.azureedge.net",
+								"dc.services.visualstudio.com",
+								"*.ods.opinsights.azure.com",
+								"*.oms.opinsights.azure.com",
+								"*.microsoftonline.com",
+								"*.monitoring.azure.com",
+								"gov-prod-policy-data.trafficmanager.net",
+								"raw.githubusercontent.com",
+								"*.gk.azmk8s.io"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "AKS  -unbuntu sites",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"security.ubuntu.com",
+								"azure.archive.ubuntu.com",
+								"changelogs.ubuntu.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "Tableau-Activation",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.tableau.com",
+								"api.mapbox.com",
+								"s.ss2.us"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "AmazonTrust-CRL",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.amazontrust.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "Ptmspropertytax",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"www.ptmspropertytax.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "data.medicaid.gov",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"data.Medicaid.gov"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "time.org",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.time.org"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "ods.opsinsights",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.ods.opsinsights.azure.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "oms.opsinsights",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.oms.opsinsights.azure.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "blob.core",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.blob.core.windows.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "azure automation",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.azure-automation.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "win.data.microsoft.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*win.data.microsoft.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "msftcloudes.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"msftcloudes.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "telemetry.microsoft.com:443",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.telemetry.microsoft.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "fs.microsoft.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"fs.microsoft.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "package.mapr.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"package.mapr.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "download.postgresql.org",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"download.postgresql.org"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "dev.monetdb.org",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"dev.monetdb.org"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "packages.nuget.org",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"packages.nuget.org"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "Microsoft - Azure",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.microsoft.com",
+								"*.azure.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "ocsp.msocsp.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.msocsp.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "catalogenrichment",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"catalogenrichment.com",
+								"*.catalogenrichment.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"192.168.0.0/24",
+								"10.0.0.0/16"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						}
+					],
+					"name": "Outbound",
+					"priority": 1000
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "ApplicationRule",
+							"name": "*visualstudio.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*visualstudio.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "*.blob.core.windows.net",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.blob.core.windows.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "*.dev.azure.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.dev.azure.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "*.vsassets.io",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"*.vsassets.io"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "dev.azure.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"dev.azure.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "login.microsoftonline.com",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"login.microsoftonline.com"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "management.core.windows.net",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"management.core.windows.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						},
+						{
+							"ruleType": "ApplicationRule",
+							"name": "vstsagentpackage.azureedge.net",
+							"protocols": [
+								{
+									"protocolType": "Http",
+									"port": 80
+								},
+								{
+									"protocolType": "Https",
+									"port": 443
+								}
+							],
+							"fqdnTags": [],
+							"webCategories": [],
+							"targetFqdns": [
+								"vstsagentpackage.azureedge.net"
+							],
+							"targetUrls": [],
+							"terminateTLS": false,
+							"sourceAddresses": [
+								"*"
+							],
+							"destinationAddresses": [],
+							"sourceIpGroups": []
+						}
+					],
+					"name": "Azure_Repos",
+					"priority": 1010
+				}
+			]
+		},
+		"networkRules": {
+			"value": [
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "SSOTEST",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.149.237.147"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.152.254.157"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed nprod-dmz-eastus2-fw-02-pip-8",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.167.31.44"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed nprod-dmz-centralus-fw-02-pip04",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.154.255.106"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed nprod-dmz-northeurope-fw-02-pip02",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.155.231.23"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed nprod-dmz-westeurope-fw-02-pip02",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"51.138.29.226"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed prod-dmz-eastus2-fw-02-pip-5",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"20.65.20.186"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed prod-dmz-centralus-fw-02-pip03",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"13.89.109.110"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed prod-dmz-northeurope-fw-02-pip02",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.155.164.146"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "PingFed prod-dmz-westeurope-fw-02-pip02",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"40.114.165.36"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"9041"
+							]
+						}
+					],
+					"name": "SSOTEST-PingFed-Auth",
+					"priority": 995
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "cloud.horizon.vmware.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"20.69.81.64"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "hydra-softwarelib-cdn.azureedge.net",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"72.21.81.200"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "softwareupdate.vmware.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"23.41.186.252",
+								"23.56.12.27"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "packages.microsoft.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"13.90.56.68"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443",
+								"11371"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "azure.archive.ubuntu.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.252.75.106"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "api.snapcraft.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"91.189.92.39",
+								"91.189.92.40",
+								"91.189.92.41",
+								"91.189.92.19",
+								"91.189.92.20",
+								"91.189.92.38"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "archive.ubuntu.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"91.189.88.152",
+								"91.189.88.142"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "changelogs.ubuntu.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"185.125.190.17",
+								"185.125.190.18",
+								"91.189.88.184",
+								"91.189.88.185",
+								"91.189.91.48",
+								"91.189.91.49"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "security.ubuntu.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"91.189.91.39",
+								"91.189.91.38"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "esm.ubuntu.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"91.189.91.47",
+								"91.189.88.182",
+								"91.189.88.183",
+								"91.189.91.46"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "login.microsoftonline.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"40.126.29.14",
+								"40.126.29.5",
+								"40.126.29.6",
+								"40.126.29.8",
+								"40.126.29.9",
+								"40.126.29.11",
+								"40.126.29.12",
+								"40.126.29.13"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "management.azure.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"20.44.8.17"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "graph.windows.net",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"40.126.29.2",
+								"40.126.29.20",
+								"40.126.29.21",
+								"40.126.29.22",
+								"40.126.29.23",
+								"40.126.29.0",
+								"40.126.29.1"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "connector-azure-us.vmwarehorizon.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.247.33.61"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "kinesis.us-east-1.amazonaws.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"3.91.171.150"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "Cloud control Plane",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"20.69.81.64"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "horizonedgeprod.azurecr.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.240.241.130"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "edgehubprodna.azure-devices.net",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.162.111.65"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "docker.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"3.225.11.9",
+								"34.193.45.8",
+								"34.195.201.174",
+								"34.202.206.152",
+								"52.55.43.248",
+								"3.224.144.203"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "docker.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"3.221.138.16",
+								"3.225.66.59",
+								"52.6.16.15"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "cloud.google.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"108.177.122.101",
+								"108.177.122.102",
+								"108.177.122.113",
+								"108.177.122.138",
+								"108.177.122.139",
+								"108.177.122.100"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "gcr.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"172.253.126.82"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "dl.k8s.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"34.107.204.206"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "k8s.gcr.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"172.253.126.82"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "storage.googleapis.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"142.250.9.128",
+								"142.250.105.128",
+								"142.250.177.16",
+								"173.194.219.128",
+								"64.233.185.128",
+								"74.125.21.128",
+								"108.177.122.128"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "cloud.weave.works",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"52.203.8.47"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "packages.cloud.google.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"172.253.124.100",
+								"172.253.124.101",
+								"172.253.124.102",
+								"172.253.124.113",
+								"172.253.124.138",
+								"172.253.124.139"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "apt.kubernetes.io",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"34.107.204.206"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "sauron.horizon.vmware.com",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27",
+								"10.0.3.32/27",
+								"10.0.3.64/27",
+								"10.0.3.96/27",
+								"10.0.3.128/27",
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"44.235.154.208",
+								"54.149.220.189",
+								"44.229.141.192"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"443"
+							]
+						}
+					],
+					"name": "VDI-Platform-02-03",
+					"priority": 1030
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "KMS",
+							"ipProtocols": [
+								"TCP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"23.102.135.246/32"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"1688"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-EastUS2-Pod-10.0.4.0_22",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.4.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-EastUS2-Mgmt-10.0.3.0_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.0/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-EastUS2-Gateway-10.0.3.32_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.32/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-CentralUS-Pod-10.0.8.0_22",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.8.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-CentralUS-Mgmt-10.0.3.64_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.64/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-CentralUS-Gateway-10.0.3.96_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.96/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-Germany-Pod-10.0.12.0_22",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.12.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-Germany-Mgmt-10.0.3.128_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.128/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "VDI-CentralUS-Gateway-10.0.3.160_27",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.3.160/27"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						}
+					],
+					"name": "VDI-to-Spokes",
+					"priority": 1020
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "192.168.0.0_24",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"192.168.0.0/24"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "192.168.1.0_24",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"192.168.1.0/24"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						}
+					],
+					"name": "VPN-to-Internet",
+					"priority": 1040
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "Poc_VPN-Spoke",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.17.0/24"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						}
+					],
+					"name": "PoC-VPN-Spoke-to-Internet",
+					"priority": 1070
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "VPN-192.168.0.0_24",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"192.168.0.0/24"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						}
+					],
+					"name": "VPN-192.168.0.0_24-to-Spokes",
+					"priority": 1010
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "PoC-Spoke",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.16.0/26"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						}
+					],
+					"name": "PoC-Spoke-to-Internet",
+					"priority": 1060
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "wh-int-infra-eastus2-vnet-01 ",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.1.0/24",
+								"10.0.2.0/24"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "wh-int-vdi-eastus2-vnet-01",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.4.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "wh-int-vdi-centralus-vnet-01",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.8.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "Germany VDI ",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.0.12.0/22"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						},
+						{
+							"ruleType": "NetworkRule",
+							"name": "wh-nprod-provisioning-eastus2-vnet-01",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"10.1.0.0/16"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"80",
+								"443"
+							]
+						}
+					],
+					"name": "Infrastructure_Spokes_to_Internet",
+					"priority": 1050
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "Spoke-to-Spoke",
+							"ipProtocols": [
+								"Any"
+							],
+							"sourceAddresses": [
+								"10.0.0.0/8"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"10.0.0.0/8"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						}
+					],
+					"name": "Spoke-to-Spoke",
+					"priority": 1080
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "ANY-to-ANY",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"*"
+							]
+						}
+					],
+					"name": "Any-to-ANY",
+					"priority": 1100
+				},
+				{
+					"ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+					"action": {
+						"type": "Allow"
+					},
+					"rules": [
+						{
+							"ruleType": "NetworkRule",
+							"name": "DNS-Allow",
+							"ipProtocols": [
+								"TCP",
+								"UDP"
+							],
+							"sourceAddresses": [
+								"*"
+							],
+							"sourceIpGroups": [],
+							"destinationAddresses": [
+								"*"
+							],
+							"destinationIpGroups": [],
+							"destinationFqdns": [],
+							"destinationPorts": [
+								"53"
+							]
+						}
+					],
+					"name": "DNS-Allow",
+					"priority": 1110
+				}
+			]
+		}
+	},
+	"deploymentParameters": {
+		"resourceGroup": "wh-nprod-eastus2-vWAN-01-rg",
+		"subscription": "wh-nprod-management-01",
+		"templateFile": "templates/azure-firewall-policy-template.json"
+	}
+}

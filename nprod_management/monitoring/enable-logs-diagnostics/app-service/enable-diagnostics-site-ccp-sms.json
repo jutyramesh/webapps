@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServiceName": {
+            "value": "ccp-sms"
+        },
+        "settingName": {
+            "value": "diagnostics"
+        },
+        "logAnalyticResourceID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourcegroups/wh-nprod-globplat-security-rg-eastus2-01/providers/microsoft.operationalinsights/workspaces/wh-nprod-globplat-seclaws-eastus2-01"
+        },
+        "logTypes": {
+            "value": [
+                {
+                    "category": "AppServiceHTTPLogs",
+                    "enabled": true
+                },
+                {
+                    "category": "AppServiceConsoleLogs",
+                    "enabled": true
+                },
+                {
+                    "category": "AppServiceAppLogs",
+                    "enabled": true
+                },
+
+                {
+                    "category": "AppServiceAuditLogs",
+                    "enabled": true
+                },
+                {
+                    "category": "AppServiceIPSecAuditLogs",
+                    "enabled": true
+                },
+                {
+                    "category": "AppServicePlatformLogs",
+                    "enabled": true
+                }
+            ]
+        },
+        "metricTypes": {
+            "value": [
+                {
+                    "category": "AllMetrics",
+                    "enabled": true
+                }
+            ]
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "templateFile": "templates/monitoring/enable-logs-diagnostics/enable-diagnostics-site.json"
+    }
+}

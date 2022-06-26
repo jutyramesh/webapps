@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-when-nprod-infra-services-dbsvr-01-master-disk-greater-85-percent" 
+        },
+        "alertDescription": {
+            "value": "Nprod SQL DB nprod-infra-services-dbsvr-01-master disk utililization is greater than 85 percentage"
+        },
+        "alertSeverity": {
+            "value": 2
+        },
+        "isEnabled": {
+            "value": true
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Sql/servers/nprod-infra-services-dbsvr-01/databases/master" 
+        },
+        "metricName": {
+            "value": "storage_percent"  
+        },
+        "targetResourceType": {
+            "value": ""
+        },
+        "operator": {
+            "value": "GreaterThan"
+        },
+        "threshold": {
+            "value": 85
+        },
+        "timeAggregation": {
+            "value": "Average"
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "evaluationFrequency": {
+            "value": "PT15M"
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actionGroups/WH-CCP-NPROD"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+    }
+}

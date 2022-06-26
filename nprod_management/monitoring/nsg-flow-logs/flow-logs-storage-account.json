@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "heng.yon",
+                "CostCenter": "Healthcare Development 5004",
+                "CostCode": "1000609920",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "envType": "Non-Production"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "storageAccountName": {
+            "value": "infravnet01nsgsflowlogs"
+        },
+        "skuName": {
+            "value": "Standard_LRS"
+        },
+        "kind": {
+            "value": "StorageV2"
+        },
+        "accessTier": {
+            "value": "Hot"
+        },
+        "largeFileSharesState": {
+            "value": "Disabled"
+        },
+        "allowedVirtualNetworks": {
+            "value": [
+                "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-vnet-01-rg/providers/Microsoft.Network/virtualNetworks/wh-int-infra-eastus2-vnet-01/subnets/wh-int-infra-eastus2-vnet-01-sn06"
+            ]
+        },
+        "roleAssignments": {
+            "value": []
+        }
+    },
+    "deploymentParameters": {
+        "subscription": "wh-nprod-management-01",
+        "resourceGroup": "wh-int-infra-eastus2-vnet-01-monitoring-rg",
+        "templateFile": "templates/storage-account-template.json"
+    }
+}

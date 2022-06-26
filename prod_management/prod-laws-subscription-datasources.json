@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptions": {
+      "value": [
+        "d042b16c-744c-4fba-a391-f8ab079d6cdf",
+        "beb71173-d66e-4f96-bfda-afed9a749a92",
+        "599f95bd-a47e-46e1-94ab-655968e3b209",
+        "6e1f74a0-5f69-4dfe-9da6-4bf8680a21e1",
+        "11567191-460c-4f3f-ba02-2ac391ffebb6"
+      ]
+    },
+    "workspaceName": {
+      "value": "prod-infra-laws-eastus2-01"
+    },
+    "location": {
+      "value": "eastus2"
+    }
+  },
+  "deploymentParameters": {
+    "resourceGroup": "prod-infra-monitoring-general-eastus2",
+    "subscription": "wh-prod-management-01",
+    "templateFile": "templates/log-analytics-subscriptions-datasource-template.json"
+  }
+}

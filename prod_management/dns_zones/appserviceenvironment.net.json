@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateZoneName": {
+            "value": "appserviceenvironment.net"
+        },
+        "linkedVirtualNetworks": {
+            "value": [
+                "/subscriptions/d042b16c-744c-4fba-a391-f8ab079d6cdf/resourceGroups/prod-infra-networking-infra-eastus2/providers/Microsoft.Network/virtualNetworks/wh-mgmt-prod-int-infra-eastus2-vnet-01"
+            ]
+        },
+        "location": {
+            "value": "eastus2"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "prod-infra-networking-dns-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/private-dns-zone-template.json"
+    }
+}

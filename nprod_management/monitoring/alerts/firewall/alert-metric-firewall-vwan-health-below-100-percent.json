@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-when-azurefirewall_wh-int-nvhub-eastus2-vhub-01-average-health-status-less-than-100"
+        },
+        "alertDescription": {
+            "value": "Alert CCP when Azure firewall health state is below 100 percent "
+        },
+        "alertSeverity": {
+            "value": 3
+        },
+        "isEnabled": {
+            "value": true
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-nprod-eastus2-vWAN-01-rg/providers/Microsoft.Network/azureFirewalls/AzureFirewall_wh-int-nvhub-eastus2-vhub-01"
+        },
+        "metricName": {
+            "value": "FirewallHealth"
+        },
+        "operator": {
+            "value": "LessThan"
+        },
+        "threshold": {
+            "value": 100
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actionGroups/WH-CCP-NPROD"
+        },
+        "evaluationFrequency": {
+            "value": "PT5M"
+        },
+        "windowSize": {
+            "value": "PT5M"
+        },
+        "timeAggregation": {
+            "value": "Average"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+    }
+}

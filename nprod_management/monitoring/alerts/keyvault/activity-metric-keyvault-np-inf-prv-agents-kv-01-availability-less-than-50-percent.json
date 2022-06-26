@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "activity-metric-when-keyvault-np-inf-prv-agents-kv-01-availability-less-than-50-percent"
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-provisioning-agents-eastus2/providers/Microsoft.KeyVault/vaults/np-inf-prv-agents-kv-01"
+        },
+        "metricName": {
+            "value": "Availability"
+        },
+        "threshold": {
+            "value": 50
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actiongroups/WH-CCP-NPROD"
+        },
+        "evaluationFrequency": {
+            "value": "PT1M"
+        },
+        "windowsSize": {
+            "value": "PT5M"
+        },
+        "timeAggregation": {
+            "value": "Average"
+        },
+        "allOf": {
+            "value": [
+                {
+                    "name": "Metric1",
+                    "metricNamespace": "insights.container/nodes",
+                    "operator": "LessThan",
+                    "criterionType": "StaticThresholdCriterion"
+                }
+            ]
+        },
+        "deploymentParameters": {
+            "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+            "subscription": "wh-nprod-management-01",
+            "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+        }
+    }
+}

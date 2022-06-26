@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-app-service-ccp-peering-api-when-cpu-time-more-than-600-seconds"
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/sites/ccp-peering-api"
+        },
+        "metricName": {
+            "value": "CpuTime"
+        },
+        "threshold": {
+            "value": 600
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actionGroups/WH-CCP-NPROD"
+        },
+        "evaluationFrequency": {
+            "value": "PT1M"
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "timeAggregation": {
+            "value": "Total"
+        },
+        "alertSeverity": {
+            "value": 2
+        },
+        "operator": {
+            "value": "GreaterThanOrEqual"
+        }
+
+    },
+        "deploymentParameters": {
+            "subscription": "wh-nprod-management-01",
+            "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+            "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+        }
+}
+

@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.6.2.0",
+    "parameters": {
+        "tags": {
+			"value": {
+                "Deployer": "Nick Barber",
+                "CostCenter": "Healthcare Development 5004",
+                "CostCode": "1000609920",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "Sensitivity": "Non-Sensitive"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverName": {
+            "value": "nprod-infra-services-dbsvr-01"
+        },
+        "databaseName": {
+            "value": "sms"
+        },
+        "databaseType": {
+            "value": "Database"
+        },
+        "applicationAccounts": {
+            "value": [
+                "ccp-sms"
+            ]
+        },
+        "distributionLists": {
+            "value": ["CommonCloudPlatformTeam"]
+        },
+        "injectedValues": {
+            "value": {
+                "geoLocation": "rpu",
+                "envType": "production"
+            }
+        }
+    },
+    "deploymentParameters": {        
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/sql-database-template.json"
+    }
+}

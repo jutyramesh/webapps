@@ -1,0 +1,25 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Suresh.Palleboina",
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "galleryName": {
+            "value": "nprodinfrabaseimagegallery01"
+        },
+        "description": {
+            "value": "Non-Prod Azure compute gallery for Walgreens Health Project."
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-baseimage-gallery-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/azure-compute-gallery-template.json"
+    }
+}

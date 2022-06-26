@@ -1,0 +1,82 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "LegalSubEntity": "Walgreens Health",
+				"SubDivision": "Walgreens Health",
+				"Department": "Walgreens Health Organic Business",
+				"CostCenter": "WAG Health Admin SG&A",
+				"CostCode": "1000641601"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "siteName": {
+            "value": "dev-datalynx-dataeng-ingest-eastus2-func-01"
+        },
+        "kind": {
+            "value": "functionapp"
+        },
+        "serverFarmId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-paas-eastus2/providers/Microsoft.Web/serverFarms/datalynx-ingest-dev-w-asp-01"
+        },
+        "isLinux": {
+            "value": false
+        },
+		"httpsOnly": {
+            "value": true
+        },
+        "httpLoggingEnabled": {
+            "value": false
+        },
+        "subnetId": {
+            "value": "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet02-eastus2/providers/Microsoft.Network/virtualNetworks/wh-datalynx-nprod-int-general-eastus2-vnet-02/subnets/wh-datalynx-nprod-int-general-eastus2-vnet-02-ase01"
+        },
+        "allowedVirtualNetworks": {
+            "value": [                "/subscriptions/74711008-33b9-4784-b1ea-76aab1287167/resourceGroups/dev-datalynx-dataeng-vnet02-eastus2/providers/Microsoft.Network/virtualNetworks/wh-datalynx-nprod-int-general-eastus2-vnet-02/subnets/wh-datalynx-nprod-int-general-eastus2-vnet-02-ase01"
+            ]
+        },
+        "appSettings" : {
+            "value": {
+                "WEBSITE_NODE_DEFAULT_VERSION": "~14",
+                "WEBSITE_VNET_ROUTE_ALL": "1",
+                "WEBSITE_DNS_SERVER": "10.124.0.250"
+            }
+        },
+        "scmType": {
+            "value": "None"
+        },
+        "alwaysOn": {
+            "value": true
+        },
+        "roleAssignments": {
+            "value": [
+                {
+                    "roleDefinitionName": "Website Contributor",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                },
+                {
+                    "roleDefinitionName": "Website Contributor",
+                    "principalId": "f77c0fa1-ae0f-4bbe-988f-1e4a53129967"
+                },
+                {
+                    "roleDefinitionName": "Reader",
+                    "principalId": "24df23c9-bd17-4baf-b2fd-72370c313d43"
+                }				
+            ]
+        },
+		"injectedValues": {
+            "value": {
+                "envType": "Non-Production"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "dev-datalynx-dataeng-paas-eastus2",
+        "subscription": "wh-nprod-dataengineering-01",
+        "templateFile": "templates/app-service-sites-template.json"
+    }
+}

@@ -1,0 +1,2181 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "2.2.2.0",
+	"parameters": {
+		"injectedValues": {
+			"defaultValue": {},
+			"type": "object"
+		},
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags.",
+				"required": "no"
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource Location.",
+				"required": "yes"
+			}
+		},
+		"siteName": {
+			"type": "string",
+			"metadata": {
+				"description": "Unique name of the app to create or update. To create or update a deployment slot, use the {slot} parameter.",
+				"required": "yes"
+			}
+		},
+		"kind": {
+			"type": "string",
+			"allowedValues": [
+				"app", 
+				"functionapp"
+			],
+			"metadata": {
+				"description": "Kind of resource.",
+				"required": "no"
+			}
+		},
+		"hostingEnvironmentProfileId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource ID of the App Service Environment.",
+				"required": "no"
+			}
+		},
+		"serverFarmId": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource ID of the associated App Service plan, formatted as: \"/subscriptions/{subscriptionID}/resourceGroups/{groupName}/providers/Microsoft.Web/serverfarms/{appServicePlanName}\".",
+				"required": "no"
+			}
+		},
+		"isLinux": {
+			"type": "bool",
+			"metadata": {
+				"description": "Whether or not this serverfarm should be Linux or Windows."
+			}
+		},
+		"subnetId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The Virtual Network subnet's resource ID. This is the subnet that this Web App will join. This subnet must have a delegation to Microsoft.Web/serverFarms defined first.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"isSwift": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "Flag that is used to denote if this is VNET injection.",
+				"required": "no"
+			}
+		},
+		"allowedIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).",
+				"required": "no",
+				"subType": "ipv4"
+			}
+		},
+		"allowedVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"allowedScmIpAddresses": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78). This is for SCM access only.",
+				"required": "no",
+				"subType": "ipv4"
+			}
+		},
+		"allowedScmVirtualNetworks": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'. This is for SCM access only.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+				
+		"enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "<code>true</code> if the app is enabled; otherwise, <code>false</code>. Setting this value to false disables the app (takes the app offline).",
+				"required": "no"
+			}
+		},
+		"managedPipelineMode": {
+			"type": "string",
+			"allowedValues": [
+				"Integrated"
+			],
+			"defaultValue": "Integrated",
+			"metadata": {
+				"description": "Managed pipeline mode.",
+				"required": "no"
+			}
+		},
+		"reserved": {
+			"type": "bool",
+			"defaultValue": false,
+			"allowedValues": [
+				false
+			],
+			"metadata": {
+				"description": "<code>true</code> if reserved; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"hyperV": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Hyper-V sandbox.",
+				"required": "no"
+			}
+		},
+		"isXenon": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Obsolete: Hyper-V sandbox.",
+				"required": "no"
+			}
+		},		
+		"redundancyMode": {
+			"type": "string",
+			"allowedValues": [
+				"None",
+				"Manual",
+				"Failover",
+				"ActiveActive",
+				"GeoRedundant"
+			],
+			"defaultValue": "None",
+			"metadata": {
+				"description": "Site redundancy mode",
+				"required": "no"
+			}
+		},
+		"httpsOnly": {
+			"type": "bool",
+			"allowedValues": [
+				true
+			],
+			"defaultValue": true,
+			"metadata": {
+				"description": "HttpsOnly: configures a web site to accept only https requests. Issues redirect for\nhttp requests",
+				"required": "no"
+			}
+		},
+		"httpLoggingEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if HTTP logging is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"remoteDebuggingVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Remote debugging version.",
+				"required": "no"
+			}
+		},
+		"localMySqlEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> to enable local MySQL; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"tracingOptions": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Tracing options.",
+				"required": "no"
+			}
+		},
+		"apiDefinitionUrl": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The URL of the API definition.",
+				"required": "no"
+			}
+		},
+		"documentRoot": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Document root.",
+				"required": "no"
+			}
+		},
+		"appCommandLine": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "App command line to launch.",
+				"required": "no"
+			}
+		},
+		"loadBalancing": {
+			"type": "string",
+			"allowedValues": [
+				"Default",
+				"WeightedRoundRobin",
+				"LeastRequests",
+				"LeastResponseTime",
+				"WeightedTotalTraffic",
+				"RequestHash"
+			],
+			"defaultValue": "Default",
+			"metadata": {
+				"description": "Site load balancing.",
+				"required": "no"
+			}
+		},
+		"remoteDebuggingEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if remote debugging is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"requestTracingEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if request tracing is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"use32BitWorkerProcess": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> to use 32-bit worker process; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"minTlsVersion": {
+			"type": "string",
+			"allowedValues": [
+				"1.2"
+			],
+			"defaultValue": "1.2",
+			"metadata": {
+				"description": "MinTlsVersion: configures the minimum version of TLS required for SSL requests",
+				"required": "no"
+			}
+		},
+		"logsDirectorySizeLimit": {
+			"type": "int",
+			"allowedValues": [
+				35
+			],
+			"defaultValue": 35,
+			"metadata": {
+				"description": "HTTP logs directory size limit.",
+				"required": "no"
+			}
+		},
+		"defaultDocuments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Default documents.",
+				"required": "no"
+			}
+		},
+		"apiManagementConfigId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "APIM-Api Identifier.",
+				"required": "no",
+				"subType": "resourceId"
+			}
+		},
+		"publishingUsername": {
+			"type": "string",
+			"defaultValue": "[concat('$', parameters('siteName'))]",
+			"metadata": {
+				"description": "Publishing user name.",
+				"required": "no"
+			}
+		},
+		"vnetName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Virtual Network name.",
+				"required": "no"
+			}
+		},
+		"requestTracingExpirationTime": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Request tracing expiration time.",
+				"required": "no"
+			}
+		},
+		"detailedErrorLoggingEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if detailed error logging is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"healthCheckPath": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Health check path",
+				"required": "no"
+			}
+		},
+		"numberOfWorkers": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "Number of workers.",
+				"required": "no"
+			}
+		},
+		"http20Enabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "Http20Enabled: configures a web site to allow clients to connect over http2.0",
+				"required": "no"
+			}
+		},
+		"ftpsState": {
+			"type": "string",
+			"allowedValues": [
+				"FtpsOnly",
+				"Disabled"
+			],
+			"defaultValue": "FtpsOnly",
+			"metadata": {
+				"description": "State of FTP / FTPS service",
+				"required": "no"
+			}
+		},
+		"preWarmedInstanceCount": {
+			"type": "int",
+			"minValue": 0,
+			"maxValue": 10,
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Number of preWarmed instances.\nThis setting only applies to the Consumption and Elastic Plans",
+				"required": "no"
+			}
+		},
+		"webSocketsEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if WebSocket is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"alwaysOn": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "<code>true</code> if Always On is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"dailyMemoryTimeQuota": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum allowed daily memory-time quota (applicable on dynamic apps only).",
+				"required": "no"
+			}
+		},
+		"hostNamesDisabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> to disable the public hostnames of the app; otherwise, <code>false</code>.\n If <code>true</code>, the app is only accessible via API management process.",
+				"required": "no"
+			}
+		},
+		"hostNameSslStates": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Hostname SSL states are used to manage the SSL bindings for app's hostnames.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Hostname.",
+							"required": "no"
+						}
+					},
+					"toUpdate": {
+						"type": "bool",
+						"metadata": {
+							"description": "Set to <code>true</code> to update existing hostname.",
+							"required": "no"
+						}
+					},
+					"sslState": {
+						"type": "string",
+						"allowedValues": [
+							"Disabled",
+							"SniEnabled",
+							"IpBasedEnabled"
+						],
+						"metadata": {
+							"description": "SSL type.",
+							"required": "no"
+						}
+					},
+					"hostType": {
+						"type": "string",
+						"allowedValues": [
+							"Standard",
+							"Repository"
+						],
+						"metadata": {
+							"description": "Indicates whether the hostname is a standard or repository hostname.",
+							"required": "no"
+						}
+					},
+					"virtualIP": {
+						"type": "string",
+						"metadata": {
+							"description": "Virtual IP address assigned to the hostname if IP based SSL is enabled.",
+							"required": "no"
+						}
+					},
+					"thumbprint": {
+						"type": "string",
+						"metadata": {
+							"description": "SSL certificate thumbprint.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"containerSize": {
+			"type": "int",
+			"minValue": 0,
+			"maxValue": 1536,
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Size of the function container. A value of 0 denotes to use default. Use 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1088, 1152, 1216, 1280, 1344, 1408, 1472, 1536.",
+				"required": "no"
+			}
+		},
+		"containerImageName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "Name of the docker image to pull"
+			}
+		},
+		"containerImageTagName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "Tag Name of the docker image to pull"
+			}
+		},
+		"containerRegistryName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "Name to the docker registry"
+			}
+		},
+		"containerRegistryUsername": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A reference object to the KeyVault and secret containing the username of the service account used to access the acr that houses the docker image being deployed",
+				"required": "no"
+			}
+		},
+		"containerRegistryPassword": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A reference object to the KeyVault and secret containing the password of the service account used to access the acr that houses the docker image being deployed",
+				"required": "no"
+			}
+		},
+		
+		"customDomainVerificationId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Unique identifier that verifies the custom domains assigned to the app. Customer will add this id to a txt record for verification.",
+				"required": "no"
+			}
+		},
+		
+		"identityType": {
+			"type": "string",
+			"allowedValues": [
+				"SystemAssigned",
+				"UserAssigned"
+			],
+			"defaultValue": "SystemAssigned",
+			"metadata": {
+				"description": "Type of managed service identity.",
+				"required": "no"
+			}
+		},
+		"identityUserAssignedIdentities": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "The list of user assigned identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}",
+				"required": "no"
+			}
+		},
+		
+		"certificates": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Certificate configuration objects",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Name of the certificate.",
+							"required": "yes"
+						}
+					},
+					"canonicalName": {
+						"type": "string",
+						"metadata": {
+							"description": "CNAME of the certificate to be issued via free certificate",
+							"required": "no"
+						}
+					},
+					"hostNames": {
+						"type": "array",
+						"metadata": {
+							"description": "Host names the certificate applies to.",
+							"required": "no"
+						}
+					},
+					"password": {
+						"type": "string",
+						"metadata": {
+							"description": "Certificate password.",
+							"required": "yes"
+						}
+					},
+					"keyVaultId": {
+						"type": "string",
+						"metadata": {
+							"description": "Key Vault Csm resource Id.",
+							"required": "no",
+							"subType": "resourceId"
+						}
+					},
+					"keyVaultSecretName": {
+						"type": "string",
+						"metadata": {
+							"description": "Key Vault secret name.",
+							"required": "no"
+						}
+					}				
+				}
+			}
+		},
+
+		"clientCertEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> to enable client certificate authentication (TLS mutual authentication); otherwise, <code>false</code>. Default is <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"clientCertMode": {
+			"type": "string",
+			"allowedValues": [
+				"Required",
+				"Optional"
+			],
+			"defaultValue": "Optional",
+			"metadata": {
+				"description": "This composes with ClientCertEnabled setting.\n- ClientCertEnabled: false means ClientCert is ignored.\n- ClientCertEnabled: true and ClientCertMode: Required means ClientCert is required.\n- ClientCertEnabled: true and ClientCertMode: Optional means ClientCert is optional or accepted.",
+				"required": "no"
+			}
+		},
+		"clientCertExclusionPaths": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "client certificate authentication comma-separated exclusion paths",
+				"required": "no"
+			}
+		},
+		"clientAffinityEnabled": {
+			"type": "bool",
+			"defaultValue": true,
+			"metadata": {
+				"description": "<code>true</code> to enable client affinity; <code>false</code> to stop sending session affinity cookies, which route client requests in the same session to the same instance. Default is <code>true</code>.",
+				"required": "no"
+			}
+		},
+		
+		"cloningInfo": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Cloning Info configuration",
+				"subTypeDefinition": {
+					"sourceWebAppId": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "ARM resource ID of the source app. App resource ID is of the form <br/>  /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName} for production slots and /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slotName} for other slots.",
+							"required": "yes"
+						}
+					},
+					"configureLoadBalancing": {
+						"type": "bool",
+						"defaultValue": false,
+						"metadata": {
+							"description": "<code>true</code> to configure load balancing for source and destination app.",
+							"required": "no"
+						}
+					},
+					"cloneSourceControl": {
+						"type": "bool",
+						"defaultValue": false,
+						"metadata": {
+							"description": "<code>true</code> to clone source control from source app; otherwise, <code>false</code>.",
+							"required": "no"
+						}
+					},
+					"appSettingsOverrides": {
+						"type": "object",
+						"defaultValue": {},
+						"metadata": {
+							"description": "Application setting overrides for cloned app. If specified, these settings override the settings cloned <br/>from source app. Otherwise, application settings from source app are retained.",
+							"required": "no"
+						}
+					},
+					"hostingEnvironment": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "App Service Environment.",
+							"required": "no"
+						}
+					},
+					"trafficManagerProfileId": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "ARM resource ID of the Traffic Manager profile to use, if it exists. Traffic Manager resource ID is of the form <br/>/subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficManagerProfiles/{profileName}.",
+							"required": "no"
+						}
+					},
+					"trafficManagerProfileName": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "Name of Traffic Manager profile to create. This is only needed if Traffic Manager profile does not already exist.",
+							"required": "no"
+						}
+					},
+					"cloneCustomHostNames": {
+						"type": "bool",
+						"defaultValue": false,
+						"metadata": {
+							"description": "<code>true</code> to clone custom hostnames from source app; otherwise, <code>false</code>.",
+							"required": "no"
+						}
+					},
+					"correlationId": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "Correlation ID of cloning operation. This ID ties multiple cloning operations<br/>together to use the same snapshot.",
+							"required": "no"
+						}
+					},
+					"sourceWebAppLocation": {
+						"type": "string",
+						"defaultValue": "",
+						"metadata": {
+							"description": "Location of source app ex: West US or North Europe",
+							"required": "no"
+						}
+					},
+					"overwrite": {
+						"type": "bool",
+						"defaultValue": false,
+						"metadata": {
+							"description": "<code>true</code> to overwrite destination app; otherwise, <code>false</code>.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"appSettings": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Name/value pairs of variables and their values."
+			}
+		},
+		"phpVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Version of PHP.",
+				"required": "no"
+			}
+		},
+		"powerShellVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Version of PowerShell.",
+				"required": "no"
+			}
+		},
+		"nodeVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Version of Node.js.",
+				"required": "no"
+			}
+		},
+		"netFrameworkVersion": {
+			"type": "string",
+			"defaultValue": "v4.6",
+			"metadata": {
+				"description": ".NET Framework version.",
+				"required": "no"
+			}
+		},
+		"pythonVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Version of Python.",
+				"required": "no"
+			}
+		},
+		"javaVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Java version.",
+				"required": "no"
+			}
+		},
+		"javaContainer": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Java container.",
+				"required": "no"
+			}
+		},
+		"javaContainerVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Java container version.",
+				"required": "no"
+			}
+		},
+		"linuxFxVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Linux App Framework and version",
+				"required": "no"
+			}
+		},
+		"windowsFxVersion": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Xenon App Framework and version",
+				"required": "no"
+			}
+		},
+		"experimentsRampUpRules": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "List of ramp-up rules.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Name of the routing rule. The recommended name would be to point to the slot which will receive the traffic in the experiment.",
+							"required": "no"
+						}
+					},
+					"changeIntervalInMinutes": {
+						"type": "int",
+						"metadata": {
+							"description": "Specifies interval in minutes to reevaluate ReroutePercentage.",
+							"required": "no"
+						}
+					},
+					"maxReroutePercentage": {
+						"type": "string",
+						"metadata": {
+							"description": "Specifies upper boundary below which ReroutePercentage will stay.",
+							"required": "no"
+						}
+					},
+					"actionHostName": {
+						"type": "string",
+						"metadata": {
+							"description": "Hostname of a slot to which the traffic will be redirected if decided to. E.g. myapp-stage.azurewebsites.net.",
+							"required": "no"
+						}
+					},
+					"reroutePercentage": {
+						"type": "string",
+						"metadata": {
+							"description": "Percentage of the traffic which will be redirected to <code>ActionHostName</code>.",
+							"required": "no"
+						}
+					},
+					"minReroutePercentage": {
+						"type": "string",
+						"metadata": {
+							"description": "Specifies lower boundary above which ReroutePercentage will stay.",
+							"required": "no"
+						}
+					},
+					"changeStep": {
+						"type": "string",
+						"metadata": {
+							"description": "In auto ramp up scenario this is the step to add/remove from <code>ReroutePercentage</code> until it reaches <br/><code>MinReroutePercentage</code> or <br/><code>MaxReroutePercentage</code>. Site metrics are checked every N minutes specified in <code>ChangeIntervalInMinutes</code>.<br/>Custom decision algorithm ARM resource ID of the source app. App resource ID is of the form <br/>  /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName} for production slots and /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slotName} for other slots.Can be provided in TiPCallback site extension which URL can be specified in <code>ChangeDecisionCallbackUrl</code>.",
+							"required": "no"
+						}
+					},
+					"changeDecisionCallbackUrl": {
+						"type": "string",
+						"metadata": {
+							"description": "Custom decision algorithm can be provided in TiPCallback site extension which URL can be specified. See TiPCallback site extension for the scaffold and contracts.<br/>https://www.siteextensions.net/packages/TiPCallback/",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"scmSiteAlsoStopped": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> to stop SCM (KUDU) site when the app is stopped; otherwise, <code>false</code>. The default is <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"scmIpSecurityRestrictionsUseMain": {
+			"type": "bool",
+			"allowedValues": [
+				false
+			],
+			"defaultValue": false,
+			"metadata": {
+				"description": "IP security restrictions for scm to use main.",
+				"required": "no"
+			}
+		},
+		"scmType": {
+			"type": "string",
+			"allowedValues": [
+				"None",
+				"LocalGit",
+				"VSO"
+			],
+			"defaultValue": "None",
+			"metadata": {
+				"description": "SCM type.",
+				"required": "no"
+			}
+		},
+		"scmIpSecurityRestrictions": {
+			"type": "array",
+			"allowedValues": [],
+			"defaultValue": [],
+			"metadata": {
+				"description": "IP security restrictions for scm.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "IP restriction rule name.",
+							"required": "no"
+						}
+					},
+					"vnetTrafficTag": {
+						"type": "int",
+						"metadata": {
+							"description": "(internal) Vnet traffic tag",
+							"required": "no"
+						}
+					},
+					"description": {
+						"type": "string",
+						"metadata": {
+							"description": "IP restriction rule description.",
+							"required": "no"
+						}
+					},
+					"priority": {
+						"type": "int",
+						"metadata": {
+							"description": "Priority of IP restriction rule.",
+							"required": "no"
+						}
+					},
+					"headers": {
+						"type": "object",
+						"metadata": {
+							"description": "IP restriction rule headers.<br/>[X-Forwarded-Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host#Examples).<br/>The matching logic is .. <ul><li>If the property is null or empty (default), all hosts(or lack of) are allowed.</li><li>A value is compared using ordinal-ignore-case (excluding port number).</li><li>Subdomain wildcards are permitted but don't match the root domain. For example, *.contoso.com matches the subdomain foo.contoso.com but not the root domain contoso.com or multi-level foo.bar.contoso.com</li><li>Unicode host names are allowed but are converted to Punycode for matching.</li></ul>[X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#Examples).<br/>The matching logic is ..<ul><li>If the property is null or empty (default), any forwarded-for chains (or lack of) are allowed.</li><li>If any address (excluding port number) in the chain (comma separated) matches the CIDR defined by the property.</li></ul>X-Azure-FDID and X-FD-HealthProbe.<ul><li>The matching logic is exact match.</li></ul>",
+							"required": "no"
+						}
+					},
+					"subnetTrafficTag": {
+						"type": "int",
+						"metadata": {
+							"description": "(internal) Subnet traffic tag",
+							"required": "no"
+						}
+					},
+					"tag": {
+						"type": "string",
+						"allowedValues": [
+							"Default",
+							"XffProxy",
+							"ServiceTag"
+						],
+						"metadata": {
+							"description": "Defines what this IP filter will be used for. This is to support IP filtering on proxies.",
+							"required": "no"
+						}
+					},
+					"action": {
+						"type": "string",
+						"metadata": {
+							"description": "Allow or Deny access for this IP range.",
+							"required": "no"
+						}
+					},
+					"subnetMask": {
+						"type": "string",
+						"metadata": {
+							"description": "Subnet mask for the range of IP addresses the restriction is valid for.",
+							"required": "no"
+						}
+					},
+					"ipAddress": {
+						"type": "string",
+						"metadata": {
+							"description": "IP address the security restriction is valid for.<br/>It can be in form of pure ipv4 address (required SubnetMask property) or<br/>CIDR notation such as ipv4/mask (leading bit match). For CIDR,<br/>SubnetMask property must not be specified.",
+							"required": "no"
+						}
+					},
+					"vnetSubnetResourceId": {
+						"type": "string",
+						"metadata": {
+							"description": "Virtual network resource id",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"managedServiceIdentityId": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Managed Service Identity Id",
+				"required": "no"
+			}
+		},
+		"xManagedServiceIdentityId": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Explicit Managed Service Identity Id",
+				"required": "no"
+			}
+		},
+		"handlerMappings": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Handler mappings.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"scriptProcessor": {
+						"type": "string",
+						"metadata": {
+							"description": "The absolute path to the FastCGI application.",
+							"required": "no"
+						}
+					},
+					"arguments": {
+						"type": "string",
+						"metadata": {
+							"description": "Command-line arguments to be passed to the script processor.",
+							"required": "no"
+						}
+					},
+					"extension": {
+						"type": "string",
+						"metadata": {
+							"description": "Requests with this extension will be handled using the specified FastCGI application.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"ipSecurityRestrictions": {
+			"type": "array",
+			"allowedValues": [],
+			"defaultValue": [],
+			"metadata": {
+				"description": "IP security restrictions for main.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "IP restriction rule name.",
+							"required": "no"
+						}
+					},
+					"vnetTrafficTag": {
+						"type": "int",
+						"metadata": {
+							"description": "(internal) Vnet traffic tag",
+							"required": "no"
+						}
+					},
+					"description": {
+						"type": "string",
+						"metadata": {
+							"description": "IP restriction rule description.",
+							"required": "no"
+						}
+					},
+					"priority": {
+						"type": "int",
+						"metadata": {
+							"description": "Priority of IP restriction rule.",
+							"required": "no"
+						}
+					},
+					"headers": {
+						"type": "object",
+						"metadata": {
+							"description": "IP restriction rule headers.<br/>[X-Forwarded-Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host#Examples).<br/>The matching logic is ..<ul><li>If the property is null or empty (default), all hosts(or lack of) are allowed.</li><li>A value is compared using ordinal-ignore-case (excluding port number).</li><li>Subdomain wildcards are permitted but don't match the root domain. For example, *.contoso.com matches the subdomain foo.contoso.com but not the root domain contoso.com or multi-level foo.bar.contoso.com</li><li>Unicode host names are allowed but are converted to Punycode for matching.</li></ul>[X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#Examples).<br/>The matching logic is ..<ul><li> If the property is null or empty (default), any forwarded-for chains (or lack of) are allowed.</li><li>If any address (excluding port number) in the chain (comma separated) matches the CIDR defined by the property.</li></ul>X-Azure-FDID and X-FD-HealthProbe.<ul><li>The matching logic is exact match.</li></ul>",
+							"required": "no"
+						}
+					},
+					"subnetTrafficTag": {
+						"type": "int",
+						"metadata": {
+							"description": "(internal) Subnet traffic tag",
+							"required": "no"
+						}
+					},
+					"tag": {
+						"type": "string",
+						"allowedValues": [
+							"Default",
+							"XffProxy",
+							"ServiceTag"
+						],
+						"metadata": {
+							"description": "Defines what this IP filter will be used for. This is to support IP filtering on proxies.",
+							"required": "no"
+						}
+					},
+					"action": {
+						"type": "string",
+						"metadata": {
+							"description": "Allow or Deny access for this IP range.",
+							"required": "no"
+						}
+					},
+					"subnetMask": {
+						"type": "string",
+						"metadata": {
+							"description": "Subnet mask for the range of IP addresses the restriction is valid for.",
+							"required": "no"
+						}
+					},
+					"ipAddress": {
+						"type": "string",
+						"metadata": {
+							"description": "IP address the security restriction is valid for.<br/>It can be in form of pure ipv4 address (required SubnetMask property) or CIDR notation such as ipv4/mask (leading bit match).<br/>For CIDR, SubnetMask property must not be specified.",
+							"required": "no"
+						}
+					},
+					"vnetSubnetResourceId": {
+						"type": "string",
+						"metadata": {
+							"description": "Virtual network resource id",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"pushIsPushEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Gets or sets a flag indicating whether the Push endpoint is enabled.",
+				"required": "yes"
+			}
+		},
+		"pushTagWhitelistJson": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Gets or sets a JSON string containing a list of tags that are whitelisted for use by the push registration endpoint.",
+				"required": "no"
+			}
+		},
+		"pushTagsRequiringAuth": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Gets or sets a JSON string containing a list of tags that require user authentication to be used in the push registration endpoint.\nTags can consist of alphanumeric characters and the following:\n'_', '@', '#', '.', ':', '-'. \nValidation should be performed at the PushRequestHandler.",
+				"required": "no"
+			}
+		},
+		"pushDynamicTagsJson": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Gets or sets a JSON string containing a list of dynamic tags that will be evaluated from user claims in the push registration endpoint.",
+				"required": "no"
+			}
+		},
+		
+		"connectionStrings": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Connection strings.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"name": {
+						"type": "string",
+						"metadata": {
+							"description": "Name of connection string.",
+							"required": "no"
+						}
+					},
+					"connectionString": {
+						"type": "string",
+						"metadata": {
+							"description": "Connection string value.",
+							"required": "no"
+						}
+					},
+					"type": {
+						"type": "string",
+						"allowedValues": [
+							"MySql",
+							"SQLServer",
+							"SQLAzure",
+							"Custom",
+							"NotificationHub",
+							"ServiceBus",
+							"EventHub",
+							"ApiHub",
+							"DocDb",
+							"RedisCache",
+							"PostgreSQL"
+						],
+						"metadata": {
+							"description": "Type of database.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		
+		"corsSupportCredentials": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Gets or sets whether CORS requests with credentials are allowed. See \nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Requests_with_credentials\nfor more details.",
+				"required": "no"
+			}
+		},
+		"corsAllowedOrigins": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "Gets or sets the list of origins that should be allowed to make cross-origin\ncalls (for example: http://example.com:12345). Use \"*\" to allow all.",
+				"required": "no"
+			}
+		},
+
+		"autoHealEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "<code>true</code> if Auto Heal is enabled; otherwise, <code>false</code>.",
+				"required": "no"
+			}
+		},
+		"autoHealRules": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"description": "Object containing auto-heal actions",
+				"subTypeDefinition": {
+					"actions": {
+						"type": "object",
+						"metadata": {
+							"subTypeDefinition": {
+								"minProcessExecutionTime": {
+									"type": "string",
+									"metadata": {
+										"description": "Minimum time the process must execute\nbefore taking the action",
+										"required": "no"
+									}
+								},
+								"actionType": {
+									"type": "string",
+									"allowedValues": [
+										"Recycle",
+										"LogEvent",
+										"CustomAction"
+									],
+									"metadata": {
+										"description": "Predefined action to be taken.",
+										"required": "no"
+									}
+								},
+								"customActionExe": {
+									"type": "string",
+									"metadata": {
+										"description": "Executable to be run.",
+										"required": "no"
+									}
+								},
+								"customActionParameters": {
+									"type": "string",
+									"metadata": {
+										"description": "Parameters for the executable.",
+										"required": "no"
+									}
+								}
+							}
+						}
+					},
+					"triggers": {
+						"type": "object",
+						"metadata": {
+							"subTypeDefinition": {
+								"requests": {
+									"type": "object",
+									"metadata": {
+										"subTypeDefinition": {
+											"count": {
+												"type": "int",
+												"metadata": {
+													"description": "Request Count.",
+													"required": "no"
+												}
+											},
+											"timeInterval": {
+												"type": "string",
+												"metadata": {
+													"description": "Time interval.",
+													"required": "no"
+												}
+											}
+										}
+									}
+								},
+								"privateBytesInKB": {
+									"type": "int",
+									"metadata": {
+										"description": "A rule based on private bytes.",
+										"required": "no"
+									}
+								},
+								"slowRequests": {
+									"type": "object",
+									"metadata": {
+										"subTypeDefinition": {
+											"count": {
+												"type": "int",
+												"metadata": {
+													"description": "Request Count.",
+													"required": "no"
+												}
+											},
+											"timeInterval": {
+												"type": "string",
+												"metadata": {
+													"description": "Time interval.",
+													"required": "no"
+												}
+											},
+											"timeTaken": {
+												"type": "string",
+												"metadata": {
+													"description": "Time taken.",
+													"required": "no"
+												}
+											}
+										}
+									}
+								},
+								"statusCodes": {
+									"type": "array",
+									"defaultValue": [],
+									"metadata": {
+										"description": "A rule based on status codes.",
+										"required": "no",
+										"subType": "object",
+										"subTypeDefinition": {
+											"status": {
+												"type": "int",
+												"metadata": {
+													"description": "HTTP status code.",
+													"required": "no"
+												}
+											},
+											"win32Status": {
+												"type": "int",
+												"metadata": {
+													"description": "Win32 error code.",
+													"required": "no"
+												}
+											},
+											"timeInterval": {
+												"type": "string",
+												"metadata": {
+													"description": "Time interval.",
+													"required": "no"
+												}
+											},
+											"subStatus": {
+												"type": "int",
+												"metadata": {
+													"description": "Request Sub Status.",
+													"required": "no"
+												}
+											},
+											"count": {
+												"type": "int",
+												"metadata": {
+													"description": "Request Count.",
+													"required": "no"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		
+		"limitsMaxPercentageCpu": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum allowed CPU usage percentage.",
+				"required": "no"
+			}
+		},
+		"limitsMaxMemoryInMb": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum allowed memory usage in MB.",
+				"required": "no"
+			}
+		},
+		"limitsMaxDiskSizeInMb": {
+			"type": "int",
+			"defaultValue": 0,
+			"metadata": {
+				"description": "Maximum allowed disk size usage in MB.",
+				"required": "no"
+			}
+		},
+
+		"virtualApplications": {
+			"type": "array",
+			"defaultValue": [
+				{
+					"virtualPath": "/",
+					"physicalPath": "site\\wwwroot",
+					"preloadEnabled": false
+				}			
+			],
+			"metadata": {
+				"description": "Virtual applications.",
+				"required": "no",
+				"subType": "object",
+				"subTypeDefinition": {
+					"virtualDirectories": {
+						"type": "array",
+						"metadata": {
+							"description": "Virtual directories for virtual application.",
+							"required": "no",
+							"subType": "object",
+							"subTypeDefinition": {
+								"physicalPath": {
+									"type": "string",
+									"metadata": {
+										"description": "Physical path.",
+										"required": "no"
+									}
+								},
+								"virtualPath": {
+									"type": "string",
+									"metadata": {
+										"description": "Path to virtual application.",
+										"required": "no"
+									}
+								}
+							}
+						}
+					},
+					"preloadEnabled": {
+						"type": "bool",
+						"metadata": {
+							"description": "<code>true</code> if preloading is enabled; otherwise, <code>false</code>.",
+							"required": "no"
+						}
+					},
+					"physicalPath": {
+						"type": "string",
+						"metadata": {
+							"description": "Physical path.",
+							"required": "no"
+						}
+					},
+					"virtualPath": {
+						"type": "string",
+						"metadata": {
+							"description": "Virtual path.",
+							"required": "no"
+						}
+					}
+				}
+			}
+		},
+		"authSettings": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {
+				"required": "no",
+				"description": "Authentication options available to the resource",
+				"subType": "object",
+				"subTypeDefinition": {
+					"runtimeVersion": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The RuntimeVersion of the Authentication / Authorization feature in use for the current app."
+						}
+					},
+					"unauthenticatedClientAction": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The action to take when an unauthenticated client attempts to access the app. - RedirectToLoginPage, AllowAnonymous"
+						}
+					},
+					"tokenStoreEnabled": {
+						"type": "bool",
+						"metadata": {
+							"required": "no",
+							"description": "true to durably store platform-specific security tokens that are obtained during login flows; otherwise, false. The default is false."
+						}
+					},
+					"allowedExternalRedirectUrls": {
+						"type": "array",
+						"metadata": {
+							"required": "no",
+							"description": "External URLs that can be redirected to as part of logging in or logging out of the app. Note that the query string part of the URL is ignored.",
+							"subType": "string"
+						}
+					},
+					"tokenRefreshExtensionHours": {
+						"type": "integer",
+						"metadata": {
+							"required": "no",
+							"description": "The number of hours after session token expiration that a session token can be used to call the token refresh API. The default is 72 hours."
+						}
+					},
+					"clientId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The Client ID of this relying party application, known as the client_id. This setting is required for enabling OpenID Connection authentication with Azure Active Directory or other 3rd party OpenID Connect providers."
+						}
+					},
+					"clientSecret": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The Client Secret of this relying party application (in Azure Active Directory, this is also referred to as the Key). This setting is optional. If no client secret is configured, the OpenID Connect implicit auth flow is used to authenticate end users. Otherwise, the OpenID Connect Authorization Code Flow is used to authenticate end users."
+						}
+					},
+					"clientSecretCertificateThumbprint": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "An alternative to the client secret, that is the thumbprint of a certificate used for signing purposes. This property acts as a replacement for the Client Secret. It is also optional"
+						}
+					},
+					"issuer": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The OpenID Connect Issuer URI that represents the entity which issues access tokens for this application. When using Azure Active Directory, this value is the URI of the directory tenant."
+						}
+					},
+					"validateIssuer": {
+						"type": "bool",
+						"metadata": {
+							"required": "no",
+							"description": "Gets a value indicating whether the issuer should be a valid HTTPS url and be validated as such."
+						}
+					},
+					"allowedAudiences": {
+						"type": "array",
+						"metadata": {
+							"required": "no",
+							"description": "Allowed audience values to consider when validating JWTs issued by Azure Active Directory.",
+							"subType": "string"
+						}
+					},
+					"additionalLoginParams": {
+						"type": "array",
+						"metadata": {
+							"required": "no",
+							"description": "Login parameters to send to the OpenID Connect authorization endpoint when a user logs in. Each parameter must be in the form key=value ",
+							"subType": "string"
+						}
+					},
+					"microsoftAccountClientId": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The OAuth 2.0 client ID that was created for the app used for authentication. This setting is required for enabling Microsoft Account authentication."
+						}
+					},
+					"microsoftAccountClientSecret": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "The OAuth 2.0 client secret that was created for the app used for authentication. This setting is required for enabling Microsoft Account authentication."
+						}
+					},
+					"microsoftAccountOAuthScopes": {
+						"type": "array",
+						"metadata": {
+							"required": "no",
+							"description": "The OAuth 2.0 scopes that will be requested as part of Microsoft Account authentication. This setting is optional. If not specified, wl.basic is used as the default scope."
+						}
+					}
+				}
+			}
+		},
+		"autoSwapSlotName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Auto-swap slot name.",
+				"required": "no"
+			}
+		},
+		
+		"keyVaultId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Key Vault Resource ID to store keys. Required if functionapp",
+				"subType": "resourceId"
+			}
+		},
+		"appInsightsInstrumentationKey": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A reference object to the KeyVault and secret containing the Instrumentation key for application insights",
+				"required": "no"
+			}
+		},
+		"appInsightsConnectionString": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A reference object to the KeyVault and secret containing the connection string for the app insights",
+				"required": "no"
+			}
+		},
+		"storageAccountConnectionString": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"description": "A reference object to the KeyVault and secret containing the connection string for the storage account",
+				"required": "no"
+			}
+		},
+		"fileShareMountname": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "Web/Config Property azureStorageAccount Name."
+			}
+		},
+		"fileShareMounttype": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "The Data Storage Service of Storage Account Used (Ex - Azure File Share)."
+			}
+		},
+		"fileShareMountaccountName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "Azure Storage Account Name"
+				}
+		},
+		"fileShareMountshareName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "The Azure Storage Account File Share Name."
+			}
+		},
+		"fileShareMountmountPath": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "The Mount Path inside the Azure Web App Linux OS ."
+			}
+		},
+		"fileShareMountaccessKey": {
+			"type": "securestring",
+			"defaultValue": "",
+			"metadata": {
+				"required": "no",
+				"description": "The Access Key of the Azure Storage Account"
+			}
+		},
+	    "roleAssignments": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "A list of role assignments mapped to identities",
+				"subType": "object",
+				"subTypeDefinition": {
+					"roleDefinitionName": {
+						"type": "string",
+						"allowedValues": [
+							"Website Contributor",
+							"WBA - LEAP - Resource Deletion",
+							"Reader"
+						],
+						"metadata": {
+							"required": "yes",
+							"description": "Name of the RBAC role that needs to be assigned to the principal i.e. Reader, Contributor, Virtual Network Administrator, etc."
+						}
+					},
+					"principalId": {
+						"type": "string",
+						"metadata": {
+							"required": "yes",
+							"description": "Azure AD Objectid of the user, group or service principal."
+						}
+					},
+					"principalName": {
+						"type": "string",
+						"metadata": {
+							"required": "no",
+							"description": "Azure AD name or email address of the user, group or service principal."
+						}
+					}
+				}
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"sites": "2021-02-01",
+			"networkConfig": "2019-08-01",
+			"keyVault": "2019-09-01",
+			"roleAssignments": "2019-04-01-preview",
+			"deployments": "2019-08-01",
+			"listKeys": "2016-08-01"
+		},
+		"uniqueName": "[uniqueString(parameters('siteName'))]",
+		"emptyArray": [],
+		"isProd": "[equals(parameters('injectedValues').envType, 'Production')]",
+		"isMultiTenant": "[empty(parameters('hostingEnvironmentProfileId'))]",
+		"isFunction": "[equals(parameters('kind'), 'functionapp')]",
+		"isContainer": "[or(equals(parameters('linuxFxVersion'), 'DOCKER'), equals(parameters('windowsFxVersion'), 'DOCKER'))]",
+		"kind": "[concat(parameters('kind'), if(and(parameters('isLinux'), not(variables('isFunction'))), ',linux', ''), if(variables('isContainer'), ',container', ''))]",
+		"reserved": "[parameters('isLinux')]",
+		"siteHost": "[resourceId('Microsoft.Web/sites/host', parameters('siteName'), 'default')]",
+		"appInsightsInstrumentationKey": "[if(not(empty(parameters('appInsightsConnectionString'))), take(skip(parameters('appInsightsConnectionString'), add(indexOf(parameters('appInsightsConnectionString'), 'InstrumentationKey='), 19)), 36), parameters('appInsightsInstrumentationKey'))]",
+		"appInsightsConnectionString": "[if(not(empty(parameters('appInsightsConnectionString'))), parameters('appInsightsConnectionString'), concat('InstrumentationKey=', parameters('appInsightsInstrumentationKey')))]",
+
+		"denyRestriction": [
+			{
+				"name": "Deny all",
+				"description": "Deny all access",
+				"action": "Deny",
+				"priority": 100,
+				"ipAddress": "Any"
+			}
+		],
+		"datacenterIpAddresses": [
+			"63.73.199.0/24",
+			"63.239.17.0/24",
+			"204.15.116.0/22",
+			"209.65.11.0/24"
+		],
+		"prodIpAddresses": [
+			"40.67.188.50/32",
+			"52.177.84.230/32",
+			"52.155.224.242/32",
+			"51.105.163.210/32",
+			"20.36.252.188/32"
+		],
+		"nonProdIpAddresses": [
+			"52.230.220.128/32",
+			"40.65.233.76/32",
+			"52.155.224.148/32",
+			"51.105.144.11/32"
+		],
+
+		"hostingEnvironmentProfile": {
+			"id": "[parameters('hostingEnvironmentProfileId')]"
+		},
+		"apiManagementConfig": {
+			"id": "[parameters('apiManagementConfigId')]"
+		},
+		"apiDefinition": {
+			"url": "[parameters('apiDefinitionUrl')]"
+		},
+		"limits": {
+			"maxPercentageCpu": "[if(greater(parameters('limitsMaxPercentageCpu'), 0), parameters('limitsMaxPercentageCpu'), json('null'))]",
+			"maxMemoryInMb": "[if(greater(parameters('limitsMaxMemoryInMb'), 0), parameters('limitsMaxMemoryInMb'), json('null'))]",
+			"maxDiskSizeInMb": "[if(greater(parameters('limitsMaxDiskSizeInMb'), 0), parameters('limitsMaxDiskSizeInMb'), json('null'))]"
+		},
+		"keyVault": {
+			"name": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[8], 'DEFAULT')]",
+			"resourceGroup": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[4], '')]",
+			"subscriptionId": "[if(not(empty(parameters('keyVaultId'))), split(parameters('keyVaultId'), '/')[2], '')]"
+		},
+		"containerRegistryUri": "[concat(parameters('containerRegistryName'), '.azurecr.io')]",
+		"containerUri": "[concat(variables('containerRegistryUri'), '/', parameters('containerImageName'), ':', parameters('containerImageTagName'))]",
+		"linuxFxVersion": "[if(equals(parameters('linuxFxVersion'), 'DOCKER'), concat(parameters('linuxFxVersion'), '|', variables('containerUri')), parameters('linuxFxVersion'))]",
+		"windowsFxVersion": "[if(equals(parameters('windowsFxVersion'), 'DOCKER'), concat(parameters('windowsFxVersion'), '|', variables('containerUri')), parameters('windowsFxVersion'))]",
+
+		"dockerSettings": {
+			"DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('containerRegistryUsername')]",
+			"DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('containerRegistryPassword')]",
+			"DOCKER_REGISTRY_SERVER_URL": "[concat('https://', parameters('containerRegistryName'), '.azurecr.io')]"
+		},
+		"appInsightsSettings": {
+			"APPINSIGHTS_INSTRUMENTATIONKEY": "[variables('appInsightsInstrumentationKey')]",
+			"APPLICATIONINSIGHTS_CONNECTION_STRING": "[variables('appInsightsConnectionString')]"
+		},
+		"storageSettings": {
+			"WEBSITES_ENABLE_APP_SERVICE_STORAGE": "true",
+			"AzureWebJobsStorage": "[parameters('storageAccountConnectionString')]"
+			
+		},		
+		"containerAppSettings": [
+			{
+				"name": "DOCKER_REGISTRY_SERVER_USERNAME",
+				"value": "[parameters('containerRegistryUsername')]"
+			},
+			{
+				"name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+				"value": "[parameters('containerRegistryPassword')]"
+			},
+			{
+				"name": "DOCKER_REGISTRY_SERVER_URL",
+				"value": "[concat('https://', parameters('containerRegistryName'), '.azurecr.io')]"
+			}
+		],
+		"fileshareconfigurations": {
+				"[parameters('fileShareMountname')]": {
+						"type": "[parameters('fileShareMounttype')]",
+						"accountName": "[parameters('fileShareMountaccountName')]",
+						"shareName": "[parameters('fileShareMountshareName')]",
+						"mountPath": "[parameters('fileShareMountmountPath')]",
+						"accessKey": "[parameters('fileShareMountaccessKey')]"
+				}
+		},
+		"defaultDenyRestriction": "[if(variables('isMultiTenant'), variables('denyRestriction'), variables('emptyArray'))]",
+		"wbaEgressAllowedIpAddresses": "[union(variables('datacenterIpAddresses'), if(variables('isProd'), variables('prodIpAddresses'), variables('nonProdIpAddresses')))]",
+		"allowedIpRulesCount": "[add(length(parameters('allowedIpAddresses')), length(parameters('allowedVirtualNetworks')))]",
+		"copy": [
+			{
+				"name": "allowedIpAddresses",
+				"count": "[length(parameters('allowedIpAddresses'))]",
+				"input": {
+					"name": "[parameters('allowedIpAddresses')[copyIndex('allowedIpAddresses')]]",
+					"description": "[concat('Allow ', parameters('allowedIpAddresses')[copyIndex('allowedIpAddresses')])]",
+					"action": "Allow",
+					"priority": "[int(copyIndex('allowedIpAddresses'))]",
+					"ipAddress": "[parameters('allowedIpAddresses')[copyIndex('allowedIpAddresses')]]"
+				}
+			},
+			{
+				"name": "allowedVirtualNetworks",
+				"count": "[length(parameters('allowedVirtualNetworks'))]",
+				"input": {
+					"name": "[take(last(split(parameters('allowedVirtualNetworks')[copyIndex('allowedVirtualNetworks')], '/')), 32)]",
+					"description": "[concat('Allow ', take(last(split(parameters('allowedVirtualNetworks')[copyIndex('allowedVirtualNetworks')], '/')), 32))]",
+					"action": "Allow",
+					"priority": "[int(copyIndex('allowedVirtualNetworks', length(parameters('allowedIpAddresses'))))]",
+					"vnetSubnetResourceId": "[parameters('allowedVirtualNetworks')[copyIndex('allowedVirtualNetworks')]]"
+				}			
+			},
+			{
+				"name": "allowedScmIpAddresses",
+				"count": "[length(parameters('allowedScmIpAddresses'))]",
+				"input": {
+					"name": "[parameters('allowedScmIpAddresses')[copyIndex('allowedScmIpAddresses')]]",
+					"description": "[concat('Allow ', parameters('allowedScmIpAddresses')[copyIndex('allowedScmIpAddresses')])]",
+					"action": "Allow",
+					"priority": "[int(copyIndex('allowedScmIpAddresses'))]",
+					"ipAddress": "[parameters('allowedScmIpAddresses')[copyIndex('allowedScmIpAddresses')]]"
+				}
+			},
+			{
+				"name": "allowedScmVirtualNetworks",
+				"count": "[length(parameters('allowedScmVirtualNetworks'))]",
+				"input": {
+					"name": "[take(last(split(parameters('allowedScmVirtualNetworks')[copyIndex('allowedScmVirtualNetworks')], '/')), 32)]",
+					"description": "[concat('Allow ', take(last(split(parameters('allowedScmVirtualNetworks')[copyIndex('allowedScmVirtualNetworks')], '/')), 32))]",
+					"action": "Allow",
+					"priority": "[int(copyIndex('allowedScmVirtualNetworks', length(parameters('allowedScmIpAddresses'))))]",
+					"vnetSubnetResourceId": "[parameters('allowedScmVirtualNetworks')[copyIndex('allowedScmVirtualNetworks')]]"
+				}			
+			},
+			{
+				"name": "defaultIpSecurityRestrictions",
+				"count": "[if(variables('isMultiTenant'), length(variables('wbaEgressAllowedIpAddresses')), 0)]",
+				"input":
+				{
+					"name": "[concat('WBA Egress - ', variables('wbaEgressAllowedIpAddresses')[copyIndex('defaultIpSecurityRestrictions', 0)])]",
+					"description": "[concat('Allow Egress IP ', variables('wbaEgressAllowedIpAddresses')[copyIndex('defaultIpSecurityRestrictions', 0)])]",
+					"action": "Allow",
+					"priority": "[int(copyIndex('defaultIpSecurityRestrictions', variables('allowedIpRulesCount')))]",
+					"ipAddress": "[variables('wbaEgressAllowedIpAddresses')[copyIndex('defaultIpSecurityRestrictions', 0)]]"
+				}
+			}
+		],
+		"appSettings": "[union(parameters('appSettings'), if(empty(parameters('containerRegistryName')), json('{}'), variables('dockerSettings')), if(empty(variables('appInsightsInstrumentationKey')), json('{}'), variables('appInsightsSettings')), if(empty(parameters('storageAccountConnectionString')), json('{}'), variables('storageSettings')))]",
+		"defaultCertificate": {
+			"name": "DEFAULT"
+		},
+		"certificates": "[if(not(empty(parameters('certificates'))), parameters('certificates'), array(variables('defaultCertificate')))]",
+		"ipSecurityRestrictions": "[union(variables('defaultIpSecurityRestrictions'), variables('allowedIpAddresses'), variables('allowedVirtualNetworks'), variables('defaultDenyRestriction'))]",
+		"scmIpSecurityRestrictions": "[union(variables('defaultIpSecurityRestrictions'), variables('allowedScmIpAddresses'), variables('allowedScmVirtualNetworks'), variables('defaultDenyRestriction'))]",
+		"defaultCorsAllowedOrigins": [
+			"https://functions.azure.com",
+			"https://functions-staging.azure.com",
+			"https://functions-next.azure.com"
+		],
+		"corsAllowedOrigins": "[union(parameters('corsAllowedOrigins'), variables('defaultCorsAllowedOrigins'))]",
+		"defaultRoleAssignment": {
+			"roleDefinitionName": "UNSET",
+			"principalId": "UNSET"
+		},
+		"roleAssignments": "[if(empty(parameters('roleAssignments')), array(variables('defaultRoleAssignment')), parameters('roleAssignments'))]",
+		"roles": {
+			"Website Contributor": "de139f84-1756-47ae-9be6-808fbbe84772",
+			"WBA - LEAP - Resource Deletion":	"0b554e07-b285-4549-b42c-53fcdd1b6b0e",
+			"Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+			"UNSET": "00000000-0000-0000-0000-000000000000"
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "[variables('apiVersions').sites]",
+			"condition": true,
+			"dependsOn": [],
+			"name": "[parameters('siteName')]",
+			"location": "[parameters('location')]",
+			"kind": "[variables('kind')]",
+			"identity": {
+				"type": "[parameters('identityType')]",
+				"userAssignedIdentities": "[if(equals(parameters('identityType'), 'UserAssigned'), parameters('identityUserAssignedIdentities'), json('null'))]"
+			},
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"enabled": "[parameters('enabled')]",
+				"hostingEnvironmentProfile": "[if(not(empty(parameters('hostingEnvironmentProfileId'))), variables('hostingEnvironmentProfile'), json('null'))]",
+				"serverFarmId": "[parameters('serverFarmId')]",
+				"reserved": "[variables('reserved')]",
+				"hyperV": "[parameters('hyperV')]",
+				"isXenon": "[parameters('isXenon')]",
+				"redundancyMode": "[parameters('redundancyMode')]",
+				"clientAffinityEnabled": "[parameters('clientAffinityEnabled')]",
+				"clientCertEnabled": "[parameters('clientCertEnabled')]",
+				"clientCertMode": "[parameters('clientCertMode')]",
+				"clientCertExclusionPaths": "[parameters('clientCertExclusionPaths')]",
+				"httpsOnly": "[parameters('httpsOnly')]",
+				"hostNamesDisabled": "[parameters('hostNamesDisabled')]",
+				"hostNameSslStates": "[parameters('hostNameSslStates')]",
+				"dailyMemoryTimeQuota": "[parameters('dailyMemoryTimeQuota')]",
+				"containerSize": "[if(greater(parameters('containerSize'), 0), parameters('containerSize'), json('null'))]",
+				"customDomainVerificationId": "[parameters('customDomainVerificationId')]",
+				"scmSiteAlsoStopped": "[parameters('scmSiteAlsoStopped')]",
+				"cloningInfo": "[if(not(empty(parameters('cloningInfo'))), parameters('cloningInfo'), json('null'))]",
+				"siteConfig": {
+					"acrUseManagedIdentityCreds": true,
+					"minTlsVersion": "[parameters('minTlsVersion')]",
+					"http20Enabled": "[parameters('http20Enabled')]",
+					"ftpsState": "[parameters('ftpsState')]",
+					"vnetName": "[if(not(empty(parameters('vnetName'))), parameters('vnetName'), json('null'))]",
+					"alwaysOn": "[parameters('alwaysOn')]",
+					"webSocketsEnabled": "[parameters('webSocketsEnabled')]",
+					"preWarmedInstanceCount": "[parameters('preWarmedInstanceCount')]",
+					"numberOfWorkers": "[parameters('numberOfWorkers')]",
+					"use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+					"defaultDocuments": "[if(not(empty(parameters('defaultDocuments'))), parameters('defaultDocuments'), json('null'))]",
+					"publishingUsername": "[parameters('publishingUsername')]",
+					"localMySqlEnabled": "[parameters('localMySqlEnabled')]",
+					"documentRoot": "[parameters('documentRoot')]",
+					"loadBalancing": "[if(equals(parameters('loadBalancing'), 'Default'), json('null'), parameters('loadBalancing'))]",
+					"ipSecurityRestrictions": "[variables('ipSecurityRestrictions')]",
+										
+					"logsDirectorySizeLimit": "[parameters('logsDirectorySizeLimit')]",
+					"detailedErrorLoggingEnabled": "[parameters('detailedErrorLoggingEnabled')]",
+					"httpLoggingEnabled": "[parameters('httpLoggingEnabled')]",
+					"requestTracingEnabled": "[parameters('requestTracingEnabled')]",
+					"tracingOptions": "[parameters('tracingOptions')]",
+					"remoteDebuggingEnabled": "[if(variables('isProd'), 'false', parameters('remoteDebuggingEnabled'))]",
+					
+					"appCommandLine": "[parameters('appCommandLine')]",
+					"apiManagementConfig": "[if(not(empty(parameters('apiManagementConfigId'))), variables('apiManagementConfig'), json('null'))]",
+					"apiDefinition": "[if(not(empty(parameters('apiDefinitionUrl'))), variables('apiDefinition'), json('null'))]",
+					
+					"appSettings": "[if(variables('isContainer'), variables('containerAppSettings'), json('null'))]",
+					"linuxFxVersion": "[variables('linuxFxVersion')]",
+					"windowsFxVersion": "[variables('windowsFxVersion')]",
+					
+					"phpVersion": "[parameters('phpVersion')]",
+					"netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+					"nodeVersion": "[parameters('nodeVersion')]",
+					"powerShellVersion": "[parameters('powerShellVersion')]",
+					"pythonVersion": "[parameters('pythonVersion')]",
+					"javaVersion": "[parameters('javaVersion')]",
+					"javaContainer": "[parameters('javaContainer')]",
+					"javaContainerVersion": "[parameters('javaContainerVersion')]",
+					"remoteDebuggingVersion": "[parameters('remoteDebuggingVersion')]",
+
+					"managedPipelineMode": "[parameters('managedPipelineMode')]",
+					"managedServiceIdentityId": "[parameters('managedServiceIdentityId')]",
+					"xManagedServiceIdentityId": "[parameters('xManagedServiceIdentityId')]",
+					"handlerMappings": "[parameters('handlerMappings')]",
+
+					"requestTracingExpirationTime": "[parameters('requestTracingExpirationTime')]",
+					"connectionStrings": "[parameters('connectionStrings')]",
+					"scmType": "[parameters('scmType')]",
+					"scmIpSecurityRestrictionsUseMain": "[parameters('scmIpSecurityRestrictionsUseMain')]",
+					"scmIpSecurityRestrictions": "[variables('scmIpSecurityRestrictions')]",
+					"healthCheckPath": "[parameters('healthCheckPath')]",
+					"autoHealEnabled": "[parameters('autoHealEnabled')]",
+					"autoHealRules": "[if(not(empty(parameters('autoHealRules'))), parameters('autoHealRules'), json('null'))]",
+					"experiments": {
+						"rampUpRules": "[parameters('experimentsRampUpRules')]"
+					},
+					"limits": "[if(not(empty(variables('limits'))), variables('limits'), json('null'))]",
+					"push": {
+						"properties": {
+							"isPushEnabled": "[parameters('pushIsPushEnabled')]",
+							"tagWhitelistJson": "[parameters('pushTagWhitelistJson')]",
+							"tagsRequiringAuth": "[parameters('pushTagsRequiringAuth')]",
+							"dynamicTagsJson": "[parameters('pushDynamicTagsJson')]"
+						}
+					},
+					"cors": {
+						"supportCredentials": "[parameters('corsSupportCredentials')]",
+						"allowedOrigins": "[variables('corsAllowedOrigins')]"
+					},
+					"virtualApplications": "[parameters('virtualApplications')]",
+					"autoSwapSlotName": "[parameters('autoSwapSlotName')]",
+					"azureStorageAccounts": "[if(and(empty(parameters('autoSwapSlotName')), not(empty(parameters('fileshareMountName')))), variables('fileshareconfigurations'), json('null'))]"
+				}
+			}
+		},
+        {
+            "type": "Microsoft.Web/sites/networkConfig",
+            "apiVersion": "[variables('apiVersions').sites]",
+			"condition": "[not(empty(parameters('subnetId')))]",
+			"name": "[concat(parameters('siteName'), '/VirtualNetwork')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+            ],
+            "properties": {
+                "subnetResourceId": "[parameters('subnetId')]",
+                "swiftSupported": "[parameters('isSwift')]"
+            }
+        },
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "[variables('apiVersions').sites]",
+			"name": "[concat(parameters('siteName'), '/authsettings')]",
+			"condition": "[not(empty(parameters('authSettings')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+			],
+			"properties": {
+				"enabled": true,
+				"defaultProvider": "AzureActiveDirectory",
+				"isAadAutoProvisioned": true,
+				"clientId": "[parameters('authSettings').clientId]",
+				"clientSecret": "[parameters('authSettings').clientSecret]",
+				"allowedAudiences": "[parameters('authSettings').allowedAudiences]",
+				"unauthenticatedClientAction": "[parameters('authSettings').unauthenticatedClientAction]",
+				"tokenStoreEnabled": "[parameters('authSettings').tokenStoreEnabled]",
+				"allowedExternalRedirectUrls": "[parameters('authSettings').allowedExternalRedirectUrls]"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "[variables('apiVersions').sites]",
+			"name": "[concat(parameters('siteName'), '/appsettings')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+			],
+			"properties": "[variables('appSettings')]"
+		},
+		{
+			"type": "Microsoft.Web/certificates",
+			"apiVersion": "[variables('apiVersions').sites]",
+			"condition": "[not(empty(parameters('certificates')))]",
+			"dependsOn": [],
+			"name": "[variables('certificates')[copyIndex()].name]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"serverFarmId": "[parameters('serverFarmId')]",
+				"hostNames": "[if(contains(variables('certificates')[copyIndex()], 'hostNames'), variables('certificates')[copyIndex()].hostNames, json('null'))]",
+				"password": "[if(contains(variables('certificates')[copyIndex()], 'password'), variables('certificates')[copyIndex()].password, json('null'))]",
+				"keyVaultId": "[if(contains(variables('certificates')[copyIndex()], 'keyVaultId'), variables('certificates')[copyIndex()].keyVaultId, json('null'))]",
+				"keyVaultSecretName": "[if(contains(variables('certificates')[copyIndex()], 'keyVaultSecretName'), variables('certificates')[copyIndex()].keyVaultSecretName, json('null'))]",
+				"canonicalName": "[if(contains(variables('certificates')[copyIndex()], 'canonicalName'), variables('certificates')[copyIndex()].canonicalName, json('null'))]",
+				"pfxBlob": "[json('null')]"
+			},
+			"copy": {
+				"name": "certificatesCopy",
+				"count": "[length(variables('certificates'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/providers/roleAssignments",
+			"apiVersion": "[variables('apiVersions').roleAssignments]",
+			"condition": "[not(empty(parameters('roleAssignments')))]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+			],
+			"name": "[concat(parameters('siteName'), '/Microsoft.Authorization/', guid(variables('roleAssignments')[copyIndex()].principalId, variables('roles')[variables('roleAssignments')[copyIndex()].roleDefinitionName], variables('uniqueName')))]",
+			"properties": {
+				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('roles')[variables('roleAssignments')[copyIndex()].roleDefinitionName])]",
+				"principalId": "[variables('roleAssignments')[copyIndex()].principalId]"
+			},
+			"copy": {
+				"name": "roleAssignmentsCopy",
+				"count": "[length(variables('roleAssignments'))]"
+			}
+		}
+	]
+}

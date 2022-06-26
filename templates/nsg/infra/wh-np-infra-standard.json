@@ -1,0 +1,146 @@
+{
+    "infraRules": {
+        "value": [
+            {
+                "name": "Inbound_Infra_Tcp",
+                "properties": {
+                    "description": "Standard inbound TCP allowances from the infrastructure zone for core services",
+                    "priority": 2500,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefixes": [
+                        "10.0.1.0/24",
+                        "10.0.2.0/24"
+                    ],
+                    "sourcePortRange": "*",
+                    "destinationPortRanges": [
+                        "22",
+                        "80",
+                        "135",
+                        "139",
+                        "443",
+                        "445",
+                        "1433",
+                        "3389",
+                        "5985",
+                        "5986",
+                        "9042",
+                        "61621",
+                        "7080",
+                        "18080",
+                        "4040-4050",
+                        "8983",
+                        "8980"
+                    ],
+                    "destinationAddressPrefix": "*"
+                }
+            },
+            {
+                "name": "Inbound_Infra_Udp",
+                "properties": {
+                    "description": "Standard inbound UDP allowances from the infrastructure zone for core services",
+                    "priority": 2501,
+                    "direction": "Inbound",
+                    "access": "Allow",
+                    "protocol": "Udp",
+                    "sourceAddressPrefixes": [
+                        "10.0.1.0/24",
+                        "10.0.2.0/24"
+                    ],
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRanges": [
+                        "137",
+                        "138",
+                        "161"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_Infra_Tcp",
+                "properties": {
+                    "description": "Standard outbound TCP allowances to the infrastructure zone for core services",
+                    "priority": 2500,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Tcp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefixes": [
+                        "10.0.1.0/24",
+                        "10.0.2.0/24"
+                    ],
+                    "destinationPortRanges": [
+                        "25",
+                        "53",
+                        "80",
+                        "111",
+                        "443",
+                        "1389",
+                        "1636",
+                        "1918",
+                        "2389",
+                        "5647",
+                        "5670",
+                        "8000",
+                        "8080",
+                        "8989",
+                        "8140",
+                        "8443",
+                        "9090",
+                        "10000",
+                        "10002",
+                        "8888",
+                        "7081",
+                        "18080",
+                        "514",
+                        "1514-1515",
+                        "5601",
+                        "9200-9300",
+                        "88",
+                        "135",
+                        "389",
+                        "445",
+                        "464",
+                        "636",
+                        "3268-3269",
+                        "9389",
+                        "5722",
+                        "49152-65535"
+                    ]
+                }
+            },
+            {
+                "name": "Outbound_Infra_Udp",
+                "properties": {
+                    "description": "Standard outbound UDP allowances to the infrastructure zone for core services",
+                    "priority": 2501,
+                    "direction": "Outbound",
+                    "access": "Allow",
+                    "protocol": "Udp",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefixes": [
+                        "10.0.1.0/24",
+                        "10.0.2.0/24"
+                    ],
+                    "destinationPortRanges": [
+                        "53",
+                        "67-69",
+                        "123",
+                        "162",
+                        "1918",
+                        "514",
+                        "1514-1515",
+                        "88",
+                        "137",
+                        "389",
+                        "464",
+                        "636"
+                    ]
+                }
+            }
+        ]
+    }
+}

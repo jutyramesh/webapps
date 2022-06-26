@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+                "DeptName": "Innovation H3",
+                "LOB": "Innovation H3",
+                "EnvType": "Production",
+                "Sensitivity": "Sensitive",
+                "SenType": "Not Applicable",
+                "CostCenter": "Healthcare Development 5004",
+                "Department": "Innovation H3",
+                "LegalSubEntity": "Walgreen Co",
+                "SubDivision": "Innovation H3",
+                "Deployer": "global-infra-automation-sp",
+                "DeployDate": "2021-11-03"
+            }
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"routeTableName": {
+			"value": "wh-nhub-eastus2-gw-rt-01"
+		},
+		"routes": {
+			"value": [
+				{
+					"name": "wh-int-bastion-eastus2-vnet-01",
+					"addressPrefix": "10.111.2.0/24",
+					"nextHopType": "VirtualAppliance",
+					"nextHopIpAddress": "10.111.0.4"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,63 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "2.2.2.0",
+    "parameters": {
+        "tags": {
+            "value": {
+                "Deployer": "Josh Hetland"
+            }
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "siteName": {
+            "value": "ccp-peering-api"
+        },
+        "kind": {
+            "value": "app"
+        },
+        "serverFarmId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/serverFarms/ccp-peering-api-np-l-asp-01"
+        },
+        "hostingEnvironmentProfileId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/hostingEnvironments/rpu-nprod-infra-svcs-eastus2-ase-01"
+        },
+        "isLinux": {
+            "value": true
+        },
+        "linuxFxVersion": {
+            "value": "DOCKER"
+        },
+        "alwaysOn": {
+            "value": true
+        },
+        "containerRegistryName": {
+            "value": "nprodinfraprovisioningagentsacr01"
+        },
+        "containerImageName": {
+            "value": "ccp-peering-api"
+        },
+        "containerImageTagName": {
+            "value": "latest"
+        },
+        "appSettings": {
+            "value": {
+              "HUB_RESOURCE_ID": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-nprod-eastus2-vWAN-01-rg/providers/Microsoft.Network/virtualHubs/wh-int-nvhub-eastus2-vhub-01",
+              "ALLOWED_OBJECT_IDS":"8473f4a8-3aee-4561-9c6e-29b3b2b6b554,33a6db57-1f29-440e-8f5b-6927869dc5f3,2a35fd1e-be6d-43ea-8749-f8d6a401d566,e9c2fd5b-9cb6-49c4-aad5-c92f51725df1,70e6d842-2f04-4614-bf2d-fdaab9923e9a"
+            }
+        },
+        "identityType": {
+            "value": "SystemAssigned"
+        },
+        "injectedValues": {
+            "value": {
+                "envType": "Infrastructure"
+            }
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "nprod-infra-services-hosting-eastus2",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/app-service-sites-template.json"
+    }
+}

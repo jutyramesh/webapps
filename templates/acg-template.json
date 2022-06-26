@@ -1,0 +1,155 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {},
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "containerGroupName": {
+      "type": "string",
+      "defaultValue": "aci-containergroup",
+      "metadata": {
+        "description": "Container group name"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "defaultValue": "aci-container",
+      "metadata": {
+        "description": "Container name"
+      }
+    },
+    "image": {
+      "type": "string",
+      "metadata": {
+        "description": "Container image to deploy. Should be of the form accountName/imagename:tag for images stored in Docker Hub or a fully qualified URI for a private registry like the Azure Container Registry."
+      }
+    },
+    "registryAuth": {
+      "type": "string",
+      "defaultValue": "Identity",
+      "allowedValues": [
+        "Identity",
+        "None"
+      ],
+      "metadata": {
+        "description": "Indicates if the identity of the instance should be used for authentication to the registry, or none (username and password are not allowed)"
+      }
+    },
+    "identity": {
+      "type": "string"
+    },
+    "ports": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "port": "80",
+          "protocol": "TCP"
+        }
+      ],
+      "metadata": {
+        "description": "Ports to open on the container."
+      }
+    },
+    "cpuCores": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The number of CPU cores to allocate to the container. Must be an integer."
+      }
+    },
+    "memoryInGb": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "The amount of memory to allocate to the container in gigabytes."
+      }
+    },
+    "subnetResourceId": {
+      "type": "string"
+    },
+    "ipAddress": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "environmentVariables": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "command": {
+      "type": "array",
+      "defaultValue": []
+    }
+  },
+  "functions": [],
+  "variables": {
+    "imageRegistryCredentials": [
+      {
+        "server": "[first(split(parameters('image'),'/'))]",
+        "identity": "[parameters('identity')]"
+      }
+    ],
+    "ipAddress": {
+      "ip": "[parameters('ipAddress')]",
+      "ports": "[parameters('ports')]",
+      "type": "private"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2021-10-01",
+      "name": "[parameters('containerGroupName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[parameters('identity')]": {}
+        }
+      },
+      "properties": {
+        "imageRegistryCredentials": "[if(equals(parameters('registryAuth'), 'Identity'), variables('imageRegistryCredentials'), json('null'))]",
+        "containers": [
+          {
+            "name": "[parameters('containerName')]",
+            "properties": {
+              "image": "[parameters('image')]",
+              "command": "[parameters('command')]",
+              "ports": "[parameters('ports')]",
+              "environmentVariables": "[parameters('environmentVariables')]",
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('cpuCores')]",
+                  "memoryInGB": "[parameters('memoryInGb')]"
+                }
+              }
+            }
+          }
+        ],
+        "osType": "Linux",
+        "subnetIds": [
+          {
+            "id": "[parameters('subnetResourceId')]"
+          }
+        ],
+        "ipAddress": "[if(not(empty(parameters('ipAddress'))), variables('ipAddress'), json('null'))]",
+        "restartPolicy": "Always"
+      }
+    }
+  ],
+  "outputs": {
+    "containerIPv4Address": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip]"
+    },
+    "imageLoginServer": {
+      "type": "string",
+      "value": "[first(split(parameters('image'),'/'))]"
+    }
+  }
+}

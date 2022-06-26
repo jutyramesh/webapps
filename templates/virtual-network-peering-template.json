@@ -1,0 +1,139 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"virtualNetworkPeeringName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the resource that is unique within a resource group. This name can be used to access the resource."
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"remoteVirtualNetworkId": {
+			"type": "string",
+			"metadata": {
+				"description": "The resource id of the remote virtual network."
+			}
+		},
+		"allowVirtualNetworkAccess": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether the VMs in the local virtual network space would be able to access the VMs in remote virtual network space.",
+				"required": "no"
+			}
+		},
+		"allowForwardedTraffic": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether the forwarded traffic from the VMs in the local virtual network will be allowed/disallowed in remote virtual network.",
+				"required": "no"
+			}
+		},
+		"allowGatewayTransit": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "If gateway links can be used in remote virtual networking to link to this virtual network.",
+				"required": "no"
+			}
+		},
+		"useRemoteGateways": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "If remote gateways can be used on this virtual network. If the flag is set to true, and allowGatewayTransit on remote peering is also true, virtual network will use gateways of remote virtual network for transit. Only one peering can have this flag set to true. This flag cannot be set if virtual network already has a gateway.",
+				"required": "no"
+			}
+		},
+		"bidirectional": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether to create peering in reverse direction."
+			}
+		},
+		"isGateway": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether the peering is to a gateway. Controls use of allowGatewayTransist and useRemoteGateways"
+			}
+		},
+		"remoteVirtualNetworkPeeringName": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The name of remote virtual network peering."
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"virtualNetworks": "2020-11-01",
+			"deployments": "2017-05-10"
+		},
+		"virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+		"remoteVirtualNetwork": {
+			"subscriptionId": "[split(parameters('remoteVirtualNetworkId'), '/')[2]]",
+			"resourceGroup": "[split(parameters('remoteVirtualNetworkId'), '/')[4]]",
+			"name": "[split(parameters('remoteVirtualNetworkId'), '/')[8]]"
+		},
+		"remoteVirtualNetworkPeeringName": "[if(not(empty(parameters('remoteVirtualNetworkPeeringName'))), parameters('remoteVirtualNetworkPeeringName'), concat(parameters('remoteVirtualNetworkName'), '-to-', parameters('virtualNetworkName')))]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+			"apiVersion": "[variables('apiVersions').virtualNetworks]",
+			"name": "[concat(parameters('virtualNetworkName'), '/', parameters('virtualNetworkPeeringName'))]",
+			"properties": {
+				"remoteVirtualNetwork": {
+					"id": "[parameters('remoteVirtualNetworkId')]"
+				},
+				"allowVirtualNetworkAccess": "[parameters('allowVirtualNetworkAccess')]",
+				"allowForwardedTraffic": "[parameters('allowForwardedTraffic')]",
+				"allowGatewayTransit": "[if(parameters('isGateway'), parameters('allowGatewayTransit'), 'false')]",
+				"useRemoteGateways": "[if(parameters('isGateway'), 'false', parameters('useRemoteGateways'))]"
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersions').deployments]",
+			"condition": "[parameters('bidirectional')]",
+			"name": "bidirectional",
+			"resourceGroup": "[variables('remoteVirtualNetwork').resourceGroup]",
+			"subscriptionId": "[variables('remoteVirtualNetwork').subscriptionId]",
+			"properties": {
+				"mode": "Incremental",
+				"template": {
+					"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+					"contentVersion": "1.0.0.0",
+					"parameters": {},
+					"variables": {},
+					"resources": [
+						{
+							"type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+							"apiVersion": "[variables('apiVersions').virtualNetworks]",
+							"name": "[concat(variables('remoteVirtualNetwork').name, '/', variables('remoteVirtualNetworkPeeringName'))]",
+							"properties": {
+								"remoteVirtualNetwork": {
+									"id": "[variables('virtualNetworkId')]"
+								},
+								"allowVirtualNetworkAccess": "[parameters('allowVirtualNetworkAccess')]",
+								"allowForwardedTraffic": "[parameters('allowForwardedTraffic')]",
+								"allowGatewayTransit": "[if(parameters('isGateway'), 'false', parameters('allowGatewayTransit'))]",
+								"useRemoteGateways": "[if(parameters('isGateway'), parameters('useRemoteGateways'), 'false')]"
+							}
+						}
+					]
+				}
+			}
+		}
+	]
+}

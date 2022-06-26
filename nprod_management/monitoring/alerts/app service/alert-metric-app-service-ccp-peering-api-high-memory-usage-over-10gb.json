@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-metric-app-service-ccp-peering-api-high-memory-usage-over-10gb"
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-services-hosting-eastus2/providers/Microsoft.Web/sites/ccp-peering-api"
+        },
+        "metricName": {
+            "value": "MemoryWorkingSet"
+        },
+        "threshold": {
+            "value": 10737418240
+        },
+        "actionGroupID": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actionGroups/WH-CCP-NPROD"
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "evaluationFrequency": {
+            "value": "PT5M"
+
+        },
+        "timeAggregation": {
+            "value": "Average"
+        },
+        "alertSeverity": {
+            "value": 2
+        },
+        "operator": {
+            "value": "GreaterThanOrEqual"
+        }
+
+    },
+        "deploymentParameters": {
+            "subscription": "wh-nprod-management-01",
+            "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+            "templateFile": "templates/monitoring/alerts/alert-metric-template.json"
+        }
+}

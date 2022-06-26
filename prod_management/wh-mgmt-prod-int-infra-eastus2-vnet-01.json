@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+                "Deployer": "Josh Hetland",
+                "DeployDate": "2022-03-25",
+                "Routable": "True"
+            }
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"virtualNetworkName": {
+			"value": "wh-mgmt-prod-int-infra-eastus2-vnet-01"
+		},
+		"addressSpaceAddressPrefixes": {
+			"value": [
+				"10.0.1.0/24",
+				"10.0.2.0/24"
+			]
+		}
+	},
+	"deploymentParameters": {
+        "resourceGroup": "prod-infra-networking-infra-eastus2",
+        "subscription": "wh-prod-management-01",
+        "templateFile": "templates/virtual-network-template.json"
+    }
+}

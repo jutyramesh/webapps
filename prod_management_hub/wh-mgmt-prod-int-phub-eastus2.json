@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"value": {
+				"Deployer": "global-infra-automation-sp",
+				"DeployDate": "2022-03-25"
+			}
+		},
+		"location": {
+			"value": "eastus2"
+		},
+		"virtualWanName": {
+			"value": "wh-mgmt-prod-int-phub-eastus2-vwan-01"
+		},
+		"virtualHubName": {
+			"value": "wh-mgmt-prod-int-phub-eastus2-vhub-01"
+		},
+		"addressPrefix": {
+			"value": "10.0.0.0/24"
+		},
+		"vpnClientAddressPool": {
+			"value": "192.168.0.0/24"
+		}
+	},
+	"deploymentParameters": {
+		"resourceGroup": "wh-mgmt-prod-int-phub-eastus2-rg",
+		"subscription": "wh-prod-management-01",
+		"templateFile": "templates/azure-secure-hub-template.json"
+	}
+}

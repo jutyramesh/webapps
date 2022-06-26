@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"tags": {
+			"type": "object",
+			"metadata": {
+				"description": "Resource tags."
+			}
+		},
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Resource location."
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the virtual network."
+			}
+		},
+		"addressSpaceAddressPrefixes": {
+			"type": "array",
+			"metadata": {
+				"description": "A list of address blocks reserved for this virtual network in CIDR notation."
+			}
+		},
+		"dhcpOptionsDnsServers": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {
+				"description": "The list of DNS servers IP addresses."
+			}
+		},
+		"enableDdosProtection": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Indicates if DDoS protection is enabled for all the protected resources in the virtual network. It requires a DDoS protection plan associated with the resource."
+			}
+		}
+	},
+	"variables": {
+		"apiVersions": {
+			"virtualNetworks": "2020-11-01"
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Network/virtualNetworks",
+			"apiVersion": "[variables('apiVersions').virtualNetworks]",
+			"name": "[parameters('virtualNetworkName')]",
+			"location": "[parameters('location')]",
+			"tags": "[parameters('tags')]",
+			"properties": {
+				"addressSpace": {
+					"addressPrefixes": "[parameters('addressSpaceAddressPrefixes')]"
+				},
+				"dhcpOptions": {
+					"dnsServers": "[parameters('dhcpOptionsDnsServers')]"
+				},
+				"enableDdosProtection": "[parameters('enableDdosProtection')]"
+			}
+		}
+	]
+}

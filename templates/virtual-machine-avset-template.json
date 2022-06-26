@@ -1,0 +1,329 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNamePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Virtual machine name prefix"
+            }
+        },
+        "vmCount": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of HANA instances"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "Size of the HANA VM"
+            }
+        },
+        "vmAdminUID": {
+            "type": "string",
+            "metadata": {
+                "description": "Administrator username"
+            }
+        },
+        "vmAdminPWD": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Administrator password"
+            }
+        },
+        "vmEnableAcceleratedNetworking": {
+            "type": "bool",
+            "metadata": {
+                "description": "Enable accelerated networking for VMs"
+            }
+        },
+        "vmSubnetID": {
+            "type": "string",
+            "metadata": {
+                "description": "Fully qualified subnet resource ID in the following format /subscriptions/[SubID]/resourceGroups/[RGName]/providers/Microsoft.Network/virtualNetworks/[VNetName]/subnets/[SubnetName]"
+            }
+        },
+        "availabilitySetFaultDomains": {
+            "type": "int",
+            "defaultValue": "2",
+            "metadata": {
+                "description": "Number of fault domains"
+            }
+        },
+        "availabilitySetUpdateDomains": {
+            "type": "int",
+            "defaultValue": "2",
+            "metadata": {
+                "description": "Number of update domains"
+            }
+        },
+        "vmImageReference": {
+            "type": "object",
+            "metadata": {
+                "description": "Azure marketplace image reference for virtual machine deployment"
+            }
+        },
+        "vmDisksAppSize": {
+            "type": "int",
+            "metadata": {
+                "description": "Size of disks in GB for App filesystem"
+            }
+        },
+        "vmDisksSharedQuantity": {
+            "type": "int",
+            "defaultValue": 0,
+            "metadata": {
+                "description": "*Optional - Number of disks for App filesystem"
+            }
+        },
+        "vmDisksSharedSize": {
+            "type": "int",
+            "defaultValue": 0,
+            "metadata": {
+                "description": "*Optional - Size of disks in GB for App filesystem"
+            }
+        },
+        "resourceTypeSuffix": {
+            "type": "bool",
+            "metadata": {
+                "description": "Option to apply resource suffix in resource name"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "JSON object with name value pairs for tags"
+            }
+        }
+    },
+    "variables": {
+        "nameAvailabilitySet": "[if(equals(parameters('resourceTypeSuffix'), bool('false')), parameters('vmNamePrefix'), concat(parameters('vmNamePrefix'), '-avset'))]",
+        "nameNic": "[if(equals(parameters('resourceTypeSuffix'), bool('false')), parameters('vmNamePrefix'), concat(parameters('vmNamePrefix'), '-nic'))]",
+        "nameOSDisk": "[if(equals(parameters('resourceTypeSuffix'), bool('false')),  '-os', '-disk-os')]",
+        "createOption": "empty",
+        "disksCaching": "None",
+        "lunTotalCount": "[if(equals(parameters('vmDisksSharedQuantity'), 0), 1, 2 )]",
+        "dataDisksApp": {
+            "name": "[if(equals(parameters('resourceTypeSuffix'), bool('false')), '-0-app', '-0-disk-app')]",
+            "lun": 0,
+            "diskSizeGB": "[parameters('vmDisksAppSize')]",
+            "createOption": "[variables('createOption')]",
+            "caching": "[variables('disksCaching')]"
+        },
+        "dataDisksShared": {
+            "name": "[if(equals(parameters('resourceTypeSuffix'), bool('false')), '-1-shared', '-1-disk-shared')]",
+            "lun": 1,
+            "diskSizeGB": "[parameters('vmDisksSharedSize')]",
+            "createOption": "[variables('createOption')]",
+            "caching": "[variables('disksCaching')]"
+        },
+        "disksPerVM": "[if(equals(parameters('vmDisksSharedQuantity'), 0), createArray(variables('dataDisksApp')), union(createArray(variables('dataDisksApp')), createArray(variables('dataDisksShared'))) )]",
+        "copy": [
+            {
+                "name": "nicRef",
+                "count": "[parameters('vmCount')]",
+                "input": {
+                    "name": "[if(equals(parameters('vmCount'), 1), variables('nameNic'), concat(variables('nameNic'), padLeft(add(1, copyIndex('nicRef')), 2, '0')))]"
+                }
+            },
+            {
+                "name": "outPutValues",
+                "count": "[parameters('vmCount')]",
+                "input": {
+                    "vmName": "[if(equals(parameters('vmCount'), 1 ), parameters('vmNamePrefix'), concat(parameters('vmNamePrefix'), padLeft(add(1, copyIndex('outPutValues')), 2, '0')))]",
+                    "ip": "[resourceId('Microsoft.Network/networkInterfaces', string(variables('nicRef')[copyIndex('outPutValues')].name))]"
+                }
+            }
+        ]
+    },
+    "resources": [
+
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2019-12-01",
+            "name": "[variables('nameAvailabilitySet')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "location": "[resourceGroup().location]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "platformUpdateDomainCount": "[parameters('availabilitySetUpdateDomains')]",
+                "platformFaultDomainCount": "[parameters('availabilitySetFaultDomains')]"
+
+            }
+        },
+
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "name": "[if(equals(parameters('vmCount'), 1), variables('nameNic'), concat(variables('nameNic'), padLeft(add(1, copyIndex('nicLoop')), 2, '0')))]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "location": "[resourceGroup().location]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "enableAcceleratedNetworking": "[parameters('vmEnableAcceleratedNetworking')]",
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('vmSubnetID')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[concat('staticNic', copyIndex('staticNicLoop'))]",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "copy": {
+                "name": "staticNicLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "nicLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-03-01",
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "name": "[if(equals(parameters('vmCount'), 1 ), variables('nameNic'), concat(variables('nameNic'), padLeft(add(1,copyIndex('staticNicLoop')), 2, '0')))]",
+                            "tags": "[parameters('tags')]",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "enableAcceleratedNetworking": "[parameters('vmEnableAcceleratedNetworking')]",
+                                "ipConfigurations": [
+                                    {
+                                        "name": "ipconfig1",
+                                        "properties": {
+                                            "privateIPAllocationMethod": "Static",
+                                            "privateIPAddress": "[reference(resourceId('Microsoft.Network/networkInterfaces', string(variables('nicRef')[copyIndex('staticNicLoop')].name))).ipConfigurations[0].properties.privateIPAddress]",
+                                            "subnet": {
+                                                "id": "[parameters('vmSubnetId')]"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "name": "[concat('Deploy-vm-', parameters('vmNamePrefix'), copyIndex('vmLoop'))]",
+            "copy": {
+                "name": "vmLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "staticNicLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Compute/virtualMachines",
+                            "name": "[if(equals(parameters('vmCount'), 1 ), parameters('vmNamePrefix'), concat(parameters('vmNamePrefix'), padLeft(add(1, copyIndex('vmLoop')), 2, '0')))]",
+                            "apiVersion": "2019-07-01",
+                            "location": "[resourceGroup().location]",
+                            "tags": "[parameters('tags')]",
+                            "properties": {
+                                "hardwareProfile": {
+                                    "vmSize": "[parameters('vmSize')]"
+                                },
+                                "availabilitySet": {
+                                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('nameAvailabilitySet'))]"
+                                },
+                                "storageProfile": {
+                                    "imageReference": "[parameters('vmImageReference')]",
+                                    "osDisk": {
+                                        "name": "[if(equals(parameters('vmCount'), 1 ), concat(parameters('vmNamePrefix'), variables('nameOSDisk')) , concat(parameters('vmNamePrefix'), padLeft(add(1, copyIndex('vmLoop')), 2, '0'), variables('nameOSDisk')))]",
+                                        "osType": "[if(contains(parameters('vmImageReference').offer, 'Windows' ), 'Windows', 'Linux')]",
+                                        "createOption": "FromImage",
+                                        "caching": "ReadWrite"
+                                    },
+                                    "copy": [
+                                        {
+                                            "name": "datadisks",
+                                            "count": "[variables('lunTotalCount')]",
+                                            "input": {
+                                                "Name": "[if(equals(parameters('vmCount'), 1 ), concat( parameters('vmNamePrefix'), variables('disksPerVM')[copyindex('datadisks')].name), concat(parameters('vmNamePrefix'), padLeft(add(1,copyIndex('vmLoop')), 2, '0'), variables('disksPerVM')[copyindex('datadisks')].name))]",
+                                                "lun": "[variables('disksPerVM')[copyindex('datadisks')].lun]",
+                                                "diskSizeGB": "[variables('disksPerVM')[copyindex('datadisks')].diskSizeGB]",
+                                                "createOption": "[variables('disksPerVM')[copyindex('datadisks')].createOption]",
+                                                "caching": "[variables('disksPerVM')[copyindex('datadisks')].caching]"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "osProfile": {
+                                    "computerName": "[if(equals(parameters('vmCount'), 1 ), parameters('vmNamePrefix'), concat(parameters('vmNamePrefix'), padLeft(add(1, copyIndex('vmLoop')), 2, '0')))]",
+                                    "adminUsername": "[parameters('vmAdminUID')]",
+                                    "adminPassword": "[parameters('vmAdminPWD')]"
+                                },
+                                "networkProfile": {
+                                    "networkInterfaces": [
+                                        {
+                                            "id": "[resourceId('Microsoft.Network/networkInterfaces', string(variables('nicRef')[copyIndex('vmLoop')].name))]"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "existingVMName": {
+            "type": "array",
+            "copy": {
+                "count": "[parameters('vmCount')]",
+                "input": "[string(variables('outPutValues')[copyIndex()].vmName)]"
+            }
+        },
+        "vmDisksAppFirstLUN": {
+            "type": "int",
+            "value": "[int(variables('dataDisksApp').lun)]"
+        },
+        "vmDisksSharedFirstLUN": {
+            "type": "int",
+            "value": "[if(equals(parameters('vmDisksSharedQuantity'), 0), -1, int(variables('dataDisksShared').lun))]"
+        },
+        "privateIp": {
+            "type": "array",
+            "copy": {
+                "count": "[parameters('vmCount')]",
+                "input": "[reference(string(variables('outPutValues')[copyIndex()].ip)).ipConfigurations[0].properties.privateIPAddress]"
+            }
+        },
+        "deploymentStatus": {
+            "type": "string",
+            "value": "Deployment Successful"
+        }
+    }
+}
