@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alert-dynamic-metric-when-container-registry-nprodinfraprovisioningagentsacr01-greater-than-dynamic-threshold"
+        },
+        "alertDescription": {
+            "value": "This is a metric alert"
+        },
+        "alertSeverity": {
+            "value": 1
+        },
+        "isEnabled": {
+            "value": true
+        },
+        "resourceId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/nprod-infra-provisioning-agents-eastus2/providers/Microsoft.KeyVault/vaults/np-inf-prv-agents-kv-01"
+        },
+        "metricName": {
+            "value": "AgentPOOLCPUTime"
+        },
+        "alertSensitivity": {
+            "value": "High"
+        },
+        "operator": {
+            "value": "GreaterThan"
+        },
+        "numberOfEvaluationPeriods": {
+            "value": "4"
+        },
+        "minFailingPeriodsToAlert": {
+            "value": "3"
+        },
+        "ignoreDataBefore": {
+            "value": ""
+        },
+        "timeAggregation": {
+            "value": "Average"
+        },
+        "windowSize": {
+            "value": "PT5M"
+        },
+        "evaluationFrequency": {
+            "value": "PT5M"
+        },
+        "actionGroupId": {
+            "value": "/subscriptions/c945a18b-dab8-4ac5-a8bd-8112afef0738/resourceGroups/wh-int-infra-eastus2-alerts-rg/providers/microsoft.insights/actiongroups/WH-CCP-NPROD"
+        }
+    },
+    "deploymentParameters": {
+        "resourceGroup": "wh-int-infra-eastus2-alerts-rg",
+        "subscription": "wh-nprod-management-01",
+        "templateFile": "templates/monitoring/alerts/alert-dynamic-metric-key-template.json"
+    }
+}
