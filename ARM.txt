@@ -1,0 +1,1753 @@
+
+Active msdn subscription https://visualstudio.microsoft.com/subscriptions/
+
+Install-Module -Name Az -AllowClobber -Force /Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+check latest version
+Get-InstalledModule -Name Az -AllVersions | Select-object -Property Name, Version /Get-InstalledModule Azure -AllVersions | Select-Object Name,Version,Path
+Enable AzureAccount
+enable ARM extension in VsCode
+az bicep version 
+if above command gives error than install "Az install Bicep"
+
+
+
+uninstall
+
+List of all the Az PowerShell module versions into variable.
+Get-Module -Name Az -ListAvailable -OutVariable AzVersions
+List of all the Az PowerShell modules that need to be uninstalled in addition to the Az module.
+($AzVersions |
+  ForEach-Object {
+    Import-Clixml -Path (Join-Path -Path $_.ModuleBase -ChildPath PSGetModuleInfo.xml)
+  }).Dependencies.Name | Sort-Object -Descending -Unique -OutVariable AzModules
+
+Remove the Az modules from memory and then uninstall them.
+
+$AzModules |
+  ForEach-Object {
+    Remove-Module -Name $_ -ErrorAction SilentlyContinue
+    Write-Output "Attempting to uninstall module: $_"
+    Uninstall-Module -Name $_ -AllVersions
+  }
+4. Finally, remove the Az PowerShell module.
+
+Remove-Module -Name Az -ErrorAction SilentlyContinue
+Uninstall-Module -Name Az -AllVersions
+
+
+
+
+Snippets : Are used to create basic templates and add elements such as parameters, resources and outputs to existing templates
+Create a new ARM template
+When in an empty JSON file, typing arm produces a list of scaffolding snippets. These snippets can be used to create an empty template for any ARM deployment scope (Tenant, Subscription, Management Group, and Resource Group).
+Add Azure resource to an ARM template
+Once you are working in an ARM template, placing your cursor in the resource and typing arm, CTRL + Space, or { produces a list of 70+ snippets for Azure resources. Selecting a snippet adds an instance of the resource type to the ARM template.
+
+Connect-AzAccount
+Get-AzSubscription
+Set-AzContext subscriptionid
+New-AzResourceGroup ramesh -Location "centralus"
+Get-AzResourceGroup
+Get-AzResourceGroup ramesh
+Get-AzContext -ListAvailable
+Get-AzLocation
+Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState
+Get-AzLocation  | Select-Object Location 
+Get-AzEnvironment
+Get-AzResource -ResourceGroupName ramesh | ft (will display resources in the resouregroup)
+Get-AzResource -Name ramesh* | ft ( whatsever ramesh resource group will display all details)
+
+Get-AzResourceGroup | ? ResourceGroupName -match $filter | Select-Object ResourceId
+Get-AzResourceGroup | Select-Object ResourceGroupName
+Get-AzResourceGroup | ? ResourceGroupName -match $filter | Select-Object ResourceGroupName ( list the total resourceGroup list)
+
+Get-AzureResourceGroup | ? ResourceGroupName -match $filter | Remove-AzResourceGroup -AsJob -Force ( remove more Resourcegorup)
+
+Snippet	Description
+arm!	Adds the framework for a full deployment template file for resource group deployments.
+arm!s	Adds the framework for a full deployment template file for subscription deployments.
+arm!mg	Adds the framework for a full deployment template file for management group deployments.
+arm!t	Adds the framework for a full deployment template file for tenant deployments.
+armp!	Adds the framework for a full deployment template parameters file.
+""	While in the parameters section adds a parameter to the template.
+""	While in the variables section adds a variable to the template.
+{}	While in the functions section add a new user-defined function.
+arm- or the resource name	Displays 70+ snippets for creating Azure resources. For example, type arm-ubuntu to add all five resources necessary for a basic Ubuntu virtual machine.
+""	While in the outputs section adds an output to the template.
+
+Schema""
+Contentversion":
+parameters: {},
+functions: [],
+variables: {},
+resources: [
+  { 
+       "name": "storage account1",
+       "type": "Microsoft.Storage/storageAccounts",
+       "apiVersion": "2021-09-18",
+       "tags": {
+           "displayName": "storageaccount1"
+        },
+        "location": "[resourceGroup().location)",
+        "kind": "StorageV2",
+         "sku": {
+             "name": "Premium_LRS",
+              "tier": "Super"
+         }
+    }
+],
+"outputs": {}
+}
+        
+-----------
+Create a new parameter file
+To create a new parameter file from an existing template, click on the code lens text `Select or create a parameter file to enable full validation...
+Schema""
+Contentversion":
+#select or create a parameter file to enable full validation
+parameters: {
+   "storageName: {
+   "type": "string",
+   "default value" : "demostorage"
+    },
+    "storageKind": {
+         "type": "string",
+         "allowValues": [
+             "Storage",
+             "StorageV2",
+             "BlobStorage"
+          ]
+      }
+},
+
+functions: [],
+variables: {},
+resources: [
+  { 
+       "name": "storage account1",
+       "type": "Microsoft.Storage/storageAccounts",
+       "apiVersion": "2021-09-18",
+       "tags": {
+           "displayName": "storageaccount1"
+        },
+        "location": "[resourceGroup().location)",
+        "kind": "StorageV2",
+         "sku": {
+             "name": "[parameters('storageSKU')]",
+             
+         }
+    }
+],    "value": "cpuUsagePercentage
+"outputs": {}
+}
+
+running tempalte from powershell
+
+Connect-AzAccount ( it will ask the credentials)
+Get-AzSubscription
+$context = Get-AzSubscription -SubscriptionId fed95c52-b08a-4a4c-b750-3f5fdce752e0 
+Set-AzContext $context
+Set-AzDefault -ResourceGroupName monu001 (creating ResourceGroup)
+remove-AzResourceGroup -Name Mysu001 (deleting resourceGroup)
+
+New-AzResourceGroupDeployment -DeploymentName Ramesh -ResourceGroupName Cloud -Templatefile c:\myapp\projects.json -storageSKU Standard_GRS
+
+Install-Module -Name Az -AllowClobber -Scope CurrentUser
+
+New-AzResourceGroupDeployment -ResourceGroupName "ramesh009test" -Templatefile "storage.json"
+New-AzResourceGroupDeployment  -DeploymentName "Aniruththen" -ResourceGroupName "rames" -Templatefile "storage.json" 
+Remove-AzResourceGroupDeployment -Name "Aniruththen" -ResourceGroupName "monu001" -Verbose 
+
+Get-AzResource -ResourceGroupName Monu001 
+
+pull the resource total groupdetails 
+
+Get-AzSubscription | ForEach-Object {
+    $subscriptionName = $_.Name
+    Set-AzContext -SubscriptionId $_.SubscriptionId
+    (Get-AzResourceGroup).ResourceGroupName | ForEach-Object {     
+        [PSCustomObject] @{
+            Subscription = $subscriptionName
+            ResourceGroup = $_
+        }
+    }
+}
+--------------------------------------------------------------
+Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState
+ProviderNamespace                       RegistrationState
+-----------------                       -----------------
+Microsoft.Compute                       Registered
+Microsoft.Storage                       Registered
+Microsoft.Advisor                       Registered
+Microsoft.ResourceHealth                Registered
+microsoft.insights                      Registered
+Microsoft.Web                           Registered
+Microsoft.OperationalInsights           Registered
+Microsoft.MarketplaceNotifications      Registered
+Microsoft.Security                      Registered
+Microsoft.AlertsManagement              Registered
+Microsoft.Network                       Registered
+Microsoft.GuestConfiguration            Registered
+Microsoft.PolicyInsights                Registered
+Crypteron.DataSecurity                  NotRegistered
+Dynatrace.Observability                 NotRegistered
+Microsoft.AAD                           NotRegistered
+microsoft.aadiam                        NotRegistered
+Microsoft.Addons                        NotRegistered
+Microsoft.ADHybridHealthService         Registered
+Microsoft.AgFoodPlatform                NotRegistered
+Microsoft.AnalysisServices              NotRegistered
+Microsoft.AnyBuild                      NotRegistered
+Microsoft.ApiManagement                 NotRegistered
+Microsoft.AppAssessment                 NotRegistered
+Microsoft.AppConfiguration              NotRegistered
+Microsoft.AppPlatform                   NotRegistered
+Microsoft.Attestation                   NotRegistered
+Microsoft.Authorization                 Registered
+Microsoft.Automanage                    NotRegistered
+Microsoft.Automation                    NotRegistered
+Microsoft.AutonomousDevelopmentPlatform NotRegistered
+Microsoft.AutonomousSystems             NotRegistered
+Microsoft.AVS                           NotRegistered
+Microsoft.AzureActiveDirectory          NotRegistered
+Microsoft.AzureArcData                  NotRegistered
+Microsoft.AzureCIS                      NotRegistered
+Microsoft.AzureData                     NotRegistered
+Microsoft.AzurePercept                  NotRegistered
+Microsoft.AzureSphere                   NotRegistered
+Microsoft.AzureStack                    NotRegistered
+Microsoft.AzureStackHCI                 NotRegistered
+Microsoft.BackupSolutions               NotRegistered
+Microsoft.BareMetalInfrastructure       NotRegistered
+Microsoft.Batch                         NotRegistered
+Microsoft.Billing                       Registered
+Microsoft.BillingBenefits               NotRegistered
+Microsoft.Bing                          NotRegistered
+Microsoft.Blockchain                    NotRegistered
+Microsoft.BlockchainTokens              NotRegistered
+Microsoft.Blueprint                     NotRegistered
+Microsoft.BotService                    NotRegistered
+Microsoft.Cache                         NotRegistered
+Microsoft.Capacity                      NotRegistered
+Microsoft.Cascade                       NotRegistered    
+Microsoft.Cdn                           NotRegistered
+Microsoft.CertificateRegistration       NotRegistered
+Microsoft.ChangeAnalysis                NotRegistered
+Microsoft.Chaos                         NotRegistered
+Microsoft.ClassicCompute                NotRegistered
+Microsoft.ClassicInfrastructureMigrate  NotRegistered
+Microsoft.ClassicNetwork                NotRegistered
+Microsoft.ClassicStorage                NotRegistered
+Microsoft.ClassicSubscription           Registered
+Microsoft.CloudTest                     NotRegistered
+Microsoft.CodeSigning                   NotRegistered
+Microsoft.Codespaces                    NotRegistered
+Microsoft.CognitiveServices             NotRegistered
+Microsoft.Commerce                      Registered
+Microsoft.Communication                 NotRegistered
+Microsoft.ConfidentialLedger            NotRegistered    
+Microsoft.Confluent                     NotRegistered
+Microsoft.ConnectedCache                NotRegistered
+Microsoft.ConnectedVehicle              NotRegistered
+Microsoft.ConnectedVMwarevSphere        NotRegistered
+Microsoft.Consumption                   Registered
+Microsoft.ContainerInstance             NotRegistered
+Microsoft.ContainerRegistry             NotRegistered
+Microsoft.ContainerService              NotRegistered
+Microsoft.CostManagement                Registered
+Microsoft.CostManagementExports         NotRegistered
+Microsoft.CustomerLockbox               NotRegistered
+Microsoft.CustomProviders               NotRegistered
+Microsoft.D365CustomerInsights          NotRegistered
+Microsoft.Dashboard                     NotRegistered
+Microsoft.DataBox                       NotRegistered
+Microsoft.DataBoxEdge                   NotRegistered
+Microsoft.Databricks                    NotRegistered
+Microsoft.DataCatalog                   NotRegistered
+Microsoft.DataCollaboration             NotRegistered
+Microsoft.Datadog                       NotRegistered
+Microsoft.DataFactory                   NotRegistered    
+Microsoft.DataLakeAnalytics             NotRegistered
+Microsoft.DataLakeStore                 NotRegistered
+Microsoft.DataMigration                 NotRegistered
+Microsoft.DataProtection                NotRegistered
+Microsoft.DataShare                     NotRegistered
+Microsoft.DBforMariaDB                  NotRegistered
+Microsoft.DBforMySQL                    NotRegistered
+Microsoft.DBforPostgreSQL               NotRegistered
+Microsoft.DelegatedNetwork              NotRegistered
+Microsoft.DeploymentManager             NotRegistered
+Microsoft.DesktopVirtualization         NotRegistered
+Microsoft.DevAI                         NotRegistered
+Microsoft.Devices                       NotRegistered
+Microsoft.DeviceUpdate                  NotRegistered
+Microsoft.DevOps                        NotRegistered
+Microsoft.DevTestLab                    NotRegistered
+Microsoft.Diagnostics                   NotRegistered
+Microsoft.DigitalTwins                  NotRegistered
+Microsoft.DocumentDB                    NotRegistered
+Microsoft.DomainRegistration            NotRegistered
+Microsoft.EdgeOrder                     NotRegistered
+Microsoft.Elastic                       NotRegistered
+Microsoft.EnterpriseKnowledgeGraph      NotRegistered
+Microsoft.EventGrid                     NotRegistered
+Microsoft.EventHub                      NotRegistered
+Microsoft.Experimentation               NotRegistered
+Microsoft.ExtendedLocation              NotRegistered    
+Microsoft.Falcon                        NotRegistered
+Microsoft.Features                      Registered
+Microsoft.Fidalgo                       NotRegistered
+Microsoft.FluidRelay                    NotRegistered
+Microsoft.HanaOnAzure                   NotRegistered
+Microsoft.HardwareSecurityModules       NotRegistered
+Microsoft.HDInsight                     NotRegistered
+Microsoft.HealthBot                     NotRegistered
+Microsoft.HealthcareApis                NotRegistered
+Microsoft.HpcWorkbench                  NotRegistered
+Microsoft.HybridCompute                 NotRegistered
+Microsoft.HybridConnectivity            NotRegistered
+Microsoft.HybridContainerService        NotRegistered
+Microsoft.HybridData                    NotRegistered
+Microsoft.HybridNetwork                 NotRegistered
+Microsoft.ImportExport                  NotRegistered
+Microsoft.IndustryDataLifecycle         NotRegistered
+Microsoft.IntelligentITDigitalTwin      NotRegistered
+Microsoft.IoTCentral                    NotRegistered
+Microsoft.IoTFirmwareDefense            NotRegistered
+Microsoft.IoTSecurity                   NotRegistered
+Microsoft.KeyVault                      NotRegistered
+Microsoft.Kubernetes                    NotRegistered
+Microsoft.KubernetesConfiguration       NotRegistered
+Microsoft.Kusto                         NotRegistered
+Microsoft.LabServices                   NotRegistered
+Microsoft.LoadTestService               NotRegistered
+Microsoft.Logic                         NotRegistered
+Microsoft.Logz                          NotRegistered
+Microsoft.MachineLearning               NotRegistered
+Microsoft.MachineLearningServices       NotRegistered
+Microsoft.Maintenance                   NotRegistered
+Microsoft.ManagedIdentity               NotRegistered
+Microsoft.ManagedServices               NotRegistered
+Microsoft.Management                    NotRegistered
+Microsoft.Maps                          NotRegistered
+Microsoft.Marketplace                   NotRegistered
+Microsoft.MarketplaceApps               NotRegistered
+Microsoft.MarketplaceOrdering           Registered
+Microsoft.Media                         NotRegistered
+Microsoft.Migrate                       NotRegistered
+Microsoft.MixedReality                  NotRegistered
+Microsoft.MobileNetwork                 NotRegistered
+Microsoft.NetApp                        NotRegistered
+Microsoft.NetworkFunction               NotRegistered    
+Microsoft.NotificationHubs              NotRegistered
+Microsoft.ObjectStore                   NotRegistered
+Microsoft.OffAzure                      NotRegistered
+Microsoft.OpenEnergyPlatform            NotRegistered
+Microsoft.OpenLogisticsPlatform         NotRegistered
+Microsoft.OperationsManagement          NotRegistered
+Microsoft.Orbital                       NotRegistered
+Microsoft.Peering                       NotRegistered
+Microsoft.PlayFab                       NotRegistered
+Microsoft.Portal                        Registered
+Microsoft.PowerBI                       NotRegistered
+Microsoft.PowerBIDedicated              NotRegistered
+Microsoft.PowerPlatform                 NotRegistered
+Microsoft.ProjectBabylon                NotRegistered
+Microsoft.ProviderHub                   NotRegistered
+Microsoft.Purview                       NotRegistered
+Microsoft.Quantum                       NotRegistered
+Microsoft.RecommendationsService        NotRegistered
+Microsoft.RecoveryServices              NotRegistered
+Microsoft.RedHatOpenShift               NotRegistered
+Microsoft.Relay                         NotRegistered
+Microsoft.ResourceConnector             NotRegistered
+Microsoft.ResourceGraph                 Registered
+Microsoft.Resources                     Registered
+Microsoft.SaaS                          NotRegistered
+Microsoft.Scheduler                     NotRegistered
+Microsoft.Scom                          NotRegistered
+Microsoft.ScVmm                         NotRegistered
+Microsoft.Search                        NotRegistered
+Microsoft.SecurityDetonation            NotRegistered
+Microsoft.SecurityInsights              NotRegistered
+Microsoft.SerialConsole                 Registered
+Microsoft.ServiceBus                    NotRegistered
+Microsoft.ServiceFabric                 NotRegistered
+Microsoft.ServiceFabricMesh             NotRegistered
+Microsoft.ServiceLinker                 NotRegistered    
+Microsoft.ServicesHub                   NotRegistered
+Microsoft.SignalRService                NotRegistered
+Microsoft.Singularity                   NotRegistered
+Microsoft.SoftwarePlan                  NotRegistered
+Microsoft.Solutions                     NotRegistered
+Microsoft.Sql                           NotRegistered
+Microsoft.SqlVirtualMachine             NotRegistered
+Microsoft.StorageCache                  NotRegistered
+Microsoft.StoragePool                   NotRegistered
+Microsoft.StorageSync                   NotRegistered
+Microsoft.StorSimple                    NotRegistered
+Microsoft.StreamAnalytics               NotRegistered
+Microsoft.Subscription                  NotRegistered
+microsoft.support                       Registered
+Microsoft.Synapse                       NotRegistered
+Microsoft.TestBase                      NotRegistered
+Microsoft.TimeSeriesInsights            NotRegistered
+Microsoft.VideoIndexer                  NotRegistered
+Microsoft.VirtualMachineImages          NotRegistered
+microsoft.visualstudio                  NotRegistered
+Microsoft.VMware                        NotRegistered
+Microsoft.VMwareCloudSimple             NotRegistered
+Microsoft.VSOnline                      NotRegistered    
+Microsoft.WindowsESU                    NotRegistered
+Microsoft.WindowsIoT                    NotRegistered
+Microsoft.WorkloadBuilder               NotRegistered
+Microsoft.WorkloadMonitor               NotRegistered
+Microsoft.Workloads                     NotRegistered
+NGINX.NGINXPLUS                         NotRegistered
+Pokitdok.Platform                       NotRegistered
+Wandisco.Fusion                         NotRegistered
+
+================ 
+256 Parameters limited in a template
+
+common template for storage creation
+{
+"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+"contentVersion": "1.0.0.0",
+"parameters": {
+"storageName": {
+"type": "string",
+"minLength": 3,
+"maxLength": 24
+},
+"storageSKU": {
+"type": "string",
+"defaultValue": "Standard_LRS",
+"allowedValues": [
+"Standard_LRS",
+"Standard_GRS",
+"Standard_RAGRS",
+"Standard_ZRS",
+"Premium_LRS",
+"Premium_ZRS",
+"Standard_GZRS",
+"Standard_RAGZRS"
+]
+}
+},
+"resources": [
+{
+"type": "Microsoft.Storage/storageAccounts",
+"apiVersion": "2021-04-01",
+"name": "[parameters('storageName')]",
+"location": "eastus",
+"sku": {
+"name": "[parameters('storageSKU')]"
+},
+"kind": "StorageV2",
+"properties": {
+"supportsHttpsTrafficOnly": true
+}
+}
+]
+}
+
+"outputs": {
+   "storageEndpoint": {
+       "type": "object",
+       "value": "[reference(parameters('storageName')).primaryEndpoints]"
+   }
+}
+
+output display like below menitoned
+
+Outputs                 :
+                          Name               Type                       Value
+                          =================  =========================  ==========
+                          storageEndpoint    Object                     {
+                            "dfs": "https://eiutoiewutiou.dfs.core.windows.net/",
+                            "web": "https://eiutoiewutiou.z19.web.core.windows.net/",
+                            "blob": "https://eiutoiewutiou.blob.core.windows.net/",
+                            "queue": "https://eiutoiewutiou.queue.core.windows.net/",
+                            "table": "https://eiutoiewutiou.table.core.windows.net/",
+                            "file": "https://eiutoiewutiou.file.core.windows.net/"
+-------------------------------------------------------------------------------------------------------------------------------------
+Variable : it is to greate storage account with prefix 
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storagePrefix": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 11
+    },
+    "storageSKU": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Standard_ZRS",
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GZRS",
+        "Standard_RAGZRS"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    }
+  },
+  "variables": {
+    "uniqueStorageName": "[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('uniqueStorageName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    }
+  ]
+}
+"outputs": {
+    "storageEndpoint": {
+      "type": "object",
+      "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
+    }
+  }
+}
+PS C:\> New-AzResourceGroupDeployment -DeploymentName "kushpoo" -ResourceGroupName "madhu" -Templatefile "storage5.json" 
+
+cmdlet New-AzResourceGroupDeployment at command pipeline position 1
+Supply values for the following parameters:
+(Type !? for Help.)
+storagePrefix: mad
+DeploymentName          : kushpoo
+ResourceGroupName       : madhu
+ProvisioningState       : Succeeded
+Timestamp               : 06-02-2022 12:07:48
+Mode                    : Incremental
+TemplateLink            :
+Parameters              :
+                          Name             Type                       Value     
+                          ===============  =========================  ==========
+                          storagePrefix    String                     mad
+                          storageSKU       String                     Standard_LRS
+                          location         String                     westus
+
+
+Outputs                 :
+                          Name               Type                       Value
+                          =================  =========================  ==========
+                          storageEndpoint    Object                     {
+                            "dfs": "https://mad4x3bq4tleead4.dfs.core.windows.net/",
+                            "web": "https://mad4x3bq4tleead4.z22.web.core.windows.net/",
+                            "blob": "https://mad4x3bq4tleead4.blob.core.windows.net/",
+                            "queue": "https://mad4x3bq4tleead4.queue.core.windows.net/",
+                            "table": "https://mad4x3bq4tleead4.table.core.windows.net/",
+                            "file": "https://mad4x3bq4tleead4.file.core.windows.net/"
+                          }
+DeploymentDebugLogLevel :
+
+
+PS C:\> Get-AzResourceGroup
+
+
+ResourceGroupName : Madhu
+Location          : westus
+ProvisioningState : Succeeded
+Tags              :
+ResourceId        : /subscriptions/fed95c52-b08a-4a4c-b750-3f5fdce752e0/resourceGroups/Madhu
+PS C:\> Get-AzResource -ResourceGroupName madhu | ft
+
+Name             ResourceGroupName ResourceType                      Location
+----             ----------------- ------------                      --------
+jk0001           madhu             Microsoft.Storage/storageAccounts westus
+mad4x3bq4tleead4 madhu             Microsoft.Storage/storageAccounts westus
+
+---------------------------------------------------------------
+Creating app service
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storagePrefix": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 11
+    },
+    "storageSKU": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Standard_ZRS",
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GZRS",
+        "Standard_RAGZRS"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "defaultValue": "exampleplan"
+    },
+    "webAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Base name of the resource such as web app name and app service plan "
+      },
+      "minLength": 2
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "php|7.0",
+      "metadata": {
+        "description": "The Runtime stack of current web app"
+      }
+    }
+  },
+  "variables": {
+    "uniqueStorageName": "[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]",
+    "webAppPortalName": "[concat(parameters('webAppName'), uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('uniqueStorageName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-12-01",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "B1",
+        "tier": "Basic",
+        "size": "B1",
+        "family": "B",
+        "capacity": 1
+      },
+      "kind": "linux",
+      "properties": {
+        "perSiteScaling": false,
+        "reserved": true,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('webAppPortalName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      ],
+      "kind": "app",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[parameters('linuxFxVersion')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "storageEndpoint": {
+      "type": "object",
+      "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
+    }
+  }
+}
+
+PS C:\> New-AzResourceGroup -Name monday
+
+cmdlet New-AzResourceGroup at command pipeline position 1
+Supply values for the following parameters:
+(Type !? for Help.)
+Location: east us
+
+
+ResourceGroupName : monday
+Location          : eastus
+ProvisioningState : Succeeded
+Tags              :
+ResourceId        : /subscriptions/fed95c52-b08a-4a4c-b750-3f5fdce752e0/resourceGroups/monday
+
+
+
+PS C:\> New-AzResourceGroupDeployment -DeploymentName "sunday" -ResourceGroupName "monday" -Templatefile "template.json"  
+
+cmdlet New-AzResourceGroupDeployment at command pipeline position 1
+Supply values for the following parameters:
+(Type !? for Help.)
+storagePrefix: mad
+webAppName: devoapp
+
+
+DeploymentName          : sunday
+ResourceGroupName       : monday
+ProvisioningState       : Succeeded
+Timestamp               : 06-02-2022 15:09:56
+Mode                    : Incremental
+TemplateLink            :
+Parameters              :
+                          Name                  Type                       Value
+                          ====================  =========================  ==========
+                          storagePrefix         String                     mad
+                          storageSKU            String                     Standard_LRS
+                          location              String                     eastus
+                          appServicePlanName    String                     exampleplan
+                          webAppName            String                     devoapp
+                          linuxFxVersion        String                     php|7.0
+
+Outputs                 :
+                          Name               Type                       Value
+                          =================  =========================  ==========
+                          storageEndpoint    Object                     {
+                            "dfs": "https://madgktb7cfssrltw.dfs.core.windows.net/",
+                            "web": "https://madgktb7cfssrltw.z13.web.core.windows.net/",
+                            "blob": "https://madgktb7cfssrltw.blob.core.windows.net/",
+                            "queue": "https://madgktb7cfssrltw.queue.core.windows.net/",
+                            "table": "https://madgktb7cfssrltw.table.core.windows.net/",
+                            "file": "https://madgktb7cfssrltw.file.core.windows.net/"
+                          }
+
+DeploymentDebugLogLevel :
+-----------------------------------------
+
+Adding tags in the deployment
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storagePrefix": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 11
+    },
+    "storageSKU": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Standard_ZRS",
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GZRS",
+        "Standard_RAGZRS"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "defaultValue": "exampleplan"
+    },
+    "webAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Base name of the resource such as web app name and app service plan "
+      },
+      "minLength": 2
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "php|7.0",
+      "metadata": {
+        "description": "The Runtime stack of current web app"
+      }
+    }
+  },
+  "variables": {
+    "uniqueStorageName": "[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]",
+    "webAppPortalName": "[concat(parameters('webAppName'), uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('uniqueStorageName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-12-01",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "B1",
+        "tier": "Basic",
+        "size": "B1",
+        "family": "B",
+        "capacity": 1
+      },
+      "kind": "linux",
+      "properties": {
+        "perSiteScaling": false,
+        "reserved": true,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('webAppPortalName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      ],
+      "kind": "app",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[parameters('linuxFxVersion')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "storageEndpoint": {
+      "type": "object",
+      "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
+    }
+  }
+}
+
+
+
+
+$templateFile = "{path-to-the-template-file}"
+$parameterFile="{path-to-azuredeploy.parameters.dev.json}"
+New-AzResourceGroup `
+  -Name myResourceGroupDev `
+  -Location "East US"
+New-AzResourceGroupDeployment `
+  -Name devenvironment `
+  -ResourceGroupName myResourceGroupDev `
+  -TemplateFile $templateFile `
+  -TemplateParameterFile $parameterFile
+
+or
+
+$templateFile = "c:\template.json"
+$parameterFile="c:\azuredeploy.parameters.dev.json"
+New-AzResourceGroup `
+  -Name myResourceGroupDev `
+  -Location "East US"
+New-AzResourceGroupDeployment `
+  -Name devenvironment `
+  -ResourceGroupName myResourceGroupDev `
+  -TemplateFile $templateFile `
+  -TemplateParameterFile $parameterFile
+
+or - prod deployment
+$templateFile = "c:\template.json"
+$parameterFile="c:\azuredeploy.parameters.prod.json"
+New-AzResourceGroup `
+  -Name myResourceGroupProd `
+  -Location "West US"
+New-AzResourceGroupDeployment `
+  -Name prodenvironment `
+  -ResourceGroupName myResourceGroupProd `
+  -TemplateFile $templateFile `
+  -TemplateParameterFile $parameterFile
+--------------------------------------------------------------------------------------------------
+https://github.com/jutyramesh/AzureRmPipeline-repo.git
+
+
+
+ARM template structure
+
+"parameters": {
+  "<parameter-name>" : {
+    "type" : "<type-of-parameter-value>",
+    "defaultValue": "<default-value-of-parameter>",
+    "allowedValues": [ "<array-of-allowed-values>" ],
+    "minValue": <minimum-value-for-int>,
+    "maxValue": <maximum-value-for-int>,
+    "minLength": <minimum-length-for-string-or-array>,
+    "maxLength": <maximum-length-for-string-or-array-parameters>,
+    "metadata": {
+      "description": "<description-of-the parameter>"
+    }
+  }
+}
+----------------------------------
+"variables": {
+  "<variable-name>": "<variable-value>",
+  "<variable-name>": {
+    <variable-complex-type-value>
+  },
+  "<variable-object-name>": {
+    "copy": [
+      {
+        "name": "<name-of-array-property>",
+        "count": <number-of-iterations>,
+        "input": <object-or-value-to-repeat>
+      }
+    ]
+  },
+  "copy": [
+    {
+      "name": "<variable-array-name>",
+      "count": <number-of-iterations>,
+      "input": <object-or-value-to-repeat>
+    }
+  ]
+}
+-----------------------------------
+
+"functions": [
+  {
+    "namespace": "<namespace-for-functions>",
+    "members": {
+      "<function-name>": {
+        "parameters": [
+          {
+            "name": "<parameter-name>",
+            "type": "<type-of-parameter-value>"
+          }
+        ],
+        "output": {
+          "type": "<type-of-output-value>",
+          "value": "<function-return-value>"
+        }
+      }
+    }
+  }
+],
+
+----------------------------------------------------------------
+"resources": [
+  {
+      "condition": "<true-to-deploy-this-resource>",
+      "type": "<resource-provider-namespace/resource-type-name>",
+      "apiVersion": "<api-version-of-resource>",
+      "name": "<name-of-the-resource>",
+      "comments": "<your-reference-notes>",
+      "location": "<location-of-resource>",
+      "dependsOn": [
+          "<array-of-related-resource-names>"
+      ],
+      "tags": {
+          "<tag-name1>": "<tag-value1>",
+          "<tag-name2>": "<tag-value2>"
+      },
+      "identity": {
+        "type": "<system-assigned-or-user-assigned-identity>",
+        "userAssignedIdentities": {
+          "<resource-id-of-identity>": {}
+        }
+      },
+      "sku": {
+          "name": "<sku-name>",
+          "tier": "<sku-tier>",
+          "size": "<sku-size>",
+          "family": "<sku-family>",
+          "capacity": <sku-capacity>
+      },
+      "kind": "<type-of-resource>",
+      "scope": "<target-scope-for-extension-resources>",
+      "copy": {
+          "name": "<name-of-copy-loop>",
+          "count": <number-of-iterations>,
+          "mode": "<serial-or-parallel>",
+          "batchSize": <number-to-deploy-serially>
+      },
+      "plan": {
+          "name": "<plan-name>",
+          "promotionCode": "<plan-promotion-code>",
+          "publisher": "<plan-publisher>",
+          "product": "<plan-product>",
+          "version": "<plan-version>"
+      },
+      "properties": {
+          "<settings-for-the-resource>",
+          "copy": [
+              {
+                  "name": ,
+                  "count": ,
+                  "input": {}
+              }
+          ]
+      },
+      "resources": [
+          "<array-of-child-resources>"
+      ]
+  }
+]
+------------------------------------------------
+"outputs": {
+  "<output-name>": {
+    "condition": "<boolean-value-whether-to-output-value>",
+    "type": "<type-of-output-value>",
+    "value": "<output-value-expression>",
+    "copy": {
+      "count": <number-of-iterations>,
+      "input": <values-for-the-variable>
+    }
+  }
+}
+------------------------------------------------------
+metadata
+
+"parameters": {
+  "adminUsername": {
+    "type": "string",
+    "metadata": {
+      "description": "User name for the Virtual Machine."
+    }
+  },
+-------------------------
+
+adding comments and metadata
+
+"resources": [
+  {
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2018-07-01",
+    "name": "[concat('storage', uniqueString(resourceGroup().id))]",
+    "comments": "Storage account used to store VM disks",
+    "location": "[parameters('location')]",
+    "metadata": {
+      "comments": "These tags are needed for policy compliance."
+    },
+    "tags": {
+      "Dept": "[parameters('deptName')]",
+      "Environment": "[parameters('environment')]"
+    },
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "Storage",
+    "properties": {}
+  }
+]
+-----------------------
+
+For outputs, add a metadata object to the output value.
+
+
+"outputs": {
+  "hostname": {
+    "type": "string",
+    "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]",
+    "metadata": {
+      "comments": "Return the fully qualified domain name"
+    }
+  },
+
+---------------------
+copy elements mentioned in resource used Outerelement
+mentioend in parameters/variable used inner input elements
+
+create multiple storage account using single ARM template
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "name": "[concat('storage',uniqueString(resourceGroup().id),copyIndex())]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            },
+            "copy": {
+                "name": "storageCopy",
+                "count": 3
+            }
+        }
+    ],
+    "outputs": {}
+}
+----------------------------------------------------------
+
+parameterized the storage count using storagecopy
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+   "parameters": {
+       "stroageCount":  {
+           "type": "int",
+           "defaultValue": 5
+       
+   }
+ },
+                    
+    "variables": {},
+    "resources": [
+        {
+            "name": "[concat('storage',uniqueString(resourceGroup().id),copyIndex())]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            },
+            "copy": {
+                "name": "storageCopy",
+                "count": "[parameters('stroageCount')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
+------------------------------------------------------------------------------
+passing the array names in parameters
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+   "parameters": {
+       "storage": {
+           "type": "array",
+           "defaultValue":[
+               "ramesh",
+               "aniru",
+               "parin",
+               "manju"
+           ]
+
+       }
+       
+   
+ },
+         
+          
+    "variables": {},
+    "resources": [
+        {
+            "name": "[concat('s',uniqueString(resourceGroup().id),parameters('storage')[copyIndex('storageCopy')])]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            },
+            "copy": {
+                "name": "storageCopy",
+                "count": "[length(parameters('storage'))]"
+            }
+        }
+    ],
+    "outputs": {}
+}
+------------------------------------------------------------------------------------
+DataFactory
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('storage', uniqueString(resourceGroup().id), copyIndex('copystorage'))]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "copy": {
+                "name": "copystorage",
+                "count": "[parameters('storageCount')]"
+            }
+        },
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "dependent-datafactory",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+-------------------------------------------------------------------------
+Blob storage using copy
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('storage', uniqueString(resourceGroup().id))]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('storage', uniqueString(resourceGroup().id), '/default/container', copyIndex('copycontainers', 1))]",
+            "copy": {
+                "name": "copycontainers",
+                "count": "[parameters('containerCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', concat('storage', uniqueString(resourceGroup().id)))]"
+            ]
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+-----------------------------------------------------------------------------------------
+Defining the variables 
+(same above example)
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {
+        "storageName": "[concat('storage', uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/container', copyIndex('copycontainers', 1))]",
+            "copy": {
+                "name": "copycontainers",
+                "count": "[parameters('containerCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ]
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+--------------------------------------------------------------------------
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {
+        "storageName": "[concat('storage', uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/container', copyIndex('copycontainers', 1))]",
+            "copy": {
+                "name": "copycontainers",
+                "count": "[parameters('containerCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ]
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+--------------------------------------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {
+        "storageName": "[concat('storage', uniqueString(resourceGroup().id))]",
+        "copy": [
+            {
+                "name": "containerNames",
+                "input": "[concat(variables('storageName'), '/default/container', copyIndex('containerNames', 1))]",
+                "count": "[parameters('containerCount')]"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('containerNames')[copyIndex('copycontainers')]]",
+            "copy": {
+                "name": "copycontainers",
+                "count": "[length(variables('containerNames'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ]
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+
+-----------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('storage', uniqueString(resourceGroup().id), copyIndex('copystorage', 1))]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "copy": {
+                "name": "copystorage",
+                "count": "[parameters('storageCount')]"
+            }
+        }
+    ],
+    "outputs": {
+        "storageEndpoints": {
+            "type": "array",
+            "copy": {
+                "count": "[parameters('storageCount')]",
+                "input": "[reference(concat('storage', uniqueString(resourceGroup().id), copyIndex(1))).primaryEndpoints.blob]"
+            }
+        }
+    },
+    "functions": []
+}
+-------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "planName": {
+            "type": "string",
+            "defaultValue": "mywebappplan"
+        },
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "mywebapp"
+        },
+        "storageCount": {
+            "type": "int",
+            "defaultValue": 3
+        }
+    },
+    "variables": {
+        "planName": "[concat(parameters('planName'), uniqueString(resourceGroup().id))]",
+        "webAppName": "[concat(parameters('webAppName'), uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('storage', uniqueString(resourceGroup().id), copyIndex('copystorage', 1))]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "copy": {
+                "name": "copystorage",
+                "count": "[parameters('storageCount')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('planName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1"
+            }
+        },
+        {
+            "type":"Microsoft.Web/sites",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('webAppName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "copystorage"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "siteConfig": {
+                    "copy": [
+                        {
+                            "name": "appSettings",
+                            "count": "[parameters('storageCount')]",
+                            "input": {
+                                "name": "[concat('storageAccessKey', copyIndex('appSettings'))]",
+                                "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', concat('storage', uniqueString(resourceGroup().id), copyIndex('appSettings', 1))), '2019-06-01').keys[0].value]"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+-----------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+------------------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "storageAccountName": "[if(not(empty(parameters('storageAccountName'))), parameters('storageAccountName'), 'storage')]"
+    },
+    "resources": [
+        {
+            "condition": "[not(empty(parameters('storageAccountName')))]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+--------------------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "storageAccountName": "[if(not(empty(parameters('storageAccountName'))), parameters('storageAccountName'), 'storage')]"
+    },
+    "resources": [
+        {
+            "condition": "[not(empty(parameters('storageAccountName')))]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[concat('appserviceplan-',uniqueString(resourceGroup().id))]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1"
+            }
+        },
+        {
+            "type":"Microsoft.Web/sites",
+            "apiVersion": "2018-02-01",
+            "name": "[concat('appservice-',uniqueString(resourceGroup().id))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', concat('appserviceplan-',uniqueString(resourceGroup().id)))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat('appserviceplan-',uniqueString(resourceGroup().id)))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "storageAccessKey",
+                            "value": "[if(not(empty(parameters('storageAccountName'))),listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value,'')]"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+-------------------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "deployStorage": "[not(empty(parameters('storageAccountName')))]",
+        "storageAccountName": "[if(variables('deployStorage'), parameters('storageAccountName'), 'storage')]"
+    },
+    "resources": [
+        {
+            "condition": "[variables('deployStorage')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[concat('appserviceplan-',uniqueString(resourceGroup().id))]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1"
+            }
+        },
+        {
+            "type":"Microsoft.Web/sites",
+            "apiVersion": "2018-02-01",
+            "name": "[concat('appservice-',uniqueString(resourceGroup().id))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', concat('appserviceplan-',uniqueString(resourceGroup().id)))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat('appserviceplan-',uniqueString(resourceGroup().id)))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "storageAccessKey",
+                            "value": "[if(variables('deployStorage'),listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value,'')]"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
+------------------------------------------------------------------------------
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allowAzureIPs": {
+            "type": "string",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
+        "adminLogin": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "serverName": "[concat('sql-server-', uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[variables('serverName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('adminLogin')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]",
+                "version": "12.0"
+            },
+            "resources": [
+                {
+                    "condition": "[equals(parameters('allowAzureIPs'), 'Yes')]",
+                    "type": "firewallRules",
+                    "apiVersion": "2015-05-01-preview",
+                    "name": "AllowAllWindowsAzureIps",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers/', variables('serverName'))]"
+                    ],
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+    },
+    "functions": [
+    ]
+}
+----------------------------------------------------------------------------
+
+brG#=C@H739zapu
+A3106026-MSP02@eydev.net
+-----------------------------------------------------------------------
+
+AKIAQX2QOH26UQOIIXNC
+4odoTC3dNNgRvE6Plf6up1oD3hytlb9kk8R6Thx7
